@@ -22,13 +22,36 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+
+// Enum defines the ROUTES for navigation
+enum class OkaneWariScreen(){
+    Home,
+    Party
+}
 
 @Composable
-fun OkaniWariApp(){
+fun OkaneWariApp(
+    navController: NavHostController = rememberNavController()
+){
     // TODO Get info
     val myPartys = DummyPartyData()
 
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+        NavHost(
+            navController = navController,
+            startDestination = OkaneWariScreen.Home.name,
+            modifier = Modifier.padding(innerPadding)
+        ){
+            composable(route = OkaneWariScreen.Home.name) {
+                PartyScreen(
+                    // TODO pass in the party selected
+                )
+            }
+        }
         LazyColumn(
             modifier = Modifier.padding(innerPadding)
         ) {
@@ -45,7 +68,7 @@ fun DisplayPartyCard(party: Party) {
     Log.d("Main Act.", "Displaying party card.")
     Card (
         modifier = Modifier.fillMaxSize().padding(12.dp).clickable {
-            Log.d("Main Act.", "Party Selected")
+            Log.d("Main Act.", "$party Selected")
         }
     ){
         Row(
@@ -63,13 +86,12 @@ fun DisplayPartyCard(party: Party) {
                     fontSize = 32.sp,
                     textAlign = TextAlign.Center,
                     maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
         }
     }
 }
-
 
 
 // TODO move to separate dummy data file
