@@ -21,13 +21,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.okanewari.data.DummyPartyData
 
 @Composable
 fun ListPartysScreen(
     onPartyCardClicked: () -> Unit,
     modifier: Modifier = Modifier
 ){
-    // TODO Get info
+    // TODO Get info passed by click
     val myPartys = DummyPartyData()
 
     LazyColumn(
@@ -69,20 +70,4 @@ fun DisplayPartyCard(party: Party, myClick: () -> Unit,) {
             }
         }
     }
-}
-
-
-// TODO move to separate dummy data file
-fun DummyPartyData(): List<Party> {
-    return listOf(
-        Party(name = "Sapporo 2024"),
-        Party(name = "Shimanamikaido 2024"),
-        Party(name = "Osaka 2023"),
-        Party(name = "Fukuoka 2023"),
-        Party(name = "Koreaaaaaaaaaaaaaaaaaaaaa 2024"),
-        Party(name = "2022 Tokyo"),
-        Party(name = "Korea"),
-        Party(name = "Kyoto"),
-        Party(name = "Kobe")
-    )
 }
