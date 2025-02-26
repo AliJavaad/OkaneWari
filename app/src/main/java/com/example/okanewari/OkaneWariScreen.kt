@@ -29,82 +29,36 @@ import androidx.navigation.compose.rememberNavController
 
 // Enum defines the ROUTES for navigation
 enum class OkaneWariScreen(){
-    Home,
-    Party
+    ListPartys,
+    IndivParty
 }
 
 @Composable
 fun OkaneWariApp(
     navController: NavHostController = rememberNavController()
 ){
-    // TODO Get info
-    val myPartys = DummyPartyData()
-
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         NavHost(
+            // Initialize the navController to the party list view
             navController = navController,
-            startDestination = OkaneWariScreen.Home.name,
+            startDestination = OkaneWariScreen.ListPartys.name,
             modifier = Modifier.padding(innerPadding)
         ){
-            composable(route = OkaneWariScreen.Home.name) {
-                PartyScreen(
+            // Setting up navigation routes for each enum defined in OkaneWariScreen
+            composable(route = OkaneWariScreen.ListPartys.name) {
+                ListPartysScreen(
                     // TODO pass in the party selected
+                    onPartyCardClicked = {
+                        // get the party data
+                        navController.navigate(OkaneWariScreen.IndivParty.name)
+                    }
                 )
             }
-        }
-        LazyColumn(
-            modifier = Modifier.padding(innerPadding)
-        ) {
-            items(myPartys) {
-                DisplayPartyCard(it)
-            }
-        }
-    }
-
-}
-
-@Composable
-fun DisplayPartyCard(party: Party) {
-    Log.d("Main Act.", "Displaying party card.")
-    Card (
-        modifier = Modifier.fillMaxSize().padding(12.dp).clickable {
-            Log.d("Main Act.", "$party Selected")
-        }
-    ){
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ){
-            Image(
-                painter = painterResource(id = R.drawable.baseline_groups_24),
-                contentDescription = "Photo of a person",
-                modifier = Modifier.width(100.dp).height(100.dp).padding(all = 12.dp)
-            )
-            Column{
-                Text(
-                    // TODO align text in the column
-                    text = party.name,
-                    fontSize = 32.sp,
-                    textAlign = TextAlign.Center,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
+            composable(route = OkaneWariScreen.IndivParty.name) {
+                PartyScreen(
+                    onNextButtonClicked = {}
                 )
             }
         }
     }
-}
-
-
-// TODO move to separate dummy data file
-fun DummyPartyData(): List<Party> {
-    return listOf(
-        Party(name = "Sapporo 2024"),
-        Party(name = "Shimanamikaido 2024"),
-        Party(name = "Osaka 2023"),
-        Party(name = "Fukuoka 2023"),
-        Party(name = "Koreaaaaaaaaaaaaaaaaaaaaa 2024"),
-        Party(name = "2022 Tokyo"),
-        Party(name = "Korea"),
-        Party(name = "Kyoto"),
-        Party(name = "Kobe")
-    )
 }
