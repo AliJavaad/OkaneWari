@@ -37,3 +37,23 @@ fun GreetingPreview() {
         Greeting("Android")
     }
 }
+
+/*
+NOTES:
+
+Party List table reqs.
+    PartyName: Parties should be able to have the same name
+    EntryTableKey: Key to the entry table
+
+Entry list table
+    Entry number:
+    Name of Expense:
+    Total Amount:
+    Date: WAL
+    Member_1: (Amount paid by member x)
+    Member_2:
+    Member_3: (Creating a new member would create a new column in the table)
+
+    max member number = 15?
+    max entries?
+ */

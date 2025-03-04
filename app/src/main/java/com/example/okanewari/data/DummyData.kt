@@ -18,7 +18,7 @@ fun DummyPartyData(): List<Party> {
 
 fun GetDummyExpenses(): Party{
     val myParty = Party(name = "Dummy Party")
-    for (i in 1..5){
+    for (i in 1..50){
         myParty.addExpense()
     }
     return myParty
