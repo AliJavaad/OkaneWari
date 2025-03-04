@@ -21,6 +21,7 @@ enum class OkaneWariScreen(){
 fun OkaneWariApp(
     navController: NavHostController = rememberNavController()
 ){
+    // The view
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         NavHost(
             // Initialize the navController to the party list view
