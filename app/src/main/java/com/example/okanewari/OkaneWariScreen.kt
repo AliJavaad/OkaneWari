@@ -1,6 +1,5 @@
 package com.example.okanewari
 
-import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -10,11 +9,17 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.okanewari.ui.AddExpenseScreen
+import com.example.okanewari.ui.AddPartyScreen
+import com.example.okanewari.ui.ListPartysScreen
+import com.example.okanewari.ui.PartyScreen
 
 // Enum defines the ROUTES for navigation
 enum class OkaneWariScreen(){
     ListPartys,
-    IndivParty
+    ShowParty,
+    AddParty,
+    AddExpense
 }
 
 @Composable
@@ -35,13 +40,30 @@ fun OkaneWariApp(
                     // TODO pass in the party selected
                     onPartyCardClicked = {
                         // get the party data
-                        navController.navigate(OkaneWariScreen.IndivParty.name)
+                        navController.navigate(OkaneWariScreen.ShowParty.name)
+                    },
+                    onAddPartyButtonClicked = {
+                        navController.navigate(OkaneWariScreen.AddParty.name)
                     }
                 )
             }
-            composable(route = OkaneWariScreen.IndivParty.name) {
+            composable(route = OkaneWariScreen.AddParty.name){
+                AddPartyScreen(
+                    onDoneButtonClicked = {},
+                    onCancelButtonClicked = {}
+                )
+            }
+            composable(route = OkaneWariScreen.ShowParty.name) {
                 PartyScreen(
-                    onNextButtonClicked = {}
+                    onAddExpenseButtonClicked = {
+                        navController.navigate(OkaneWariScreen.AddExpense.name)
+                    }
+                )
+            }
+            composable(route = OkaneWariScreen.AddExpense.name) {
+                AddExpenseScreen(
+                    onDoneButtonClicked = {},
+                    onCancelButtonClicked = {}
                 )
             }
         }
