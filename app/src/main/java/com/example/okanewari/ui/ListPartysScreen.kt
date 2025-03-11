@@ -28,7 +28,7 @@ import com.example.okanewari.ui.components.FabSize
 
 @Composable
 fun ListPartysScreen(
-    onPartyCardClicked: () -> Unit,
+    onPartyCardClicked: (String) -> Unit,
     onAddPartyButtonClicked: () -> Unit,
     modifier: Modifier = Modifier
 ){
@@ -48,7 +48,8 @@ fun ListPartysScreen(
 
 @Composable
 fun DisplayParties(
-    partys: List<Party>, myClick: () -> Unit
+    partys: List<Party>,
+    myClick: (String) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier
@@ -59,7 +60,7 @@ fun DisplayParties(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(dimensionResource(R.dimen.medium_padding))
-                    .clickable(onClick = myClick)
+                    .clickable(onClick = { myClick(it.name) },)
             ){
                 Row(
                     verticalAlignment = Alignment.CenterVertically

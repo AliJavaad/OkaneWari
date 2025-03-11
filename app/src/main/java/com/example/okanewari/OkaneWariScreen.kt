@@ -1,5 +1,6 @@
 package com.example.okanewari
 
+import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -14,9 +15,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -25,6 +28,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.okanewari.ui.AddExpenseScreen
 import com.example.okanewari.ui.AddPartyScreen
 import com.example.okanewari.ui.ListPartysScreen
+import com.example.okanewari.ui.OkaneViewModel
 import com.example.okanewari.ui.PartyScreen
 
 // Enum defines the ROUTES for navigation
@@ -42,13 +46,20 @@ enum class OkaneWariScreen(val title: Int){
 @Composable
 fun OkaneWariAppBar(
     currentScreen: OkaneWariScreen,
+    currParty: String,
     canNavigateBack: Boolean,
     navigateUp: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    // Check if the currentScreen is on a 'party screen' and set name accordingly
+    var title = stringResource(currentScreen.title)
+    val showPartyName = stringResource(OkaneWariScreen.ShowParty.title)
+    if (title == showPartyName){
+        title = currParty
+    }
     TopAppBar(
         // TODO change the title depending on the party name
-        title = { Text(stringResource(currentScreen.title)) },
+        title = { Text(title) },
         colors = TopAppBarDefaults.mediumTopAppBarColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer
         ),
@@ -69,6 +80,7 @@ fun OkaneWariAppBar(
 
 @Composable
 fun OkaneWariApp(
+    owViewModel: OkaneViewModel = viewModel(),
     navController: NavHostController = rememberNavController()
 ){
     // Get current back stack entry
@@ -77,17 +89,22 @@ fun OkaneWariApp(
     val currentScreen = OkaneWariScreen.valueOf(
         backStackEntry?.destination?.route ?: OkaneWariScreen.ListPartys.name
     )
+    val uiState by owViewModel.uiState.collectAsState()
+
     // The view
     Scaffold(
+
         // Creating the top app bar
         topBar = {
             OkaneWariAppBar(
                 currentScreen = currentScreen,
+                currParty = uiState.currentPartyName,
                 canNavigateBack = navController.previousBackStackEntry != null,
                 navigateUp = { navController.navigateUp() }
             )
         }
     ) { innerPadding ->
+
         NavHost(
             // Initialize the navController to the party list view
             navController = navController,
@@ -100,6 +117,7 @@ fun OkaneWariApp(
                     // TODO pass in the party selected
                     onPartyCardClicked = {
                         // get the party data
+                        owViewModel.setCurrentPartyName(it)
                         navController.navigate(OkaneWariScreen.ShowParty.name)
                     },
                     onAddPartyButtonClicked = {
