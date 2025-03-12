@@ -4,7 +4,7 @@
     <string name="home_screen">My Parties</string>
     <string name="add_party">Add a new Party</string>
     <string name="add_expense">Add a new Expense</string>
-    <string name="my_party">Party Name</string>
+    <string name="party_name">Party Name</string>
     <!-- Misc -->
     <string name="done">Done</string>
     <string name="cancel">Cancel</string>
