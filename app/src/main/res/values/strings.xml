@@ -1,11 +1,13 @@
 <resources>
     <!-- Screen names -->
     <string name="app_name">OkaneWari</string>
-    <string name="home_screen">My Parties</string>
-    <string name="add_party">Add a new Party</string>
-    <string name="add_expense">Add a new Expense</string>
+    <string name="my_parties">My Parties</string>
+    <string name="add_new_party">Add a new Party</string>
+    <string name="add_new_expense">Add a new Expense</string>
     <string name="party_name">Party Name</string>
-    <!-- Misc -->
+    <!-- Text holderes -->
+    <string name="my_party">My Party</string>
+    <!-- Buttons -->
     <string name="done">Done</string>
     <string name="cancel">Cancel</string>
     <string name="back_button">Back</string>

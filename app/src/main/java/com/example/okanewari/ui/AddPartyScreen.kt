@@ -7,6 +7,10 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -17,16 +21,18 @@ import com.example.okanewari.ui.components.DoneAndCancelButtons
 @Composable
 fun AddPartyScreen(
     onDoneButtonClicked: () -> Unit,
-    onCancelButtonClicked: () -> Unit,
-    modifier: Modifier = Modifier
+    onCancelButtonClicked: () -> Unit
 ){
+    var toName by remember { mutableStateOf("") }
     Column(
         modifier = Modifier.padding(dimensionResource(R.dimen.medium_padding))
     ){
         TextField(
-            value = "Fix me",
-            onValueChange = { },
+            value = toName,
+            onValueChange = { toName = it },
             label = { Text(stringResource(R.string.party_name)) },
+            placeholder = { Text(stringResource(R.string.my_party)) },
+            singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
         DoneAndCancelButtons(
@@ -34,5 +40,4 @@ fun AddPartyScreen(
             cancelButtonClick = onCancelButtonClicked
         )
     }
-
 }

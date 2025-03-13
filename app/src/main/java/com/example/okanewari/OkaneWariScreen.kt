@@ -30,10 +30,10 @@ import com.example.okanewari.ui.PartyScreen
 
 // Enum defines the ROUTES for navigation
 enum class OkaneWariScreen(val title: Int){
-    ListPartys(title = R.string.home_screen),
+    ListPartys(title = R.string.my_parties),
     ShowParty(title = R.string.party_name),
-    AddParty(title = R.string.add_party),
-    AddExpense(title = R.string.add_expense)
+    AddParty(title = R.string.add_new_party),
+    AddExpense(title = R.string.add_new_expense)
 }
 
 /**
@@ -101,7 +101,6 @@ fun OkaneWariApp(
             )
         }
     ) { innerPadding ->
-
         NavHost(
             // Initialize the navController to the party list view
             navController = navController,

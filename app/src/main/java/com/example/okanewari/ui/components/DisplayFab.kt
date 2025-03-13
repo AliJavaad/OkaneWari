@@ -44,7 +44,7 @@ fun DisplayFab(
                         .padding(all = dimensionResource(R.dimen.medium_padding))
                         .align(alignment)
                 ) {
-                    Icon(icon, stringResource( R.string.add_party))
+                    Icon(icon, stringResource( R.string.add_new_party))
                 }
             }
             FabSize.SMALL -> {
@@ -55,7 +55,7 @@ fun DisplayFab(
                         .padding(all = dimensionResource(R.dimen.medium_padding))
                         .align(alignment)
                 ) {
-                    Icon(icon, stringResource( R.string.add_party))
+                    Icon(icon, stringResource( R.string.add_new_party))
                 }
             }
             FabSize.NORMAL -> {
@@ -66,7 +66,7 @@ fun DisplayFab(
                         .padding(all = dimensionResource(R.dimen.medium_padding))
                         .align(alignment)
                 ) {
-                    Icon(icon, stringResource(R.string.add_party))
+                    Icon(icon, stringResource(R.string.add_new_party))
                 }
             }
         }
