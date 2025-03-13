@@ -5,15 +5,17 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 
 class PartyHolderViewModel(
-    private val dao: PartyHolderDao
+    private val dao: PartyDao
 ): ViewModel() {
     // Adds dummy data for testing purposes
     fun addDummyData() {
         val nameList = DummyPartyNameList()
         viewModelScope.launch {
             nameList.forEach {
-                val newDataToAdd = PartyHolderModel(
-                    partyName = it
+                val newDataToAdd = PartyModel(
+                    partyName = it,
+                    currency = "$",
+                    numberOfMembers = 1
                 )
                 dao.upsertPartyListModel(newDataToAdd)
             }
@@ -23,7 +25,13 @@ class PartyHolderViewModel(
     // entryTableName param is left empty as no entries are in yet
     fun addData(name: String){
         viewModelScope.launch{
-            dao.upsertPartyListModel(PartyHolderModel(partyName = name))
+            dao.upsertPartyListModel(
+                PartyModel(
+                    partyName = name,
+                    currency = "$",
+                    numberOfMembers = 1
+                )
+            )
         }
     }
 }
