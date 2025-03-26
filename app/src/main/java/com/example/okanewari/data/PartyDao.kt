@@ -22,11 +22,6 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface PartyDao {
-    // this will either insert the object if it doesn't exist
-    // or update the object if it does already exists in the database
-    @Upsert
-    suspend fun upsertPartyListModel(partyListModel: PartyModel)
-
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(party: PartyModel)
 
@@ -36,13 +31,13 @@ interface PartyDao {
     @Delete
     suspend fun delete(party: PartyModel)
 
-    @Query("SELECT * from partymodel WHERE id = :id")
+    @Query("SELECT * from party_table WHERE id = :id")
     fun getParty(id: Int): Flow<PartyModel>
 
-    @Query("SELECT * from partymodel")
+    @Query("SELECT * from party_table")
     fun getAllRecords(): Flow<List<PartyModel>>
 
-    @Query("SELECT partyName from partymodel")
+    @Query("SELECT partyName from party_table")
     fun getAllNames(): Flow<List<String>>
 
     @RawQuery(observedEntities = [PartyModel::class])

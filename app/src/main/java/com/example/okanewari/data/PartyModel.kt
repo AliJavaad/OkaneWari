@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 /**
  * Entity data class represents a single row in the database.
  */
-@Entity
+@Entity(tableName = "party_table")
 data class PartyModel (
     /**
      * [id]: Unique key so partys can have same name
