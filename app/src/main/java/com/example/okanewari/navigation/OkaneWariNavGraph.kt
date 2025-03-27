@@ -1,6 +1,7 @@
 package com.example.okanewari.navigation
 
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -15,6 +16,9 @@ import com.example.okanewari.ui.ListPartiesDestination
 import com.example.okanewari.ui.ListPartysScreen
 import com.example.okanewari.ui.ListExpensesScreen
 
+/**
+ * Holds the navigation for the app.
+ */
 @Composable
 fun OkaneWariNavHost(
     navController: NavHostController,
@@ -30,12 +34,8 @@ fun OkaneWariNavHost(
         composable(route = ListPartiesDestination.route) {
             ListPartysScreen(
                 // TODO pass in the party selected
-                onPartyCardClicked = {
-                    navController.navigate(ListExpensesDestination.route)
-                },
-                onAddPartyButtonClicked = {
-                    navController.navigate(AddPartyDestination.route)
-                }
+                onPartyCardClicked = { navController.navigate(ListExpensesDestination.route) },
+                onAddPartyButtonClicked = { navController.navigate(AddPartyDestination.route) }
             )
         }
         composable(route = AddPartyDestination.route){

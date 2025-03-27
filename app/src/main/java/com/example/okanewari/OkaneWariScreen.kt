@@ -5,6 +5,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarScrollBehavior
@@ -48,9 +49,10 @@ fun OkaneWareTopAppBar(
 
 @Composable
 fun OkaneWariApp(
-    owViewModel: OkaneViewModel = viewModel(),
     navController: NavHostController = rememberNavController()
 ){
-    val uiState by owViewModel.uiState.collectAsState()
-    OkaneWariNavHost(navController = navController)
+    // TODO Temp solution to fix screen navigation flicker. May interfere with custom backgrounds
+    Surface {
+        OkaneWariNavHost(navController = navController)
+    }
 }
