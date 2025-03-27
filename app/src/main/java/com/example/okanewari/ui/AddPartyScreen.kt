@@ -15,8 +15,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import com.example.okanewari.R
+import com.example.okanewari.navigation.NavigationDestination
 import com.example.okanewari.ui.components.DoneAndCancelButtons
 
+
+object AddPartyDestination: NavigationDestination{
+    override val route = "add_new_party"
+    override val titleRes = R.string.add_new_party
+}
 
 @Composable
 fun AddPartyScreen(

@@ -23,8 +23,14 @@ import androidx.compose.ui.unit.sp
 import com.example.okanewari.Party
 import com.example.okanewari.R
 import com.example.okanewari.data.DummyPartyData
+import com.example.okanewari.navigation.NavigationDestination
 import com.example.okanewari.ui.components.DisplayFab
 import com.example.okanewari.ui.components.FabSize
+
+object ListPartiesDestination : NavigationDestination {
+    override val route = "list_parties"
+    override val titleRes = R.string.list_parties
+}
 
 @Composable
 fun ListPartysScreen(

@@ -14,11 +14,18 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.example.okanewari.R
 import com.example.okanewari.data.GetDummyExpenses
+import com.example.okanewari.navigation.NavigationDestination
 import com.example.okanewari.ui.components.DisplayFab
 
+object ListExpensesDestination : NavigationDestination {
+    override val route = "list_expenses"
+    override val titleRes = R.string.list_expenses
+}
+
 @Composable
-fun PartyScreen(
+fun ListExpensesScreen(
     onAddExpenseButtonClicked: () -> Unit,
     modifier: Modifier = Modifier
 ){
