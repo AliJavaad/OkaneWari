@@ -1,5 +1,6 @@
 package com.example.okanewari.navigation
 
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -23,7 +24,7 @@ fun OkaneWariNavHost(
         // Initialize the navController to the party list view
         navController = navController,
         startDestination = ListPartiesDestination.route,
-        modifier = Modifier
+        modifier = Modifier.fillMaxSize()
     ){
         // Setting up navigation routes for each enum defined in OkaneWariScreen
         composable(route = ListPartiesDestination.route) {
@@ -40,20 +41,19 @@ fun OkaneWariNavHost(
         composable(route = AddPartyDestination.route){
             AddPartyScreen(
                 onDoneButtonClicked = {},
-                onCancelButtonClicked = {}
+                onCancelButtonClicked = { navController.navigate(ListPartiesDestination.route) }
             )
         }
         composable(route = ListExpensesDestination.route) {
             ListExpensesScreen(
-                onAddExpenseButtonClicked = {
-                    navController.navigate(AddExpenseDestination.route)
-                }
+                onAddExpenseButtonClicked = { navController.navigate(AddExpenseDestination.route) },
+                navigateBack = { navController.navigate(ListPartiesDestination.route) }
             )
         }
         composable(route = AddExpenseDestination.route) {
             AddExpenseScreen(
                 onDoneButtonClicked = {},
-                onCancelButtonClicked = {}
+                onCancelButtonClicked = { navController.navigate(ListExpensesDestination.route) }
             )
         }
     }

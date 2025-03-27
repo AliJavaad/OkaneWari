@@ -11,15 +11,21 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
+import com.example.okanewari.OkaneWareTopAppBar
 import com.example.okanewari.Party
 import com.example.okanewari.R
 import com.example.okanewari.data.DummyPartyData
@@ -32,6 +38,7 @@ object ListPartiesDestination : NavigationDestination {
     override val titleRes = R.string.list_parties
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListPartysScreen(
     onPartyCardClicked: (String) -> Unit,
@@ -41,15 +48,32 @@ fun ListPartysScreen(
     // TODO Get info passed by click
     val myPartys = DummyPartyData()
 
-    Column(
-        modifier = Modifier
-    ){
-        DisplayParties(myPartys, onPartyCardClicked)
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+    Scaffold (
+        modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {
+            OkaneWareTopAppBar(
+                title = stringResource(ListPartiesDestination.titleRes),
+                canNavigateBack = false,
+                scrollBehavior = scrollBehavior
+            )
+        },
+        floatingActionButton = {
+            DisplayFab(
+                myClick = onAddPartyButtonClicked,
+                fabSize = FabSize.LARGE
+            )
+        }
+    ){ innerPadding ->
+        Column(
+            modifier = Modifier.padding(innerPadding)
+        ){
+            DisplayParties(myPartys, onPartyCardClicked)
+
+        }
+
     }
-    DisplayFab(
-        myClick = onAddPartyButtonClicked,
-        fabSize = FabSize.LARGE
-    )
+
 }
 
 @Composable

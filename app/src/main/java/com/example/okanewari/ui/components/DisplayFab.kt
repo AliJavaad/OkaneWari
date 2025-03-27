@@ -28,46 +28,38 @@ enum class FabSize(){
 @Composable
 fun DisplayFab(
     myClick: () -> Unit,
-    alignment: Alignment = Alignment.BottomEnd,
     icon: ImageVector = Icons.Filled.Add,
     fabSize: FabSize = FabSize.NORMAL
 ){
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ){
-        when (fabSize) {
-            FabSize.LARGE -> {
-                LargeFloatingActionButton(
-                    onClick = myClick,
-                    shape = CircleShape,
-                    modifier = Modifier
-                        .padding(all = dimensionResource(R.dimen.medium_padding))
-                        .align(alignment)
-                ) {
-                    Icon(icon, stringResource( R.string.add_new_party))
-                }
+    when (fabSize) {
+        FabSize.LARGE -> {
+            LargeFloatingActionButton(
+                onClick = myClick,
+                shape = CircleShape,
+                modifier = Modifier
+                    .padding(all = dimensionResource(R.dimen.medium_padding))
+            ) {
+                Icon(icon, stringResource( R.string.add_new_party))
             }
-            FabSize.SMALL -> {
-                SmallFloatingActionButton(
-                    onClick = myClick,
-                    shape = CircleShape,
-                    modifier = Modifier
-                        .padding(all = dimensionResource(R.dimen.medium_padding))
-                        .align(alignment)
-                ) {
-                    Icon(icon, stringResource( R.string.add_new_party))
-                }
+        }
+        FabSize.SMALL -> {
+            SmallFloatingActionButton(
+                onClick = myClick,
+                shape = CircleShape,
+                modifier = Modifier
+                    .padding(all = dimensionResource(R.dimen.medium_padding))
+            ) {
+                Icon(icon, stringResource( R.string.add_new_party))
             }
-            FabSize.NORMAL -> {
-                FloatingActionButton(
-                    onClick = myClick,
-                    shape = CircleShape,
-                    modifier = Modifier
-                        .padding(all = dimensionResource(R.dimen.medium_padding))
-                        .align(alignment)
-                ) {
-                    Icon(icon, stringResource(R.string.add_new_party))
-                }
+        }
+        FabSize.NORMAL -> {
+            FloatingActionButton(
+                onClick = myClick,
+                shape = CircleShape,
+                modifier = Modifier
+                    .padding(all = dimensionResource(R.dimen.medium_padding))
+            ) {
+                Icon(icon, stringResource(R.string.add_new_party))
             }
         }
     }
