@@ -5,7 +5,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.example.okanewari.data.PartyModel
-import com.example.okanewari.data.PartyRepository
 
 /**
  * ViewModel to validate and insert Party in the Room database.
@@ -14,16 +13,20 @@ class AddPartyViewModel(
     // private val partyRepository: PartyRepository
 ): ViewModel() {
 
-    var partyUiState by mutableStateOf(PartyUiState())
+    var partyUiState by mutableStateOf(AddPartyUiState())
         private set
 
     /**
      * Updates the [partyUiState] with the value provided in the argument.
      * This method also triggers a validation for input values.
      */
-    fun updateUiState(partyDetails: PartyDetails) {
+    fun updateUiState(partyDetails: PartyDetails, currencyDropdown: Boolean) {
         partyUiState =
-            PartyUiState(partyDetails = partyDetails, isEntryValid = validateInput(partyDetails))
+            AddPartyUiState(
+                partyDetails = partyDetails,
+                isEntryValid = validateInput(partyDetails),
+                currencyDropdown = currencyDropdown
+                )
     }
 
 //    suspend fun saveItem() {
@@ -42,9 +45,10 @@ class AddPartyViewModel(
 /**
  * Represents Ui State for a Party.
  */
-data class PartyUiState(
+data class AddPartyUiState(
     val partyDetails: PartyDetails = PartyDetails(),
-    val isEntryValid: Boolean = false
+    val isEntryValid: Boolean = false,
+    val currencyDropdown: Boolean = false
 )
 
 data class PartyDetails(
@@ -67,9 +71,9 @@ fun PartyDetails.toPartyModel(): PartyModel = PartyModel(
 )
 
 /**
- * Extension function to convert [PartyModel] to [PartyUiState]
+ * Extension function to convert [PartyModel] to [AddPartyUiState]
  */
-fun PartyModel.toPartyUiState(isEntryValid: Boolean = false): PartyUiState = PartyUiState(
+fun PartyModel.toPartyUiState(isEntryValid: Boolean = false): AddPartyUiState = AddPartyUiState(
     partyDetails = this.toPartyDetails(),
     isEntryValid = isEntryValid
 )

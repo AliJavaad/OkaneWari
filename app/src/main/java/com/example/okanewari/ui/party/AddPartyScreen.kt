@@ -1,18 +1,19 @@
 package com.example.okanewari.ui.party
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -22,6 +23,7 @@ import com.example.okanewari.OkaneWareTopAppBar
 import com.example.okanewari.R
 import com.example.okanewari.navigation.NavigationDestination
 import com.example.okanewari.ui.OwViewModelProvider
+import com.example.okanewari.ui.components.CurrencySymbols
 import com.example.okanewari.ui.components.DoneAndCancelButtons
 
 
@@ -60,8 +62,8 @@ fun AddPartyScreen(
 
 @Composable
 fun AddPartyBody(
-    partyUiState: PartyUiState,
-    onValueChange: (PartyDetails) -> Unit,
+    partyUiState: AddPartyUiState,
+    onValueChange: (PartyDetails, Boolean) -> Unit,
     onDone: () -> Unit,
     onCancel: () -> Unit,
     contentPadding: PaddingValues = PaddingValues(0.dp),
@@ -71,6 +73,7 @@ fun AddPartyBody(
     ){
         PartyInputForm(
             partyDetails = partyUiState.partyDetails,
+            currencyDropdown = partyUiState.currencyDropdown,
             onValueChange = onValueChange,
         )
         DoneAndCancelButtons(
@@ -83,12 +86,13 @@ fun AddPartyBody(
 @Composable
 fun PartyInputForm(
     partyDetails: PartyDetails,
-    onValueChange: (PartyDetails) -> Unit = {},
+    currencyDropdown: Boolean,
+    onValueChange: (PartyDetails, Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ){
     TextField(
         value = partyDetails.partyName,
-        onValueChange = { onValueChange(partyDetails.copy(partyName = it)) },
+        onValueChange = { onValueChange(partyDetails.copy(partyName = it), currencyDropdown) },
         label = { Text(stringResource(R.string.party_name)) },
         placeholder = { Text(stringResource(R.string.my_party)) },
         singleLine = true,
@@ -96,4 +100,52 @@ fun PartyInputForm(
             .fillMaxWidth()
             .padding(all = dimensionResource(R.dimen.medium_padding))
     )
+    Row (
+        modifier = Modifier.padding(all = dimensionResource(R.dimen.medium_padding))
+    ){
+        Text("Select a currency: ")
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { onValueChange(partyDetails.copy(), true) }
+        ){
+            Text(
+                text = partyDetails.currency,
+                modifier = Modifier.padding(all = dimensionResource(R.dimen.medium_padding))
+            )
+            DropdownMenu(
+                expanded = currencyDropdown,
+                onDismissRequest = { onValueChange(partyDetails, false) }
+            ) {
+                for(currency in CurrencySymbols.dropdownCurrencyMenu){
+                    DropdownMenuItem(
+                        text = { Text(currency.symbol + "  (${currency.description})")},
+                        onClick = { onValueChange(partyDetails.copy(currency = currency.symbol), false) }
+                    )
+                }
+            }
+        }
+    }
 }
+
+//    Box{
+//        Row(
+//            modifier = Modifier.clickable { onValueChange(partyDetails.copy(), true) }
+//        ){
+//            Text(
+//                text = "Select a currency: ${partyDetails.currency}",
+//                modifier = Modifier.padding(all = dimensionResource(R.dimen.medium_padding))
+//            )
+//        }
+//        DropdownMenu(
+//            expanded = currencyDropdown,
+//            onDismissRequest = { onValueChange(partyDetails, false) }
+//        ) {
+//            for(currency in CurrencySymbols.dropdownCurrencyMenu){
+//                DropdownMenuItem(
+//                    text = { Text(currency.symbol + "  (${currency.description})")},
+//                    onClick = { onValueChange(partyDetails.copy(currency = currency.symbol), false) }
+//                )
+//            }
+//        }
+//    }
