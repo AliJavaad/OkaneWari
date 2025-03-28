@@ -1,20 +1,19 @@
 package com.example.okanewari.navigation
 
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.okanewari.ui.AddExpenseDestination
-import com.example.okanewari.ui.AddExpenseScreen
-import com.example.okanewari.ui.AddPartyDestination
-import com.example.okanewari.ui.AddPartyScreen
-import com.example.okanewari.ui.ListExpensesDestination
-import com.example.okanewari.ui.ListPartiesDestination
-import com.example.okanewari.ui.ListPartysScreen
-import com.example.okanewari.ui.ListExpensesScreen
+import com.example.okanewari.ui.expense.AddExpenseDestination
+import com.example.okanewari.ui.expense.AddExpenseScreen
+import com.example.okanewari.ui.party.AddPartyDestination
+import com.example.okanewari.ui.party.AddPartyScreen
+import com.example.okanewari.ui.expense.ListExpensesDestination
+import com.example.okanewari.ui.party.ListPartiesDestination
+import com.example.okanewari.ui.party.ListPartysScreen
+import com.example.okanewari.ui.expense.ListExpensesScreen
 
 /**
  * Holds the navigation for the app.

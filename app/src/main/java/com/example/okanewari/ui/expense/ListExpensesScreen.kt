@@ -1,6 +1,5 @@
-package com.example.okanewari.ui
+package com.example.okanewari.ui.expense
 
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -10,13 +9,11 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -25,7 +22,6 @@ import com.example.okanewari.R
 import com.example.okanewari.data.GetDummyExpenses
 import com.example.okanewari.navigation.NavigationDestination
 import com.example.okanewari.ui.components.DisplayFab
-import com.example.okanewari.ui.components.FabSize
 
 object ListExpensesDestination : NavigationDestination {
     override val route = "list_expenses"
@@ -59,6 +55,7 @@ fun ListExpensesScreen(
         LazyColumn (
             modifier = modifier.padding(innerPadding)
         ){
+            // TODO case where expenses are empty
             items(myParty.expenseList){
                 Card (
                     // TODO make each card clickable

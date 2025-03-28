@@ -12,15 +12,11 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.okanewari.navigation.OkaneWariNavHost
-import com.example.okanewari.ui.OkaneViewModel
 
 /**
  * Composable that displays the topBar and displays back button if back navigation is possible.
@@ -50,7 +46,8 @@ fun OkaneWareTopAppBar(
                     )
                 }
             }
-        })
+        }
+    )
 }
 
 @Composable

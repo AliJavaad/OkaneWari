@@ -1,8 +1,9 @@
-package com.example.okanewari.ui
+package com.example.okanewari.ui.party
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -24,6 +25,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.okanewari.OkaneWareTopAppBar
 import com.example.okanewari.Party
@@ -43,6 +45,7 @@ object ListPartiesDestination : NavigationDestination {
 fun ListPartysScreen(
     onPartyCardClicked: (String) -> Unit,
     onAddPartyButtonClicked: () -> Unit,
+    canNavigateBackBool: Boolean = false,
     modifier: Modifier = Modifier
 ){
     // TODO Get info passed by click
@@ -54,7 +57,7 @@ fun ListPartysScreen(
         topBar = {
             OkaneWareTopAppBar(
                 title = stringResource(ListPartiesDestination.titleRes),
-                canNavigateBack = false,
+                canNavigateBack = canNavigateBackBool,
                 scrollBehavior = scrollBehavior
             )
         },
@@ -65,26 +68,25 @@ fun ListPartysScreen(
             )
         }
     ){ innerPadding ->
-        Column(
-            modifier = Modifier.padding(innerPadding)
-        ){
-            DisplayParties(myPartys, onPartyCardClicked)
-
-        }
-
+        DisplayParties(
+            parties = myPartys,
+            myClick = onPartyCardClicked,
+            contentPadding = innerPadding
+        )
     }
-
 }
 
 @Composable
 fun DisplayParties(
-    partys: List<Party>,
-    myClick: (String) -> Unit
+    parties: List<Party>,
+    myClick: (String) -> Unit,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
     LazyColumn(
-        modifier = Modifier
+        modifier = Modifier.padding(contentPadding)
     ) {
-        items(partys) {
+        // TODO case where party list is empty
+        items(parties) {
             Card (
                 // Making each card a clickable to take to the party screen
                 modifier = Modifier
