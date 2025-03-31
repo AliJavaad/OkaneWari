@@ -1,5 +1,7 @@
 package com.example.okanewari.ui.party
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -7,15 +9,21 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.AbsoluteAlignment
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -90,6 +98,9 @@ fun PartyInputForm(
     onValueChange: (PartyDetails, Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ){
+    /**
+     * Handling the party name input field
+     */
     TextField(
         value = partyDetails.partyName,
         onValueChange = { onValueChange(partyDetails.copy(partyName = it), currencyDropdown) },
@@ -100,18 +111,27 @@ fun PartyInputForm(
             .fillMaxWidth()
             .padding(all = dimensionResource(R.dimen.medium_padding))
     )
+    /**
+     * Handling the currency symbol input
+     */
     Row (
         modifier = Modifier.padding(all = dimensionResource(R.dimen.medium_padding))
     ){
-        Text("Select a currency: ")
+        Text(stringResource(R.string.select_a_currency) + ": ")
         Box(
             modifier = Modifier
-                .fillMaxWidth()
+                .width(dimensionResource(R.dimen.currency_symbol_spacing))
+                .background(MaterialTheme.colorScheme.secondaryContainer)
                 .clickable { onValueChange(partyDetails.copy(), true) }
         ){
+            Image(
+                painter = painterResource(R.drawable.baseline_arrow_drop_down_24),
+                contentDescription = "asdf",
+                modifier = Modifier.align(Alignment.TopEnd)
+            )
             Text(
                 text = partyDetails.currency,
-                modifier = Modifier.padding(all = dimensionResource(R.dimen.medium_padding))
+                modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.small_padding))
             )
             DropdownMenu(
                 expanded = currencyDropdown,
@@ -127,25 +147,3 @@ fun PartyInputForm(
         }
     }
 }
-
-//    Box{
-//        Row(
-//            modifier = Modifier.clickable { onValueChange(partyDetails.copy(), true) }
-//        ){
-//            Text(
-//                text = "Select a currency: ${partyDetails.currency}",
-//                modifier = Modifier.padding(all = dimensionResource(R.dimen.medium_padding))
-//            )
-//        }
-//        DropdownMenu(
-//            expanded = currencyDropdown,
-//            onDismissRequest = { onValueChange(partyDetails, false) }
-//        ) {
-//            for(currency in CurrencySymbols.dropdownCurrencyMenu){
-//                DropdownMenuItem(
-//                    text = { Text(currency.symbol + "  (${currency.description})")},
-//                    onClick = { onValueChange(partyDetails.copy(currency = currency.symbol), false) }
-//                )
-//            }
-//        }
-//    }

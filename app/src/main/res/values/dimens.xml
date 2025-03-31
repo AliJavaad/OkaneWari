@@ -2,5 +2,9 @@
 <resources>
     <dimen name="thumbnail_height">100dp</dimen>
     <dimen name="thumbnail_width">100dp</dimen>
+    <!-- Padding -->
     <dimen name="medium_padding">12dp</dimen>
+    <dimen name="small_padding">6dp</dimen>
+    <!-- Spacers -->
+    <dimen name="currency_symbol_spacing">42dp</dimen>
 </resources>

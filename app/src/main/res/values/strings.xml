@@ -6,8 +6,10 @@
     <string name="add_new_expense">Add a new Expense</string>
     <string name="party_name">Party Name</string>
     <string name="list_expenses">Expenses TODO</string>
-    <!-- Text holderes -->
+    <!-- Text holders -->
     <string name="my_party">My Party</string>
+    <string name="select_a_currency">Select a currency</string>
+    <string name="default_currency">¥</string>
     <!-- Buttons -->
     <string name="done">Done</string>
     <string name="cancel">Cancel</string>

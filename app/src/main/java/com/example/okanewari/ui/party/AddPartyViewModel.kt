@@ -54,8 +54,9 @@ data class AddPartyUiState(
 data class PartyDetails(
     val id: Int = 0,
     val partyName: String = "",
-    val currency: String = "",
-    val numberOfMems: String = "",
+    // Defualt currency symbol for a new party
+    val currency: String = "¥",
+    val numberOfMems: String = "1",
 )
 
 /**
