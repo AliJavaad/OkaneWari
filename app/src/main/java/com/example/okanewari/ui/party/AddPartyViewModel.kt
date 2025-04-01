@@ -5,12 +5,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.example.okanewari.data.PartyModel
+import com.example.okanewari.data.PartyRepository
 
 /**
  * ViewModel to validate and insert Party in the Room database.
  */
 class AddPartyViewModel(
-    // private val partyRepository: PartyRepository
+    private val partyRepository: PartyRepository
 ): ViewModel() {
 
     var partyUiState by mutableStateOf(AddPartyUiState())
@@ -29,15 +30,15 @@ class AddPartyViewModel(
                 )
     }
 
-//    suspend fun saveItem() {
-//        if (validateInput()) {
-//            partyRepository.insertParty(partyUiState.partyDetails.toPartyModel())
-//        }
-//    }
+    suspend fun saveItem() {
+        if (validateInput()) {
+            partyRepository.insertParty(partyUiState.partyDetails.toPartyModel())
+        }
+    }
 
     private fun validateInput(uiState: PartyDetails = partyUiState.partyDetails): Boolean {
         return with(uiState) {
-            partyName.isNotBlank() && currency.isNotBlank()
+            partyName.isNotBlank() && currency.isNotBlank() && numberOfMems.isNotBlank()
         }
     }
 }
