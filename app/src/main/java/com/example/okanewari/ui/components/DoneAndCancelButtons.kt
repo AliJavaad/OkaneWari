@@ -18,7 +18,8 @@ import com.example.okanewari.R
 @Composable
 fun DoneAndCancelButtons(
     doneButtonClick: () -> Unit,
-    cancelButtonClick: () -> Unit
+    cancelButtonClick: () -> Unit,
+    enableDone: Boolean = true
 ) {
     val mediumPadding = dimensionResource(R.dimen.medium_padding)
     Column(

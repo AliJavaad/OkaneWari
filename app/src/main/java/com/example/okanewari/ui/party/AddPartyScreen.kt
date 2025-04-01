@@ -19,6 +19,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,6 +34,7 @@ import com.example.okanewari.navigation.NavigationDestination
 import com.example.okanewari.ui.OwViewModelProvider
 import com.example.okanewari.ui.components.CurrencySymbols
 import com.example.okanewari.ui.components.DoneAndCancelButtons
+import kotlinx.coroutines.launch
 
 
 object AddPartyDestination: NavigationDestination{
@@ -48,6 +50,7 @@ fun AddPartyScreen(
     canNavigateBackBool: Boolean = true,
     viewModel: AddPartyViewModel = viewModel(factory = OwViewModelProvider.Factory)
 ){
+    val coroutineScope = rememberCoroutineScope()
     Scaffold(
         topBar = {
             OkaneWareTopAppBar(
@@ -61,7 +64,12 @@ fun AddPartyScreen(
         AddPartyBody(
             partyUiState = viewModel.partyUiState,
             onValueChange = viewModel::updateUiState,
-            onDone = onDoneButtonClicked,
+            onDone = {
+                coroutineScope.launch{
+                    viewModel.saveItem()
+                    onDoneButtonClicked()
+                }
+            },
             onCancel = onCancelButtonClicked,
             contentPadding = innerPadding
         )
@@ -86,7 +94,8 @@ fun AddPartyBody(
         )
         DoneAndCancelButtons(
             doneButtonClick = onDone,
-            cancelButtonClick = onCancel
+            cancelButtonClick = onCancel,
+            enableDone = partyUiState.isEntryValid
         )
     }
 }
@@ -146,4 +155,5 @@ fun PartyInputForm(
             }
         }
     }
+    // TODO Number of members input field. Currently set to 1
 }
