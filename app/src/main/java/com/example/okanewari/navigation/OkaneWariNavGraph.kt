@@ -39,22 +39,20 @@ fun OkaneWariNavHost(
         }
         composable(route = AddPartyDestination.route){
             AddPartyScreen(
-                onDoneButtonClicked = { navController.navigate(ListPartiesDestination.route) },
-                onCancelButtonClicked = { navController.navigate(ListPartiesDestination.route) },
-//                onDoneButtonClicked = {  navController.navigateUp() },
-//                onCancelButtonClicked = {  navController.popBackStack() }
+                navigateUp = { navController.navigateUp() },
+                navigateBack = { navController.popBackStack() }
             )
         }
         composable(route = ListExpensesDestination.route) {
             ListExpensesScreen(
-                onAddExpenseButtonClicked = { navController.navigate(AddExpenseDestination.route) },
-                navigateBack = { navController.navigate(ListPartiesDestination.route) }
+                navigateBack = { navController.navigateUp() },
+                onAddExpenseButtonClicked = { navController.navigate(AddExpenseDestination.route) }
             )
         }
         composable(route = AddExpenseDestination.route) {
             AddExpenseScreen(
-                onDoneButtonClicked = {},
-                onCancelButtonClicked = { navController.navigate(ListExpensesDestination.route) }
+                navigateUp = { navController.navigateUp() },
+                navigateBack = { navController.popBackStack() }
             )
         }
     }

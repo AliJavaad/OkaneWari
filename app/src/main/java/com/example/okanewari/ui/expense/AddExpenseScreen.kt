@@ -20,15 +20,15 @@ object AddExpenseDestination: NavigationDestination{
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddExpenseScreen(
-    onDoneButtonClicked: () -> Unit,
-    onCancelButtonClicked: () -> Unit
+    navigateUp: () -> Unit,
+    navigateBack: () -> Unit
 ){
     Scaffold(
         topBar = {
             OkaneWareTopAppBar(
                 title = stringResource(AddExpenseDestination.titleRes),
                 canNavigateBack = true,
-                navigateUp = onCancelButtonClicked
+                navigateUp = navigateUp
             )
         }
     ){ innerPadding ->
@@ -37,8 +37,8 @@ fun AddExpenseScreen(
         )
         {
             DoneAndCancelButtons(
-                doneButtonClick = onDoneButtonClicked,
-                cancelButtonClick = onCancelButtonClicked
+                doneButtonClick = navigateBack,
+                cancelButtonClick = navigateBack
             )
         }
     }

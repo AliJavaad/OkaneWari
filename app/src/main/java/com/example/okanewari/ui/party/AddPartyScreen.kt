@@ -45,8 +45,8 @@ object AddPartyDestination: NavigationDestination{
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddPartyScreen(
-    onDoneButtonClicked: () -> Unit,
-    onCancelButtonClicked: () -> Unit,
+    navigateBack: () -> Unit,
+    navigateUp: () -> Unit,
     canNavigateBackBool: Boolean = true,
     viewModel: AddPartyViewModel = viewModel(factory = OwViewModelProvider.Factory)
 ){
@@ -56,7 +56,7 @@ fun AddPartyScreen(
             OkaneWareTopAppBar(
                 title = stringResource(AddPartyDestination.titleRes),
                 canNavigateBack = canNavigateBackBool,
-                navigateUp = onCancelButtonClicked
+                navigateUp = navigateUp
             )
         }
     ){ innerPadding ->
@@ -67,10 +67,10 @@ fun AddPartyScreen(
             onDone = {
                 coroutineScope.launch{
                     viewModel.saveItem()
-                    onDoneButtonClicked()
+                    navigateBack()
                 }
             },
-            onCancel = onCancelButtonClicked,
+            onCancel = navigateBack,
             contentPadding = innerPadding
         )
     }

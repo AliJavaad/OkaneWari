@@ -73,7 +73,7 @@ fun ListPartysScreen(
         }
     ){ innerPadding ->
         ListPartysBody(
-            partyList = listOf(),
+            partyList = myPartys, // listOf(),
             partyClicked = onPartyCardClicked,
             contentPadding = innerPadding
         )
