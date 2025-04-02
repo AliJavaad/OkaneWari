@@ -15,7 +15,7 @@ object OwViewModelProvider {
     val Factory = viewModelFactory {
         // Initializer for ListPartysViewModel
         initializer {
-            ListPartysViewModel()
+            ListPartysViewModel(okaneWariApplication().container.partyRepository)
         }
         // Initializer for AddPartyViewModel:
         /**

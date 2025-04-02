@@ -21,6 +21,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -31,11 +33,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.okanewari.OkaneWareTopAppBar
 import com.example.okanewari.Party
 import com.example.okanewari.R
 import com.example.okanewari.data.DummyPartyData
+import com.example.okanewari.data.PartyModel
 import com.example.okanewari.navigation.NavigationDestination
+import com.example.okanewari.ui.OwViewModelProvider
 import com.example.okanewari.ui.components.DisplayFab
 import com.example.okanewari.ui.components.FabSize
 
@@ -50,10 +55,12 @@ fun ListPartysScreen(
     onPartyCardClicked: (String) -> Unit,
     onAddPartyButtonClicked: () -> Unit,
     canNavigateBackBool: Boolean = false,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: ListPartysViewModel = viewModel(factory = OwViewModelProvider.Factory)
 ){
     // TODO Get info passed by click
-    val myPartys = DummyPartyData()
+    // val myPartys = DummyPartyData()
+    val listPartysUiState by viewModel.listPartysUiState.collectAsState()
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     Scaffold (
@@ -73,7 +80,7 @@ fun ListPartysScreen(
         }
     ){ innerPadding ->
         ListPartysBody(
-            partyList = myPartys, // listOf(),
+            partyList = listPartysUiState.partyList,
             partyClicked = onPartyCardClicked,
             contentPadding = innerPadding
         )
@@ -82,7 +89,7 @@ fun ListPartysScreen(
 
 @Composable
 fun ListPartysBody(
-    partyList: List<Party>,
+    partyList: List<PartyModel>,
     partyClicked: (String) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp)
@@ -116,7 +123,7 @@ fun ListPartysBody(
 
 @Composable
 fun DisplayParties(
-    partyList: List<Party>,
+    partyList: List<PartyModel>,
     partyClicked: (String) -> Unit,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     modifier: Modifier = Modifier
@@ -124,14 +131,13 @@ fun DisplayParties(
     LazyColumn(
         modifier = Modifier.padding(contentPadding)
     ) {
-        // TODO case where party list is empty
         items(partyList) {
             Card (
                 // Making each card a clickable to take to the party screen
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(dimensionResource(R.dimen.medium_padding))
-                    .clickable(onClick = { partyClicked(it.name) },)
+                    .clickable(onClick = { partyClicked(it.partyName) },)
             ){
                 Row(
                     verticalAlignment = Alignment.CenterVertically
@@ -149,7 +155,7 @@ fun DisplayParties(
                         Text(
                             // TODO align text in the column
                             // TODO move constants to resource folder
-                            text = it.name,
+                            text = it.partyName,
                             fontSize = 32.sp,
                             textAlign = TextAlign.Center,
                             maxLines = 2,
