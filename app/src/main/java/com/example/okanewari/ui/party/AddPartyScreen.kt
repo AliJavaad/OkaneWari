@@ -61,7 +61,7 @@ fun AddPartyScreen(
         }
     ){ innerPadding ->
         // TODO add in save coroutine
-        AddPartyBody(
+        PartyEntryBody(
             partyUiState = viewModel.partyUiState,
             onValueChange = viewModel::updateUiState,
             onDone = {
@@ -77,7 +77,7 @@ fun AddPartyScreen(
 }
 
 @Composable
-fun AddPartyBody(
+fun PartyEntryBody(
     partyUiState: AddPartyUiState,
     onValueChange: (PartyDetails, Boolean) -> Unit,
     onDone: () -> Unit,

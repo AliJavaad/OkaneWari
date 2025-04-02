@@ -3,6 +3,7 @@
     <string name="app_name">OkaneWari</string>
     <string name="list_parties">My Parties</string>
     <string name="add_new_party">Add a new Party</string>
+    <string name="edit_party_details">Editing Party</string>
     <string name="add_new_expense">Add a new Expense</string>
     <string name="party_name">Party Name</string>
     <string name="list_expenses">Expenses TODO</string>
