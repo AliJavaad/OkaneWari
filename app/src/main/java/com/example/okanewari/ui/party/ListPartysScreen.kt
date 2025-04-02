@@ -1,7 +1,9 @@
 package com.example.okanewari.ui.party
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -54,6 +56,7 @@ object ListPartiesDestination : NavigationDestination {
 fun ListPartysScreen(
     onPartyCardClicked: (String) -> Unit,
     onAddPartyButtonClicked: () -> Unit,
+    onEditPartyButtonClicked: () -> Unit,
     canNavigateBackBool: Boolean = false,
     modifier: Modifier = Modifier,
     viewModel: ListPartysViewModel = viewModel(factory = OwViewModelProvider.Factory)
@@ -82,6 +85,7 @@ fun ListPartysScreen(
         ListPartysBody(
             partyList = listPartysUiState.partyList,
             partyClicked = onPartyCardClicked,
+            editPartyClicked = onEditPartyButtonClicked,
             contentPadding = innerPadding
         )
     }
@@ -91,6 +95,7 @@ fun ListPartysScreen(
 fun ListPartysBody(
     partyList: List<PartyModel>,
     partyClicked: (String) -> Unit,
+    editPartyClicked: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ){
@@ -114,6 +119,7 @@ fun ListPartysBody(
             DisplayParties(
                 partyList = partyList,
                 partyClicked = partyClicked,
+                editPartyClicked = editPartyClicked,
                 contentPadding = contentPadding,
                 modifier = modifier
             )
@@ -121,10 +127,12 @@ fun ListPartysBody(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DisplayParties(
     partyList: List<PartyModel>,
     partyClicked: (String) -> Unit,
+    editPartyClicked: () -> Unit,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     modifier: Modifier = Modifier
 ) {
@@ -137,7 +145,11 @@ fun DisplayParties(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(dimensionResource(R.dimen.medium_padding))
-                    .clickable(onClick = { partyClicked(it.partyName) },)
+                    .combinedClickable(
+                        onClick = { partyClicked(it.partyName) },
+                        // TODO onLongClick dropdown menu with edit and delete
+                        onLongClick = { editPartyClicked() }
+                    )
             ){
                 Row(
                     verticalAlignment = Alignment.CenterVertically

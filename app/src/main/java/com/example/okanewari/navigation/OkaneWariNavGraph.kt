@@ -14,6 +14,8 @@ import com.example.okanewari.ui.expense.ListExpensesDestination
 import com.example.okanewari.ui.party.ListPartiesDestination
 import com.example.okanewari.ui.party.ListPartysScreen
 import com.example.okanewari.ui.expense.ListExpensesScreen
+import com.example.okanewari.ui.party.EditPartyDestination
+import com.example.okanewari.ui.party.EditPartyScreen
 
 /**
  * Holds the navigation for the app.
@@ -34,11 +36,18 @@ fun OkaneWariNavHost(
             ListPartysScreen(
                 // TODO pass in the party selected
                 onPartyCardClicked = { navController.navigate(ListExpensesDestination.route) },
-                onAddPartyButtonClicked = { navController.navigate(AddPartyDestination.route) }
+                onAddPartyButtonClicked = { navController.navigate(AddPartyDestination.route) },
+                onEditPartyButtonClicked = { navController.navigate(EditPartyDestination.route) }
             )
         }
         composable(route = AddPartyDestination.route){
             AddPartyScreen(
+                navigateUp = { navController.navigateUp() },
+                navigateBack = { navController.popBackStack() }
+            )
+        }
+        composable(route = EditPartyDestination.route){
+            EditPartyScreen(
                 navigateUp = { navController.navigateUp() },
                 navigateBack = { navController.popBackStack() }
             )

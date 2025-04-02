@@ -1,6 +1,8 @@
 package com.example.okanewari.ui.party
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -36,27 +38,30 @@ fun EditPartyScreen(
     Scaffold(
         topBar = {
             OkaneWareTopAppBar(
-                title = stringResource(AddPartyDestination.titleRes),
+                title = stringResource(EditPartyDestination.titleRes),
                 canNavigateBack = canNavigateBackBool,
                 navigateUp = navigateUp
             )
         }
     ) { innerPadding ->
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier.fillMaxHeight(0.6f).padding(innerPadding)
+        Column (
+            modifier = Modifier.padding(innerPadding)
         ) {
-            Text(
-                text = "nothing\nhere",
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.fillMaxWidth()
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier.fillMaxHeight(0.6f)
+            ) {
+                Text(
+                    text = "nothing\nhere",
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+            DoneAndCancelButtons(
+                doneButtonClick = navigateBack,
+                cancelButtonClick = navigateBack
             )
         }
-        DoneAndCancelButtons(
-            doneButtonClick = navigateBack,
-            cancelButtonClick = navigateBack
-        )
-
     }
 }
