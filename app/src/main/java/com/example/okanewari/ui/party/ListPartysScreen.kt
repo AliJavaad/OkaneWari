@@ -2,10 +2,13 @@ package com.example.okanewari.ui.party
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -13,6 +16,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -68,31 +72,66 @@ fun ListPartysScreen(
             )
         }
     ){ innerPadding ->
-        DisplayParties(
-            parties = myPartys,
-            myClick = onPartyCardClicked,
+        ListPartysBody(
+            partyList = listOf(),
+            partyClicked = onPartyCardClicked,
             contentPadding = innerPadding
         )
     }
 }
 
 @Composable
+fun ListPartysBody(
+    partyList: List<Party>,
+    partyClicked: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(0.dp)
+){
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier
+    ) {
+        if (partyList.isEmpty()) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier.fillMaxHeight(0.6f)
+            ) {
+                Text(
+                    text = stringResource(R.string.empty_party_list),
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.padding(contentPadding).fillMaxWidth()
+                )
+            }
+        } else{
+            DisplayParties(
+                partyList = partyList,
+                partyClicked = partyClicked,
+                contentPadding = contentPadding,
+                modifier = modifier
+            )
+        }
+    }
+}
+
+@Composable
 fun DisplayParties(
-    parties: List<Party>,
-    myClick: (String) -> Unit,
+    partyList: List<Party>,
+    partyClicked: (String) -> Unit,
     contentPadding: PaddingValues = PaddingValues(0.dp),
+    modifier: Modifier = Modifier
 ) {
     LazyColumn(
         modifier = Modifier.padding(contentPadding)
     ) {
         // TODO case where party list is empty
-        items(parties) {
+        items(partyList) {
             Card (
                 // Making each card a clickable to take to the party screen
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(dimensionResource(R.dimen.medium_padding))
-                    .clickable(onClick = { myClick(it.name) },)
+                    .clickable(onClick = { partyClicked(it.name) },)
             ){
                 Row(
                     verticalAlignment = Alignment.CenterVertically

@@ -10,6 +10,7 @@
     <string name="my_party">My Party</string>
     <string name="select_a_currency">Select a currency</string>
     <string name="default_currency">¥</string>
+    <string name="empty_party_list">Oops!\nNo parties.\nTap + to add.</string>
     <!-- Buttons -->
     <string name="done">Done</string>
     <string name="cancel">Cancel</string>
