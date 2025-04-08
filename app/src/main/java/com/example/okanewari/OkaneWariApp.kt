@@ -1,5 +1,6 @@
 package com.example.okanewari
 
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -28,12 +29,14 @@ fun OkaneWareTopAppBar(
     canNavigateBack: Boolean,
     modifier: Modifier = Modifier,
     scrollBehavior: TopAppBarScrollBehavior? = null,
-    navigateUp: () -> Unit = {}
+    navigateUp: () -> Unit = {},
+    actionButtons: @Composable() (RowScope.() -> Unit) = {}
 ) {
     TopAppBar(
         title = { Text(title) },
         modifier = modifier,
         scrollBehavior = scrollBehavior,
+        actions = actionButtons,
         colors = TopAppBarDefaults.mediumTopAppBarColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer
         ),

@@ -12,8 +12,11 @@
     <string name="select_a_currency">Select a currency</string>
     <string name="default_currency">¥</string>
     <string name="empty_party_list">Oops!\nNo parties.\nTap + to add.</string>
+    <!-- Content Description -->
+    <string name="settings_buttton_description">Settings.</string>
     <!-- Buttons -->
     <string name="done">Done</string>
     <string name="cancel">Cancel</string>
+    <string name="delete">Delete</string>
     <string name="back_button">Back</string>
 </resources>

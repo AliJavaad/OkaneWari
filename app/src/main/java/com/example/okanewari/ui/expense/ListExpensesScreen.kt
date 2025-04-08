@@ -5,8 +5,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,7 +36,8 @@ object ListExpensesDestination : NavigationDestination {
 @Composable
 fun ListExpensesScreen(
     onAddExpenseButtonClicked: () -> Unit,
-    navigateBack: () -> Unit,
+    onSettingsButtonClicked: () -> Unit,
+    navigateUp: () -> Unit,
     modifier: Modifier = Modifier
 ){
     // TODO get from database
@@ -43,7 +48,15 @@ fun ListExpensesScreen(
                 // TODO title should be the current party name
                 title = stringResource(ListExpensesDestination.titleRes),
                 canNavigateBack = true,
-                navigateUp = navigateBack
+                navigateUp = navigateUp,
+                actionButtons = {
+                    IconButton(onClick = onSettingsButtonClicked ) {
+                        Icon(
+                            imageVector = Icons.Filled.Settings,
+                            contentDescription = stringResource(R.string.settings_buttton_description)
+                        )
+                    }
+                }
             )
         },
         floatingActionButton = {

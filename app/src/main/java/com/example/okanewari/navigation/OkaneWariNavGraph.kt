@@ -36,8 +36,7 @@ fun OkaneWariNavHost(
             ListPartysScreen(
                 // TODO pass in the party selected
                 onPartyCardClicked = { navController.navigate(ListExpensesDestination.route) },
-                onAddPartyButtonClicked = { navController.navigate(AddPartyDestination.route) },
-                onEditPartyButtonClicked = { navController.navigate(EditPartyDestination.route) }
+                onAddPartyButtonClicked = { navController.navigate(AddPartyDestination.route) }
             )
         }
         composable(route = AddPartyDestination.route){
@@ -54,8 +53,9 @@ fun OkaneWariNavHost(
         }
         composable(route = ListExpensesDestination.route) {
             ListExpensesScreen(
-                navigateBack = { navController.navigateUp() },
-                onAddExpenseButtonClicked = { navController.navigate(AddExpenseDestination.route) }
+                navigateUp = { navController.navigateUp() },
+                onAddExpenseButtonClicked = { navController.navigate(AddExpenseDestination.route) },
+                onSettingsButtonClicked = { navController.navigate(EditPartyDestination.route) }
             )
         }
         composable(route = AddExpenseDestination.route) {

@@ -56,7 +56,6 @@ object ListPartiesDestination : NavigationDestination {
 fun ListPartysScreen(
     onPartyCardClicked: (String) -> Unit,
     onAddPartyButtonClicked: () -> Unit,
-    onEditPartyButtonClicked: () -> Unit,
     canNavigateBackBool: Boolean = false,
     modifier: Modifier = Modifier,
     viewModel: ListPartysViewModel = viewModel(factory = OwViewModelProvider.Factory)
@@ -85,7 +84,6 @@ fun ListPartysScreen(
         ListPartysBody(
             partyList = listPartysUiState.partyList,
             partyClicked = onPartyCardClicked,
-            editPartyClicked = onEditPartyButtonClicked,
             contentPadding = innerPadding
         )
     }
@@ -95,7 +93,6 @@ fun ListPartysScreen(
 fun ListPartysBody(
     partyList: List<PartyModel>,
     partyClicked: (String) -> Unit,
-    editPartyClicked: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ){
@@ -119,7 +116,6 @@ fun ListPartysBody(
             DisplayParties(
                 partyList = partyList,
                 partyClicked = partyClicked,
-                editPartyClicked = editPartyClicked,
                 contentPadding = contentPadding,
                 modifier = modifier
             )
@@ -132,7 +128,6 @@ fun ListPartysBody(
 fun DisplayParties(
     partyList: List<PartyModel>,
     partyClicked: (String) -> Unit,
-    editPartyClicked: () -> Unit,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     modifier: Modifier = Modifier
 ) {
@@ -145,11 +140,7 @@ fun DisplayParties(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(dimensionResource(R.dimen.medium_padding))
-                    .combinedClickable(
-                        onClick = { partyClicked(it.partyName) },
-                        // TODO onLongClick dropdown menu with edit and delete
-                        onLongClick = { editPartyClicked() }
-                    )
+                    .clickable { partyClicked(it.partyName) }
             ){
                 Row(
                     verticalAlignment = Alignment.CenterVertically
