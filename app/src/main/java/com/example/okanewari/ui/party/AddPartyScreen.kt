@@ -62,7 +62,7 @@ fun AddPartyScreen(
     ){ innerPadding ->
         // TODO add in save coroutine
         PartyEntryBody(
-            partyUiState = viewModel.partyUiState,
+            addPartyUiState = viewModel.addPartyUiState,
             onValueChange = viewModel::updateUiState,
             onDone = {
                 coroutineScope.launch{
@@ -78,7 +78,7 @@ fun AddPartyScreen(
 
 @Composable
 fun PartyEntryBody(
-    partyUiState: AddPartyUiState,
+    addPartyUiState: AddPartyUiState,
     onValueChange: (PartyDetails, Boolean) -> Unit,
     onDone: () -> Unit,
     onCancel: () -> Unit,
@@ -88,14 +88,14 @@ fun PartyEntryBody(
         modifier = Modifier.padding(contentPadding)
     ){
         PartyInputForm(
-            partyDetails = partyUiState.partyDetails,
-            currencyDropdown = partyUiState.currencyDropdown,
+            partyDetails = addPartyUiState.partyUiState.partyDetails,
+            currencyDropdown = addPartyUiState.currencyDropdown,
             onValueChange = onValueChange,
         )
         DoneAndCancelButtons(
             doneButtonClick = onDone,
             cancelButtonClick = onCancel,
-            enableDone = partyUiState.isEntryValid
+            enableDone = addPartyUiState.partyUiState.isEntryValid
         )
     }
 }

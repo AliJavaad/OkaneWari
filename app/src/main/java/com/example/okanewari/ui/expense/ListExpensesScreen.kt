@@ -21,15 +21,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.okanewari.OkaneWareTopAppBar
 import com.example.okanewari.R
 import com.example.okanewari.data.GetDummyExpenses
 import com.example.okanewari.navigation.NavigationDestination
+import com.example.okanewari.ui.OwViewModelProvider
 import com.example.okanewari.ui.components.DisplayFab
 
 object ListExpensesDestination : NavigationDestination {
     override val route = "list_expenses"
     override val titleRes = R.string.list_expenses
+    const val partyIdArg = "partyIdArg"
+    val routeWithArg = "{$route}/{$partyIdArg}"
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -38,15 +42,18 @@ fun ListExpensesScreen(
     onAddExpenseButtonClicked: () -> Unit,
     onSettingsButtonClicked: () -> Unit,
     navigateUp: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: ListExpensesViewModel = viewModel(factory = OwViewModelProvider.Factory)
 ){
     // TODO get from database
     val myParty = GetDummyExpenses()
+
+
     Scaffold (
         topBar = {
             OkaneWareTopAppBar(
                 // TODO title should be the current party name
-                title = stringResource(ListExpensesDestination.titleRes),
+                title = viewModel.partyUiState.partyDetails.partyName,
                 canNavigateBack = true,
                 navigateUp = navigateUp,
                 actionButtons = {

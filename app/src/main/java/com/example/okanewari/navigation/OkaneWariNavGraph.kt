@@ -4,8 +4,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.example.okanewari.ui.expense.AddExpenseDestination
 import com.example.okanewari.ui.expense.AddExpenseScreen
 import com.example.okanewari.ui.party.AddPartyDestination
@@ -35,7 +37,8 @@ fun OkaneWariNavHost(
         composable(route = ListPartiesDestination.route) {
             ListPartysScreen(
                 // TODO pass in the party selected
-                onPartyCardClicked = { navController.navigate(ListExpensesDestination.route) },
+                onPartyCardClicked = {
+                    navController.navigate("${ListExpensesDestination.route}/${it}") },
                 onAddPartyButtonClicked = { navController.navigate(AddPartyDestination.route) }
             )
         }
@@ -51,7 +54,12 @@ fun OkaneWariNavHost(
                 navigateBack = { navController.popBackStack() }
             )
         }
-        composable(route = ListExpensesDestination.route) {
+        composable(
+            route = ListExpensesDestination.routeWithArg,
+            arguments = listOf(navArgument(ListExpensesDestination.partyIdArg){
+                type = NavType.IntType})
+
+        ) {
             ListExpensesScreen(
                 navigateUp = { navController.navigateUp() },
                 onAddExpenseButtonClicked = { navController.navigate(AddExpenseDestination.route) },

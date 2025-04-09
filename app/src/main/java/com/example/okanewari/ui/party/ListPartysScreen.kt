@@ -54,7 +54,7 @@ object ListPartiesDestination : NavigationDestination {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListPartysScreen(
-    onPartyCardClicked: (String) -> Unit,
+    onPartyCardClicked: (Int) -> Unit,
     onAddPartyButtonClicked: () -> Unit,
     canNavigateBackBool: Boolean = false,
     modifier: Modifier = Modifier,
@@ -92,7 +92,7 @@ fun ListPartysScreen(
 @Composable
 fun ListPartysBody(
     partyList: List<PartyModel>,
-    partyClicked: (String) -> Unit,
+    partyClicked: (Int) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ){
@@ -127,7 +127,7 @@ fun ListPartysBody(
 @Composable
 fun DisplayParties(
     partyList: List<PartyModel>,
-    partyClicked: (String) -> Unit,
+    partyClicked: (Int) -> Unit,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     modifier: Modifier = Modifier
 ) {
@@ -140,7 +140,7 @@ fun DisplayParties(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(dimensionResource(R.dimen.medium_padding))
-                    .clickable { partyClicked(it.partyName) }
+                    .clickable { partyClicked(it.id) }
             ){
                 Row(
                     verticalAlignment = Alignment.CenterVertically

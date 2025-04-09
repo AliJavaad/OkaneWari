@@ -14,42 +14,49 @@ class AddPartyViewModel(
     private val partyRepository: PartyRepository
 ): ViewModel() {
 
-    var partyUiState by mutableStateOf(AddPartyUiState())
+    var addPartyUiState by mutableStateOf(AddPartyUiState())
         private set
 
     /**
-     * Updates the [partyUiState] with the value provided in the argument.
+     * Updates the [addPartyUiState] with the value provided in the argument.
      * This method also triggers a validation for input values.
      */
     fun updateUiState(partyDetails: PartyDetails, currencyDropdown: Boolean) {
-        partyUiState =
+        addPartyUiState =
             AddPartyUiState(
-                partyDetails = partyDetails,
-                isEntryValid = validateInput(partyDetails),
+                partyUiState = PartyUiState(partyDetails, validateInput(partyDetails)),
                 currencyDropdown = currencyDropdown
-                )
+            )
     }
 
     suspend fun saveItem() {
         if (validateInput()) {
-            partyRepository.insertParty(partyUiState.partyDetails.toPartyModel())
+            partyRepository.insertParty(addPartyUiState.partyUiState.partyDetails.toPartyModel())
         }
     }
 
-    private fun validateInput(uiState: PartyDetails = partyUiState.partyDetails): Boolean {
+    private fun validateInput(uiState: PartyDetails = addPartyUiState.partyUiState.partyDetails): Boolean {
         return with(uiState) {
             partyName.isNotBlank() && currency.isNotBlank() && numberOfMems.isNotBlank()
         }
     }
+
 }
 
 /**
- * Represents Ui State for a Party.
+ * Represents Ui State for adding a Party.
  */
 data class AddPartyUiState(
-    val partyDetails: PartyDetails = PartyDetails(),
-    val isEntryValid: Boolean = false,
+    val partyUiState: PartyUiState = PartyUiState(PartyDetails()),
     val currencyDropdown: Boolean = false
+)
+
+/**
+ * Represents Ui State for a party.
+ */
+data class PartyUiState(
+    val partyDetails: PartyDetails = PartyDetails(),
+    val isEntryValid: Boolean = false
 )
 
 data class PartyDetails(
@@ -75,7 +82,7 @@ fun PartyDetails.toPartyModel(): PartyModel = PartyModel(
 /**
  * Extension function to convert [PartyModel] to [AddPartyUiState]
  */
-fun PartyModel.toPartyUiState(isEntryValid: Boolean = false): AddPartyUiState = AddPartyUiState(
+fun PartyModel.toPartyUiState(isEntryValid: Boolean = false): PartyUiState = PartyUiState(
     partyDetails = this.toPartyDetails(),
     isEntryValid = isEntryValid
 )

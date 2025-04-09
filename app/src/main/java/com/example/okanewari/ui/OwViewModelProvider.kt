@@ -1,10 +1,12 @@
 package com.example.okanewari.ui
 
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.okanewari.OkaneWariApplication
+import com.example.okanewari.ui.expense.ListExpensesViewModel
 import com.example.okanewari.ui.party.AddPartyViewModel
 import com.example.okanewari.ui.party.ListPartysViewModel
 
@@ -24,6 +26,13 @@ object OwViewModelProvider {
          */
         initializer {
             AddPartyViewModel(okaneWariApplication().container.partyRepository)
+        }
+        // Initializer for ListExpensesViewModel
+        initializer {
+            ListExpensesViewModel(
+                this.createSavedStateHandle(),
+                okaneWariApplication().container.partyRepository
+            )
         }
     }
 }
