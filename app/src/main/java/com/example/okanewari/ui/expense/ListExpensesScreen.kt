@@ -14,6 +14,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
@@ -40,14 +42,13 @@ object ListExpensesDestination : NavigationDestination {
 @Composable
 fun ListExpensesScreen(
     onAddExpenseButtonClicked: () -> Unit,
-    onSettingsButtonClicked: () -> Unit,
+    onSettingsButtonClicked: (Int) -> Unit,
     navigateUp: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ListExpensesViewModel = viewModel(factory = OwViewModelProvider.Factory)
 ){
     // TODO get from database
     val myParty = GetDummyExpenses()
-
 
     Scaffold (
         topBar = {
@@ -57,7 +58,9 @@ fun ListExpensesScreen(
                 canNavigateBack = true,
                 navigateUp = navigateUp,
                 actionButtons = {
-                    IconButton(onClick = onSettingsButtonClicked ) {
+                    IconButton(
+                        onClick = {onSettingsButtonClicked(viewModel.partyUiState.partyDetails.id)}
+                    ){
                         Icon(
                             imageVector = Icons.Filled.Settings,
                             contentDescription = stringResource(R.string.settings_buttton_description)

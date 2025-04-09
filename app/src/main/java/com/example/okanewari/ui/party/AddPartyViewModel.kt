@@ -29,7 +29,7 @@ class AddPartyViewModel(
             )
     }
 
-    suspend fun saveItem() {
+    suspend fun saveParty() {
         if (validateInput()) {
             partyRepository.insertParty(addPartyUiState.partyUiState.partyDetails.toPartyModel())
         }
@@ -47,7 +47,7 @@ class AddPartyViewModel(
  * Represents Ui State for adding a Party.
  */
 data class AddPartyUiState(
-    val partyUiState: PartyUiState = PartyUiState(PartyDetails()),
+    var partyUiState: PartyUiState = PartyUiState(PartyDetails()),
     val currencyDropdown: Boolean = false
 )
 

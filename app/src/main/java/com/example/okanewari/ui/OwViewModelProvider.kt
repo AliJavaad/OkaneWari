@@ -8,6 +8,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.okanewari.OkaneWariApplication
 import com.example.okanewari.ui.expense.ListExpensesViewModel
 import com.example.okanewari.ui.party.AddPartyViewModel
+import com.example.okanewari.ui.party.EditPartyViewModel
 import com.example.okanewari.ui.party.ListPartysViewModel
 
 /**
@@ -30,6 +31,13 @@ object OwViewModelProvider {
         // Initializer for ListExpensesViewModel
         initializer {
             ListExpensesViewModel(
+                this.createSavedStateHandle(),
+                okaneWariApplication().container.partyRepository
+            )
+        }
+        // Initializer for EditPartyViewModel
+        initializer {
+            EditPartyViewModel(
                 this.createSavedStateHandle(),
                 okaneWariApplication().container.partyRepository
             )

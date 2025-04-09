@@ -19,6 +19,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,18 +27,21 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.okanewari.OkaneWareTopAppBar
 import com.example.okanewari.R
 import com.example.okanewari.navigation.NavigationDestination
+import com.example.okanewari.ui.OwViewModelProvider
 import com.example.okanewari.ui.components.DisplayFab
 import com.example.okanewari.ui.components.DoneAndCancelButtons
 import com.example.okanewari.ui.components.FabSize
+import kotlinx.coroutines.launch
 
 object EditPartyDestination : NavigationDestination {
     override val route = "party_edit"
     override val titleRes = R.string.edit_party_details
-    const val itemIdArg = "partyId"
-    val routeWithArgs = "$route/{$itemIdArg}"
+    const val partyIdArg = "partyIdArg"
+    val routeWithArgs = "$route/{$partyIdArg}"
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -46,12 +50,14 @@ fun EditPartyScreen(
     navigateBack: () -> Unit,
     navigateUp: () -> Unit,
     canNavigateBackBool: Boolean = true,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: EditPartyViewModel = viewModel(factory = OwViewModelProvider.Factory)
 ){
+    val coroutineScope = rememberCoroutineScope()
     Scaffold(
         topBar = {
             OkaneWareTopAppBar(
-                title = stringResource(EditPartyDestination.titleRes),
+                title = "Editing: ${viewModel.editPartyUiState.partyUiState.partyDetails.partyName}",
                 canNavigateBack = canNavigateBackBool,
                 navigateUp = navigateUp
             )
@@ -60,19 +66,16 @@ fun EditPartyScreen(
         Column (
             modifier = Modifier.padding(innerPadding)
         ) {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier.fillMaxHeight(0.6f)
-            ) {
-                Text(
-                    text = "nothing\nhere",
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
+            PartyInputForm(
+                partyDetails = viewModel.editPartyUiState.partyUiState.partyDetails,
+                currencyDropdown = viewModel.editPartyUiState.currencyDropdown,
+                onValueChange = viewModel::updateUiState,
+            )
             DoneCancelDeleteButtons(
-                doneButtonClick = navigateBack,
+                doneButtonClick = { coroutineScope.launch{
+                    viewModel.updateParty()
+                    navigateBack()
+                } },
                 cancelButtonClick = navigateBack,
                 deleteButtonClicked = { }
             )

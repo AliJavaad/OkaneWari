@@ -66,7 +66,7 @@ fun AddPartyScreen(
             onValueChange = viewModel::updateUiState,
             onDone = {
                 coroutineScope.launch{
-                    viewModel.saveItem()
+                    viewModel.saveParty()
                     navigateBack()
                 }
             },

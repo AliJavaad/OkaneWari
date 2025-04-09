@@ -36,7 +36,6 @@ fun OkaneWariNavHost(
         // Setting up navigation routes for each enum defined in OkaneWariScreen
         composable(route = ListPartiesDestination.route) {
             ListPartysScreen(
-                // TODO pass in the party selected
                 onPartyCardClicked = {
                     navController.navigate("${ListExpensesDestination.route}/${it}") },
                 onAddPartyButtonClicked = { navController.navigate(AddPartyDestination.route) }
@@ -48,7 +47,11 @@ fun OkaneWariNavHost(
                 navigateBack = { navController.popBackStack() }
             )
         }
-        composable(route = EditPartyDestination.route){
+        composable(
+            route = EditPartyDestination.routeWithArgs,
+            arguments = listOf(navArgument(EditPartyDestination.partyIdArg){
+                type = NavType.IntType})
+        ){
             EditPartyScreen(
                 navigateUp = { navController.navigateUp() },
                 navigateBack = { navController.popBackStack() }
@@ -58,12 +61,12 @@ fun OkaneWariNavHost(
             route = ListExpensesDestination.routeWithArg,
             arguments = listOf(navArgument(ListExpensesDestination.partyIdArg){
                 type = NavType.IntType})
-
         ) {
             ListExpensesScreen(
                 navigateUp = { navController.navigateUp() },
                 onAddExpenseButtonClicked = { navController.navigate(AddExpenseDestination.route) },
-                onSettingsButtonClicked = { navController.navigate(EditPartyDestination.route) }
+                onSettingsButtonClicked = {
+                    navController.navigate("${EditPartyDestination.route}/${it}") }
             )
         }
         composable(route = AddExpenseDestination.route) {
