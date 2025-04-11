@@ -57,7 +57,7 @@ fun EditPartyScreen(
     Scaffold(
         topBar = {
             OkaneWareTopAppBar(
-                title = "Editing: ${viewModel.editPartyUiState.partyUiState.partyDetails.partyName}",
+                title = "Editing: ${viewModel.editPartyUiState.topBarPartyName}",
                 canNavigateBack = canNavigateBackBool,
                 navigateUp = navigateUp
             )

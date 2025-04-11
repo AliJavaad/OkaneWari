@@ -20,7 +20,7 @@ class EditPartyViewModel(
     private val partyRepository: PartyRepository
 ) : ViewModel() {
 
-    var editPartyUiState by mutableStateOf(AddPartyUiState())
+    var editPartyUiState by mutableStateOf(EditPartyUiState())
         private set
 
     private val partyId: Int = checkNotNull(savedStateHandle[EditPartyDestination.partyIdArg])
@@ -31,6 +31,9 @@ class EditPartyViewModel(
                 .filterNotNull()
                 .first()
                 .toPartyUiState(true)
+            // The topBarPartyName should only be updated at the initial screen creation stage.
+            // Otherwise it will keep changing as the text field/party name is edited.
+            editPartyUiState.topBarPartyName = editPartyUiState.partyUiState.partyDetails.partyName
         }
     }
 
@@ -46,9 +49,10 @@ class EditPartyViewModel(
      */
     fun updateUiState(partyDetails: PartyDetails, currencyDropdown: Boolean) {
         editPartyUiState =
-            AddPartyUiState(
+            EditPartyUiState(
                 partyUiState = PartyUiState(partyDetails, validateInput(partyDetails)),
-                currencyDropdown = currencyDropdown
+                currencyDropdown = currencyDropdown,
+                topBarPartyName = editPartyUiState.topBarPartyName
             )
     }
 
@@ -58,3 +62,12 @@ class EditPartyViewModel(
         }
     }
 }
+
+/**
+ * Represents Ui State for adding a Party.
+ */
+data class EditPartyUiState(
+    var partyUiState: PartyUiState = PartyUiState(PartyDetails()),
+    var topBarPartyName: String = "",
+    val currencyDropdown: Boolean = false
+)

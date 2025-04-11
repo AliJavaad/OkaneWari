@@ -16,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
@@ -47,6 +48,8 @@ fun ListExpensesScreen(
     modifier: Modifier = Modifier,
     viewModel: ListExpensesViewModel = viewModel(factory = OwViewModelProvider.Factory)
 ){
+    val partyUiState by viewModel.partyUiState.collectAsState()
+
     // TODO get from database
     val myParty = GetDummyExpenses()
 
@@ -54,12 +57,12 @@ fun ListExpensesScreen(
         topBar = {
             OkaneWareTopAppBar(
                 // TODO title should be the current party name
-                title = viewModel.partyUiState.partyDetails.partyName,
+                title = partyUiState.partyDetails.partyName,
                 canNavigateBack = true,
                 navigateUp = navigateUp,
                 actionButtons = {
                     IconButton(
-                        onClick = {onSettingsButtonClicked(viewModel.partyUiState.partyDetails.id)}
+                        onClick = {onSettingsButtonClicked(partyUiState.partyDetails.id)}
                     ){
                         Icon(
                             imageVector = Icons.Filled.Settings,

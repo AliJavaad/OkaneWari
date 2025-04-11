@@ -10,9 +10,14 @@ import com.example.okanewari.data.PartyRepository
 import com.example.okanewari.ui.party.AddPartyUiState
 import com.example.okanewari.ui.party.PartyDetails
 import com.example.okanewari.ui.party.PartyUiState
+import com.example.okanewari.ui.party.toPartyDetails
 import com.example.okanewari.ui.party.toPartyUiState
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 /**
@@ -25,18 +30,37 @@ class ListExpensesViewModel(
     /**
      * Holds current item ui state
      */
-    var partyUiState by mutableStateOf(PartyUiState())
-        private set
+//    var partyUiState by mutableStateOf(PartyUiState())
+//        private set
 
     private val partyId: Int = checkNotNull(savedStateHandle[ListExpensesDestination.partyIdArg])
 
-    init {
-        viewModelScope.launch {
-            partyUiState = partyRepository.getPartyStream(partyId)
-                .filterNotNull()
-                .first()
-                .toPartyUiState(true)
-        }
+//    init {
+//        viewModelScope.launch {
+//            partyUiState = partyRepository.getPartyStream(partyId)
+//                .filterNotNull()
+//                .first()
+//                .toPartyUiState(true)
+//        }
+//    }
+
+    /**
+     * Holds the item details ui state. The data is retrieved from [] and mapped to
+     * the UI state.
+     */
+    val partyUiState: StateFlow<PartyUiState> =
+        partyRepository.getPartyStream(partyId)
+            .filterNotNull()
+            .map { PartyUiState(partyDetails = it.toPartyDetails()) }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+                initialValue = PartyUiState()
+            )
+
+    companion object {
+        private const val TIMEOUT_MILLIS = 5_000L
     }
+
 }
 
