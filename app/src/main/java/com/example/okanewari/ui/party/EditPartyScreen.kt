@@ -49,6 +49,7 @@ object EditPartyDestination : NavigationDestination {
 fun EditPartyScreen(
     navigateBack: () -> Unit,
     navigateUp: () -> Unit,
+    navigateHome: () -> Unit,
     canNavigateBackBool: Boolean = true,
     modifier: Modifier = Modifier,
     viewModel: EditPartyViewModel = viewModel(factory = OwViewModelProvider.Factory)
@@ -77,7 +78,10 @@ fun EditPartyScreen(
                     navigateBack()
                 } },
                 cancelButtonClick = navigateBack,
-                deleteButtonClicked = { }
+                deleteButtonClicked = { coroutineScope.launch{
+                    viewModel.deleteParty()
+                    navigateHome()
+                } }
             )
         }
     }
@@ -94,7 +98,7 @@ fun DoneCancelDeleteButtons(
         doneButtonClick = doneButtonClick,
         cancelButtonClick = cancelButtonClick
     )
-
+    
     val mediumPadding = dimensionResource(R.dimen.medium_padding)
 
     Column(

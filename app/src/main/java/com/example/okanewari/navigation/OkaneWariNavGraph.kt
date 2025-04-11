@@ -54,7 +54,15 @@ fun OkaneWariNavHost(
         ){
             EditPartyScreen(
                 navigateUp = { navController.navigateUp() },
-                navigateBack = { navController.popBackStack() }
+                navigateBack = { navController.popBackStack() },
+                navigateHome = {
+                    navController.navigate(ListPartiesDestination.route){
+                        // Pop everything in the navigation stack
+                        popUpTo(0){
+                            inclusive = true
+                        }
+                    }
+                }
             )
         }
         composable(

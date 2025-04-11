@@ -56,6 +56,14 @@ class EditPartyViewModel(
             )
     }
 
+    /**
+     * Deletes the Party from the [PartyRepository]'s data source.
+     */
+    suspend fun deleteParty() {
+        // TODO Safely delete all expenses
+        partyRepository.deleteParty(editPartyUiState.partyUiState.partyDetails.toPartyModel())
+    }
+
     private fun validateInput(uiState: PartyDetails = editPartyUiState.partyUiState.partyDetails): Boolean {
         return with(uiState) {
             partyName.isNotBlank() && currency.isNotBlank() && numberOfMems.isNotBlank()
