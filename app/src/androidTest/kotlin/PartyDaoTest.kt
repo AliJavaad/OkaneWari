@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -56,6 +57,28 @@ class PartyDaoTest {
         val allPartys = partyDao.getAllRecords().first()
         assertEquals(allPartys[0], party1)
         assertEquals(allPartys[1], party2)
+    }
+
+    @Test
+    @Throws(Exception::class)
+    fun daoUpdateParty_updatesPartyInDb() = runBlocking{
+        addTwoPartysToDb()
+        partyDao.update(PartyModel(1, "svaj", "£", 5))
+        partyDao.update(PartyModel(2, "blue", "$", 2))
+
+        val allPartys = partyDao.getAllRecords().first()
+        assertEquals(allPartys[0], PartyModel(1, "svaj", "£", 5))
+        assertEquals(allPartys[1], PartyModel(2, "blue", "$", 2))
+    }
+
+    @Test
+    @Throws(Exception::class)
+    fun daoDeleteParty_deletesAllPartiesFromDb() = runBlocking {
+        addTwoPartysToDb()
+        partyDao.delete(party1)
+        partyDao.delete(party2)
+        val allItems = partyDao.getAllRecords().first()
+        assertTrue(allItems.isEmpty())
     }
 
     private suspend fun addOnePartyToDb() {

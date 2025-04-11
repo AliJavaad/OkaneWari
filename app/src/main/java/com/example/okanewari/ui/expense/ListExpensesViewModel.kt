@@ -21,31 +21,17 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 /**
- * ViewModel to retrieve, update and delete an item from the [owRepository]'s data source.
+ * ViewModel to retrieve a party and expenses from the [owRepository]'s data source.
  */
 class ListExpensesViewModel(
     savedStateHandle: SavedStateHandle,
     private val partyRepository: PartyRepository
 ) : ViewModel(){
-    /**
-     * Holds current item ui state
-     */
-//    var partyUiState by mutableStateOf(PartyUiState())
-//        private set
 
     private val partyId: Int = checkNotNull(savedStateHandle[ListExpensesDestination.partyIdArg])
 
-//    init {
-//        viewModelScope.launch {
-//            partyUiState = partyRepository.getPartyStream(partyId)
-//                .filterNotNull()
-//                .first()
-//                .toPartyUiState(true)
-//        }
-//    }
-
     /**
-     * Holds the item details ui state. The data is retrieved from [] and mapped to
+     * Holds the party details ui state. The data is retrieved from [partyRepository] and mapped to
      * the UI state.
      */
     val partyUiState: StateFlow<PartyUiState> =

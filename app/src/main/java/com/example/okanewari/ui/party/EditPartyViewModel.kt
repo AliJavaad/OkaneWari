@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 /**
- * ViewModel to retrieve and update a party from the [PartyRepository]'s data source.
+ * ViewModel to retrieve, update, or delete a party from the [PartyRepository]'s data source.
  */
 class EditPartyViewModel(
     savedStateHandle: SavedStateHandle,
