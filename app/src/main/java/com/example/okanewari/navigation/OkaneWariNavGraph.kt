@@ -10,6 +10,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.okanewari.ui.expense.AddExpenseDestination
 import com.example.okanewari.ui.expense.AddExpenseScreen
+import com.example.okanewari.ui.expense.EditExpenseDestination
+import com.example.okanewari.ui.expense.EditExpenseScreen
 import com.example.okanewari.ui.party.AddPartyDestination
 import com.example.okanewari.ui.party.AddPartyScreen
 import com.example.okanewari.ui.expense.ListExpensesDestination
@@ -74,11 +76,18 @@ fun OkaneWariNavHost(
                 navigateUp = { navController.navigateUp() },
                 onAddExpenseButtonClicked = { navController.navigate(AddExpenseDestination.route) },
                 onSettingsButtonClicked = {
-                    navController.navigate("${EditPartyDestination.route}/${it}") }
+                    navController.navigate("${EditPartyDestination.route}/${it}") },
+                onExpenseCardClick = { navController.navigate(EditExpenseDestination.route) }
             )
         }
         composable(route = AddExpenseDestination.route) {
             AddExpenseScreen(
+                navigateUp = { navController.navigateUp() },
+                navigateBack = { navController.popBackStack() }
+            )
+        }
+        composable(route = EditExpenseDestination.route) {
+            EditExpenseScreen(
                 navigateUp = { navController.navigateUp() },
                 navigateBack = { navController.popBackStack() }
             )

@@ -1,7 +1,12 @@
 package com.example.okanewari.ui.expense
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -11,6 +16,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,12 +31,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.okanewari.Expense
 import com.example.okanewari.OkaneWareTopAppBar
 import com.example.okanewari.R
 import com.example.okanewari.data.GetDummyExpenses
 import com.example.okanewari.navigation.NavigationDestination
 import com.example.okanewari.ui.OwViewModelProvider
 import com.example.okanewari.ui.components.DisplayFab
+import com.example.okanewari.ui.party.PartyDetails
 
 object ListExpensesDestination : NavigationDestination {
     override val route = "list_expenses"
@@ -44,6 +52,7 @@ object ListExpensesDestination : NavigationDestination {
 fun ListExpensesScreen(
     onAddExpenseButtonClicked: () -> Unit,
     onSettingsButtonClicked: (Int) -> Unit,
+    onExpenseCardClick: () -> Unit,
     navigateUp: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ListExpensesViewModel = viewModel(factory = OwViewModelProvider.Factory)
@@ -78,35 +87,82 @@ fun ListExpensesScreen(
             )
         }
     ) { innerPadding ->
-        LazyColumn (
-            modifier = modifier.padding(innerPadding)
-        ){
-            // TODO case where expenses are empty
-            items(myParty.expenseList){
-                Card (
-                    // TODO make each card clickable
-                    modifier = Modifier.fillMaxSize().padding(12.dp)
-                ){
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ){
-                        Text(
-                            // TODO align text in the column
-                            text = it.expenseName,
-                            fontSize = 16.sp,
-                            textAlign = TextAlign.Center,
-                            maxLines = 2,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                        Text(
-                            // TODO align text in the column
-                            text = myParty.moneySymbol + it.total,
-                            fontSize = 16.sp,
-                            textAlign = TextAlign.Center,
-                            maxLines = 2,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    }
+        ListExpensesBody(
+            // expenseList = listOf(),
+            expenseList = myParty.expenseList,
+            expenseClicked = onExpenseCardClick,
+            partyDetails = PartyDetails(2, "TODO"),
+            contentPadding = innerPadding
+        )
+    }
+}
+
+@Composable
+fun ListExpensesBody(
+    expenseList: List<Expense>,
+    expenseClicked: () -> Unit,
+    partyDetails: PartyDetails,
+    contentPadding: PaddingValues = PaddingValues(0.dp)
+) {
+    if (expenseList.isEmpty()) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.fillMaxHeight(0.6f)
+        ) {
+            Text(
+                text = stringResource(R.string.empty_expense_list),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(contentPadding).fillMaxWidth()
+            )
+        }
+    } else {
+        DisplayExpenses(
+            expenseList = expenseList,
+            expenseClicked = expenseClicked,
+            partyDetails = partyDetails,
+            contentPadding = contentPadding
+        )
+    }
+}
+
+@Composable
+fun DisplayExpenses(
+    expenseList: List<Expense>,
+    expenseClicked: () -> Unit,
+    partyDetails: PartyDetails,
+    contentPadding: PaddingValues = PaddingValues(0.dp)
+) {
+    LazyColumn(
+        modifier = Modifier.padding(contentPadding)
+    ) {
+        items(expenseList) {
+            Card(
+                // TODO make each card clickable
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(12.dp)
+                    .clickable { expenseClicked() }
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        // TODO align text in the column
+                        text = it.expenseName,
+                        fontSize = 16.sp,
+                        textAlign = TextAlign.Center,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Text(
+                        // TODO align text in the column
+                        text = partyDetails.currency + it.total,
+                        fontSize = 16.sp,
+                        textAlign = TextAlign.Center,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
+                    )
                 }
             }
         }

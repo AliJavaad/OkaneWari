@@ -86,7 +86,7 @@ fun PartyEntryBody(
     onValueChange: (PartyDetails) -> Unit,
     onDone: () -> Unit,
     onCancel: () -> Unit,
-    contentPadding: PaddingValues = PaddingValues(0.dp),
+    contentPadding: PaddingValues = PaddingValues(0.dp)
 ){
     Column(
         modifier = Modifier.padding(contentPadding)
