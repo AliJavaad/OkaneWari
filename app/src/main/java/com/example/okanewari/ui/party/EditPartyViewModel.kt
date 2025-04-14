@@ -46,11 +46,10 @@ class EditPartyViewModel(
      * Updates the [editPartyUiState] with the value provided in the argument. This method also triggers
      * a validation for input values.
      */
-    fun updateUiState(partyDetails: PartyDetails, currencyDropdown: Boolean) {
+    fun updateUiState(partyDetails: PartyDetails) {
         editPartyUiState =
             EditPartyUiState(
                 partyUiState = PartyUiState(partyDetails, validateInput(partyDetails)),
-                currencyDropdown = currencyDropdown,
                 topBarPartyName = editPartyUiState.topBarPartyName
             )
     }
@@ -75,6 +74,5 @@ class EditPartyViewModel(
  */
 data class EditPartyUiState(
     var partyUiState: PartyUiState = PartyUiState(PartyDetails()),
-    var topBarPartyName: String = "",
-    val currencyDropdown: Boolean = false
+    var topBarPartyName: String = ""
 )

@@ -19,7 +19,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -62,7 +66,7 @@ fun AddPartyScreen(
     ){ innerPadding ->
         // TODO add in save coroutine
         PartyEntryBody(
-            addPartyUiState = viewModel.addPartyUiState,
+            partyUiState = viewModel.addPartyUiState,
             onValueChange = viewModel::updateUiState,
             onDone = {
                 coroutineScope.launch{
@@ -78,8 +82,8 @@ fun AddPartyScreen(
 
 @Composable
 fun PartyEntryBody(
-    addPartyUiState: AddPartyUiState,
-    onValueChange: (PartyDetails, Boolean) -> Unit,
+    partyUiState: PartyUiState,
+    onValueChange: (PartyDetails) -> Unit,
     onDone: () -> Unit,
     onCancel: () -> Unit,
     contentPadding: PaddingValues = PaddingValues(0.dp),
@@ -88,14 +92,13 @@ fun PartyEntryBody(
         modifier = Modifier.padding(contentPadding)
     ){
         PartyInputForm(
-            partyDetails = addPartyUiState.partyUiState.partyDetails,
-            currencyDropdown = addPartyUiState.currencyDropdown,
-            onValueChange = onValueChange,
+            partyDetails = partyUiState.partyDetails,
+            onValueChange = onValueChange
         )
         DoneAndCancelButtons(
             doneButtonClick = onDone,
             cancelButtonClick = onCancel,
-            enableDone = addPartyUiState.partyUiState.isEntryValid
+            enableDone = partyUiState.isEntryValid
         )
     }
 }
@@ -103,16 +106,16 @@ fun PartyEntryBody(
 @Composable
 fun PartyInputForm(
     partyDetails: PartyDetails,
-    currencyDropdown: Boolean,
-    onValueChange: (PartyDetails, Boolean) -> Unit,
+    onValueChange: (PartyDetails) -> Unit,
     modifier: Modifier = Modifier,
 ){
+    var currencyDropdownMenu by rememberSaveable { mutableStateOf(false) }
     /**
      * Handling the party name input field
      */
     TextField(
         value = partyDetails.partyName,
-        onValueChange = { onValueChange(partyDetails.copy(partyName = it), currencyDropdown) },
+        onValueChange = { onValueChange(partyDetails.copy(partyName = it)) },
         label = { Text(stringResource(R.string.party_name)) },
         placeholder = { Text(stringResource(R.string.my_party)) },
         singleLine = true,
@@ -131,7 +134,10 @@ fun PartyInputForm(
             modifier = Modifier
                 .width(dimensionResource(R.dimen.currency_symbol_spacing))
                 .background(MaterialTheme.colorScheme.secondaryContainer)
-                .clickable { onValueChange(partyDetails.copy(), true) }
+                .clickable {
+                    onValueChange(partyDetails.copy())
+                    currencyDropdownMenu = true
+                }
         ){
             Image(
                 painter = painterResource(R.drawable.baseline_arrow_drop_down_24),
@@ -143,13 +149,19 @@ fun PartyInputForm(
                 modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.small_padding))
             )
             DropdownMenu(
-                expanded = currencyDropdown,
-                onDismissRequest = { onValueChange(partyDetails, false) }
+                expanded = currencyDropdownMenu,
+                onDismissRequest = {
+                    onValueChange(partyDetails)
+                    currencyDropdownMenu = false
+                }
             ) {
                 for(currency in CurrencySymbols.dropdownCurrencyMenu){
                     DropdownMenuItem(
                         text = { Text(currency.symbol + "  (${currency.description})")},
-                        onClick = { onValueChange(partyDetails.copy(currency = currency.symbol), false) }
+                        onClick = {
+                            onValueChange(partyDetails.copy(currency = currency.symbol))
+                            currencyDropdownMenu = false
+                        }
                     )
                 }
             }

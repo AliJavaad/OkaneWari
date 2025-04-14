@@ -65,7 +65,6 @@ fun EditPartyScreen(
         ) {
             PartyInputForm(
                 partyDetails = viewModel.editPartyUiState.partyUiState.partyDetails,
-                currencyDropdown = viewModel.editPartyUiState.currencyDropdown,
                 onValueChange = viewModel::updateUiState,
             )
             DoneCancelDeleteButtons(

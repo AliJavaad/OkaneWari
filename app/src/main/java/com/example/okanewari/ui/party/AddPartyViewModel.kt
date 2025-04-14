@@ -14,28 +14,28 @@ class AddPartyViewModel(
     private val partyRepository: PartyRepository
 ): ViewModel() {
 
-    var addPartyUiState by mutableStateOf(AddPartyUiState())
+    var addPartyUiState by mutableStateOf(PartyUiState())
         private set
 
     /**
      * Updates the [addPartyUiState] with the value provided in the argument.
      * This method also triggers a validation for input values.
      */
-    fun updateUiState(partyDetails: PartyDetails, currencyDropdown: Boolean) {
+    fun updateUiState(partyDetails: PartyDetails) {
         addPartyUiState =
-            AddPartyUiState(
-                partyUiState = PartyUiState(partyDetails, validateInput(partyDetails)),
-                currencyDropdown = currencyDropdown
+            PartyUiState(
+                partyDetails = partyDetails,
+                isEntryValid = validateInput(partyDetails)
             )
     }
 
     suspend fun saveParty() {
         if (validateInput()) {
-            partyRepository.insertParty(addPartyUiState.partyUiState.partyDetails.toPartyModel())
+            partyRepository.insertParty(addPartyUiState.partyDetails.toPartyModel())
         }
     }
 
-    private fun validateInput(uiState: PartyDetails = addPartyUiState.partyUiState.partyDetails): Boolean {
+    private fun validateInput(uiState: PartyDetails = addPartyUiState.partyDetails): Boolean {
         return with(uiState) {
             partyName.isNotBlank() && currency.isNotBlank() && numberOfMems.isNotBlank()
         }
