@@ -3,6 +3,7 @@ package com.example.okanewari.data
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import java.math.BigDecimal
 
 @Entity(
     tableName = "expense_table",

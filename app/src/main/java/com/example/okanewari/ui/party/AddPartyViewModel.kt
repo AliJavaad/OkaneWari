@@ -44,14 +44,6 @@ class AddPartyViewModel(
 }
 
 /**
- * Represents Ui State for adding a Party.
- */
-data class AddPartyUiState(
-    var partyUiState: PartyUiState = PartyUiState(PartyDetails()),
-    val currencyDropdown: Boolean = false
-)
-
-/**
  * Represents Ui State for a party.
  */
 data class PartyUiState(
