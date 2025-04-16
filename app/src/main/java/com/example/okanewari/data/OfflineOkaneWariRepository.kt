@@ -2,13 +2,11 @@ package com.example.okanewari.data
 
 import kotlinx.coroutines.flow.Flow
 
-class OfflinePartyRepository(
+class OfflineOkaneWariRepository(
     private val partyDao: PartyDao,
     private val expenseDao: ExpenseDao
-): PartyRepository {
-    /**
-     * Party methods
-     */
+): OkaneWariRepository {
+    // Party Methods
     override fun getAllPartiesStream(): Flow<List<PartyModel>> = partyDao.getAllRecords()
 
     override fun getPartyStream(id: Int): Flow<PartyModel?> = partyDao.getParty(id)
@@ -19,9 +17,7 @@ class OfflinePartyRepository(
 
     override suspend fun updateParty(party: PartyModel) = partyDao.update(party)
 
-    /**
-     * Expense Methods
-     */
+    // Expense Methods
     override fun getAllExpensesStream(partyId: Int): Flow<List<ExpenseModel>> =
         expenseDao.getAllExpensesForParty(partyId = partyId)
 

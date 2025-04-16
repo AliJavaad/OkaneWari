@@ -2,7 +2,7 @@ package com.example.okanewari.data
 
 import kotlinx.coroutines.flow.Flow
 
-interface PartyRepository {
+interface OkaneWariRepository {
     /**
      * Retrieve all the parties from the the given data source.
      */

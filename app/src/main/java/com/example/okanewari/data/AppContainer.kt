@@ -6,15 +6,15 @@ import android.content.Context
  * App container for Dependency injection.
  */
 interface AppContainer {
-    val partyRepository: PartyRepository
+    val partyRepository: OkaneWariRepository
 }
 
 class AppDataContainer(private val context: Context): AppContainer {
     /**
-     * Implementation for [PartyRepository]
+     * Implementation for [OkaneWariRepository]
      */
-    override val partyRepository: PartyRepository by lazy {
-        OfflinePartyRepository(
+    override val partyRepository: OkaneWariRepository by lazy {
+        OfflineOkaneWariRepository(
             OkaneWariDatabase.getDatabase(context).partyDao(),
             OkaneWariDatabase.getDatabase(context).expenseDao()
         )

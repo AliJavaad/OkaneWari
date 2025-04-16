@@ -6,17 +6,17 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.okanewari.data.PartyRepository
+import com.example.okanewari.data.OkaneWariRepository
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 /**
- * ViewModel to retrieve, update, or delete a party from the [PartyRepository]'s data source.
+ * ViewModel to retrieve, update, or delete a party from the [OkaneWariRepository]'s data source.
  */
 class EditPartyViewModel(
     savedStateHandle: SavedStateHandle,
-    private val partyRepository: PartyRepository
+    private val owRepository: OkaneWariRepository
 ) : ViewModel() {
 
     var editPartyUiState by mutableStateOf(EditPartyUiState())
@@ -26,7 +26,7 @@ class EditPartyViewModel(
 
     init {
         viewModelScope.launch {
-            editPartyUiState.partyUiState = partyRepository.getPartyStream(partyId)
+            editPartyUiState.partyUiState = owRepository.getPartyStream(partyId)
                 .filterNotNull()
                 .first()
                 .toPartyUiState(true)
@@ -38,7 +38,7 @@ class EditPartyViewModel(
 
     suspend fun updateParty() {
         if (validateInput()) {
-            partyRepository.updateParty(editPartyUiState.partyUiState.partyDetails.toPartyModel())
+            owRepository.updateParty(editPartyUiState.partyUiState.partyDetails.toPartyModel())
         }
     }
 
@@ -55,11 +55,11 @@ class EditPartyViewModel(
     }
 
     /**
-     * Deletes the Party from the [PartyRepository]'s data source.
+     * Deletes the Party from the [OkaneWariRepository]'s data source.
      */
     suspend fun deleteParty() {
         // TODO Safely delete all expenses
-        partyRepository.deleteParty(editPartyUiState.partyUiState.partyDetails.toPartyModel())
+        owRepository.deleteParty(editPartyUiState.partyUiState.partyDetails.toPartyModel())
     }
 
     private fun validateInput(uiState: PartyDetails = editPartyUiState.partyUiState.partyDetails): Boolean {
