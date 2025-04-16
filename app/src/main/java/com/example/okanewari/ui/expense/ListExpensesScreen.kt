@@ -34,6 +34,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.okanewari.Expense
 import com.example.okanewari.OkaneWareTopAppBar
 import com.example.okanewari.R
+import com.example.okanewari.data.ExpenseModel
 import com.example.okanewari.data.GetDummyExpenses
 import com.example.okanewari.navigation.NavigationDestination
 import com.example.okanewari.ui.OwViewModelProvider
@@ -57,7 +58,7 @@ fun ListExpensesScreen(
     modifier: Modifier = Modifier,
     viewModel: ListExpensesViewModel = viewModel(factory = OwViewModelProvider.Factory)
 ){
-    val partyUiState by viewModel.partyUiState.collectAsState()
+    val listExpensesUiState by viewModel.listExpensesUiState.collectAsState()
 
     // TODO get from database
     val myParty = GetDummyExpenses()
@@ -66,12 +67,12 @@ fun ListExpensesScreen(
         topBar = {
             OkaneWareTopAppBar(
                 // TODO title should be the current party name
-                title = partyUiState.partyDetails.partyName,
+                title = listExpensesUiState.partyDetails.partyName,
                 canNavigateBack = true,
                 navigateUp = navigateUp,
                 actionButtons = {
                     IconButton(
-                        onClick = {onSettingsButtonClicked(partyUiState.partyDetails.id)}
+                        onClick = {onSettingsButtonClicked(listExpensesUiState.partyDetails.id)}
                     ){
                         Icon(
                             imageVector = Icons.Filled.Settings,
@@ -89,7 +90,7 @@ fun ListExpensesScreen(
     ) { innerPadding ->
         ListExpensesBody(
             // expenseList = listOf(),
-            expenseList = myParty.expenseList,
+            expenseList = listExpensesUiState.expenseList,
             expenseClicked = onExpenseCardClick,
             partyDetails = PartyDetails(2, "TODO"),
             contentPadding = innerPadding
@@ -99,7 +100,7 @@ fun ListExpensesScreen(
 
 @Composable
 fun ListExpensesBody(
-    expenseList: List<Expense>,
+    expenseList: List<ExpenseModel>,
     expenseClicked: () -> Unit,
     partyDetails: PartyDetails,
     contentPadding: PaddingValues = PaddingValues(0.dp)
@@ -128,7 +129,7 @@ fun ListExpensesBody(
 
 @Composable
 fun DisplayExpenses(
-    expenseList: List<Expense>,
+    expenseList: List<ExpenseModel>,
     expenseClicked: () -> Unit,
     partyDetails: PartyDetails,
     contentPadding: PaddingValues = PaddingValues(0.dp)
@@ -149,7 +150,7 @@ fun DisplayExpenses(
                 ) {
                     Text(
                         // TODO align text in the column
-                        text = it.expenseName,
+                        text = it.name,
                         fontSize = 16.sp,
                         textAlign = TextAlign.Center,
                         maxLines = 2,
@@ -157,7 +158,7 @@ fun DisplayExpenses(
                     )
                     Text(
                         // TODO align text in the column
-                        text = partyDetails.currency + it.total,
+                        text = partyDetails.currency + it.amount,
                         fontSize = 16.sp,
                         textAlign = TextAlign.Center,
                         maxLines = 2,
