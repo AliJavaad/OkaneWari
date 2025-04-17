@@ -51,7 +51,7 @@ object ListExpensesDestination : NavigationDestination {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListExpensesScreen(
-    onAddExpenseButtonClicked: () -> Unit,
+    onAddExpenseButtonClicked: (Int) -> Unit,
     onSettingsButtonClicked: (Int) -> Unit,
     onExpenseCardClick: () -> Unit,
     navigateUp: () -> Unit,
@@ -84,7 +84,7 @@ fun ListExpensesScreen(
         },
         floatingActionButton = {
             DisplayFab(
-                myClick = onAddExpenseButtonClicked
+                myClick = { onAddExpenseButtonClicked(listExpensesUiState.partyDetails.id) }
             )
         }
     ) { innerPadding ->

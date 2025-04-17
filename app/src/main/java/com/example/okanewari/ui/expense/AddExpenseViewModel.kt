@@ -3,19 +3,21 @@ package com.example.okanewari.ui.expense
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.example.okanewari.data.ExpenseModel
 import com.example.okanewari.data.OkaneWariRepository
-import com.example.okanewari.ui.party.PartyDetails
 import java.math.BigDecimal
 
 class AddExpenseViewModel(
+    savedStateHandle: SavedStateHandle,
     private val owRepository: OkaneWariRepository
 ): ViewModel() {
 
+    private val partyId: Int = checkNotNull(savedStateHandle[AddExpenseDestination.partyIdArg])
+
     var addExpenseUiState by mutableStateOf(ExpenseUiState())
         private set
-
 
     private fun validateInput(uiState: ExpenseDetails = addExpenseUiState.expenseDetails): Boolean {
         return with(uiState) {
@@ -28,7 +30,8 @@ class AddExpenseViewModel(
  * Represents Ui State for a party.
  */
 data class ExpenseUiState(
-    val expenseDetails: ExpenseDetails = ExpenseDetails()
+    val expenseDetails: ExpenseDetails = ExpenseDetails(),
+    val isEntryValid: Boolean = false
 )
 
 data class ExpenseDetails(
