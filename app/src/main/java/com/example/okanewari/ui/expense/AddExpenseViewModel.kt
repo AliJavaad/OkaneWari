@@ -19,6 +19,24 @@ class AddExpenseViewModel(
     var addExpenseUiState by mutableStateOf(ExpenseUiState())
         private set
 
+    /**
+     * Updates the [addExpenseUiState] with the value provided in the argument.
+     * This method also triggers a validation for input values.
+     */
+    fun updateUiState(expenseDetails: ExpenseDetails) {
+        addExpenseUiState =
+            ExpenseUiState(
+                expenseDetails = expenseDetails,
+                isEntryValid = validateInput(expenseDetails)
+            )
+    }
+
+    suspend fun saveExpense() {
+        if (validateInput()) {
+            owRepository.insertExpense(addExpenseUiState.expenseDetails.toExpenseModel())
+        }
+    }
+
     private fun validateInput(uiState: ExpenseDetails = addExpenseUiState.expenseDetails): Boolean {
         return with(uiState) {
             name.isNotBlank()

@@ -51,9 +51,7 @@ fun EditExpenseBody(
     Column(
         modifier = Modifier.padding(contentPadding)
     ) {
-        ExpenseInputForm(
 
-        )
         DoneAndCancelButtons(
             doneButtonClick = onDone,
             cancelButtonClick = onCancel
