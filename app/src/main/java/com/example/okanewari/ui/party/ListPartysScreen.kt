@@ -1,5 +1,6 @@
 package com.example.okanewari.ui.party
 
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -140,7 +141,10 @@ fun DisplayParties(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(dimensionResource(R.dimen.medium_padding))
-                    .clickable { partyClicked(it.id) }
+                    .clickable {
+                        Log.d("PartyKey", "Inserting selected party's key: ${it.id}")
+                        partyClicked(it.id)
+                    }
             ){
                 Row(
                     verticalAlignment = Alignment.CenterVertically

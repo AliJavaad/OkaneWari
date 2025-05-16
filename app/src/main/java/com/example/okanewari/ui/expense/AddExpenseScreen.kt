@@ -1,5 +1,6 @@
 package com.example.okanewari.ui.expense
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -40,6 +41,8 @@ fun AddExpenseScreen(
     viewModel: AddExpenseViewModel = viewModel(factory = OwViewModelProvider.Factory)
 ){
     val coroutineScope = rememberCoroutineScope()
+    Log.d("PartyKey", "AddExpenseScreenPartyKey: ${viewModel.addExpenseUiState.expenseDetails.partyKey}")
+
     Scaffold(
         topBar = {
             OkaneWareTopAppBar(
@@ -53,8 +56,9 @@ fun AddExpenseScreen(
             expenseUiState = viewModel.addExpenseUiState,
             onValueChange = viewModel::updateUiState,
             onDone = {
+                Log.d("PartyKey", "Adding expense to partyKey: ${viewModel.addExpenseUiState.expenseDetails.partyKey}")
                 coroutineScope.launch{
-                    // viewModel.saveExpense()
+                    viewModel.saveExpense()
                     navigateBack()
                 }
             },

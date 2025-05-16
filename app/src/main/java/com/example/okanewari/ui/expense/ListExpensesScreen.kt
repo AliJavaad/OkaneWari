@@ -1,5 +1,6 @@
 package com.example.okanewari.ui.expense
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -62,6 +63,7 @@ fun ListExpensesScreen(
 
     // TODO get from database
     val myParty = GetDummyExpenses()
+    Log.d("PartyKey", "ListExpensesScreen partykey: ${listExpensesUiState.partyDetails.id}")
 
     Scaffold (
         topBar = {

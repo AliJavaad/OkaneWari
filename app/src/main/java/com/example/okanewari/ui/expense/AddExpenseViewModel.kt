@@ -15,7 +15,7 @@ class AddExpenseViewModel(
 
     private val partyId: Int = checkNotNull(savedStateHandle[AddExpenseDestination.partyIdArg])
 
-    var addExpenseUiState by mutableStateOf(ExpenseUiState())
+    var addExpenseUiState by mutableStateOf(ExpenseUiState(ExpenseDetails(partyKey = partyId)))
         private set
 
     /**

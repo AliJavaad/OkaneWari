@@ -3,7 +3,6 @@ package com.example.okanewari.data
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
-import java.math.BigDecimal
 
 @Entity(
     tableName = "expense_table",
@@ -12,6 +11,7 @@ import java.math.BigDecimal
             entity = PartyModel::class,
             parentColumns = arrayOf("id"),
             childColumns = arrayOf("partyKey"),
+            onUpdate = ForeignKey.CASCADE,
             onDelete = ForeignKey.CASCADE
         )
     ]
