@@ -10,18 +10,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.okanewari.OkaneWareTopAppBar
 import com.example.okanewari.R
@@ -87,7 +81,8 @@ fun ExpenseEntryBody(
         )
         DoneAndCancelButtons(
             doneButtonClick = onDone,
-            cancelButtonClick = onCancel
+            cancelButtonClick = onCancel,
+            enableDone = expenseUiState.isEntryValid
         )
     }
 }
@@ -113,27 +108,18 @@ fun ExpenseInputForm(
     /**
      * Handling the money input field
      */
-    var showWarning by rememberSaveable { mutableStateOf(false) }
     TextField(
         value = expenseDetails.amount,
         onValueChange = {
-            showWarning = !canConvertStringToBigDecimal(it)
             onValueChange(expenseDetails.copy(amount = it))
         },
         label = { Text(stringResource(R.string.amount)) },
         placeholder = { Text(stringResource(R.string.zero)) },
         singleLine = true,
         keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+        supportingText = { Text(stringResource(R.string.currency_format_warning)) },
         modifier = Modifier
             .fillMaxWidth()
             .padding(all = dimensionResource(R.dimen.medium_padding))
     )
-    if(showWarning){
-        Text(
-            stringResource(R.string.currency_format_warning),
-            color = Color.Red,
-            fontSize = 12.sp,
-            modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.medium_padding))
-        )
-    }
 }

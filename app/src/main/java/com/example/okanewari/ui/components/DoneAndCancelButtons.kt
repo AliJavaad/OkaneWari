@@ -32,6 +32,7 @@ fun DoneAndCancelButtons(
 
         Button(
             modifier = Modifier.fillMaxWidth(),
+            enabled = enableDone,
             onClick = doneButtonClick
         ) {
             Text(
