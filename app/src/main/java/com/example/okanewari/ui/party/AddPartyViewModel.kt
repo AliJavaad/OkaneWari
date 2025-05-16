@@ -4,8 +4,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import com.example.okanewari.data.PartyModel
 import com.example.okanewari.data.OkaneWariRepository
+import com.example.okanewari.data.PartyModel
 
 /**
  * ViewModel to validate and insert Party in the Room database.

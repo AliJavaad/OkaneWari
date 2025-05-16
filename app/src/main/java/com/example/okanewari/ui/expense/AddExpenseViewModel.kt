@@ -7,7 +7,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.example.okanewari.data.ExpenseModel
 import com.example.okanewari.data.OkaneWariRepository
-import java.math.BigDecimal
 
 class AddExpenseViewModel(
     savedStateHandle: SavedStateHandle,
@@ -39,7 +38,7 @@ class AddExpenseViewModel(
 
     private fun validateInput(uiState: ExpenseDetails = addExpenseUiState.expenseDetails): Boolean {
         return with(uiState) {
-            name.isNotBlank()
+            name.isNotBlank() && canConvertStringToBigDecimal(amount)
         }
     }
 }
@@ -56,7 +55,7 @@ data class ExpenseDetails(
     val id: Int = 0,
     val partyKey: Int = 0,
     val name: String = "",
-    val amount: BigDecimal = BigDecimal(0.0)
+    val amount: String = "0.00"
 )
 
 /**
@@ -68,8 +67,7 @@ fun ExpenseDetails.toExpenseModel(): ExpenseModel = ExpenseModel(
     id = id,
     partyKey = partyKey,
     name = name,
-    // No negative numbers
-    amount = amount.coerceAtLeast(BigDecimal.ZERO).toString()
+    amount = amount
 )
 
 /**
@@ -86,5 +84,9 @@ fun ExpenseModel.toExpenseDetails(): ExpenseDetails = ExpenseDetails(
     id = id,
     partyKey = partyKey,
     name = name,
-    amount = BigDecimal(amount)
+    amount = amount
 )
+
+fun canConvertStringToBigDecimal(value: String): Boolean{
+    return value.matches(Regex("^\\d{1,8}(\\.\\d{1,2})?\$"))
+}

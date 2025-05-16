@@ -19,6 +19,7 @@
     <string name="expense_name">Expense Name</string>
     <string name="amount">Amount</string>
     <string name="zero">0.0</string>
+    <string name="currency_format_warning">Please enter the amount in the format "1234" or "1234.56"</string>
     <!-- Content Description -->
     <string name="settings_buttton_description">Settings.</string>
     <!-- Buttons -->
