@@ -78,7 +78,8 @@ fun OkaneWariNavHost(
                     navController.navigate("${AddExpenseDestination.route}/${it}") },
                 onSettingsButtonClicked = {
                     navController.navigate("${EditPartyDestination.route}/${it}") },
-                onExpenseCardClick = { navController.navigate(EditExpenseDestination.route) }
+                onExpenseCardClick = {
+                    navController.navigate("${EditExpenseDestination.route}/${it[0]}/${it[1]}") }
             )
         }
         composable(
@@ -91,7 +92,13 @@ fun OkaneWariNavHost(
                 navigateBack = { navController.popBackStack() }
             )
         }
-        composable(route = EditExpenseDestination.route) {
+        composable(
+            route = EditExpenseDestination.routeWithArg,
+            arguments = listOf(
+                navArgument(EditExpenseDestination.partyIdArg){ type = NavType.IntType },
+                navArgument(EditExpenseDestination.expenseIdArg){ type = NavType.IntType }
+                )
+        ) {
             EditExpenseScreen(
                 navigateUp = { navController.navigateUp() },
                 navigateBack = { navController.popBackStack() }

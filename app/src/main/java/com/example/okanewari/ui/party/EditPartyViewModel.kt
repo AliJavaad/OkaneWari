@@ -58,7 +58,6 @@ class EditPartyViewModel(
      * Deletes the Party from the [OkaneWariRepository]'s data source.
      */
     suspend fun deleteParty() {
-        // TODO Safely delete all expenses
         owRepository.deleteParty(editPartyUiState.partyUiState.partyDetails.toPartyModel())
     }
 

@@ -55,12 +55,17 @@ object ListExpensesDestination : NavigationDestination {
     val routeWithArg = "{$route}/{$partyIdArg}"
 }
 
+/**
+ * onExpenseCardClick: (List<Int>)
+ *      [0] = party id
+ *      [1] = expense id
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListExpensesScreen(
     onAddExpenseButtonClicked: (Int) -> Unit,
     onSettingsButtonClicked: (Int) -> Unit,
-    onExpenseCardClick: () -> Unit,
+    onExpenseCardClick: (List<Int>) -> Unit,
     navigateUp: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ListExpensesViewModel = viewModel(factory = OwViewModelProvider.Factory)
@@ -107,7 +112,7 @@ fun ListExpensesScreen(
 @Composable
 fun ListExpensesBody(
     expenseList: List<ExpenseModel>,
-    expenseClicked: () -> Unit,
+    expenseClicked: (List<Int>) -> Unit,
     partyDetails: PartyDetails,
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
@@ -136,7 +141,7 @@ fun ListExpensesBody(
 @Composable
 fun DisplayExpenses(
     expenseList: List<ExpenseModel>,
-    expenseClicked: () -> Unit,
+    expenseClicked: (List<Int>) -> Unit,
     partyDetails: PartyDetails,
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
@@ -148,7 +153,7 @@ fun DisplayExpenses(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(12.dp)
-                    .clickable { expenseClicked() }
+                    .clickable { expenseClicked(listOf(partyDetails.id, it.id)) }
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically

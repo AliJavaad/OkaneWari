@@ -8,6 +8,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.okanewari.OkaneWariApplication
 import com.example.okanewari.ui.expense.ListExpensesViewModel
 import com.example.okanewari.ui.expense.AddExpenseViewModel
+import com.example.okanewari.ui.expense.EditExpenseViewModel
 import com.example.okanewari.ui.party.AddPartyViewModel
 import com.example.okanewari.ui.party.EditPartyViewModel
 import com.example.okanewari.ui.party.ListPartysViewModel
@@ -46,6 +47,13 @@ object OwViewModelProvider {
         // Initializer for AddExpenseViewModel
         initializer {
             AddExpenseViewModel(
+                this.createSavedStateHandle(),
+                okaneWariApplication().container.okaneWariRepository
+            )
+        }
+        // Initializer for EditExpenseViewModel
+        initializer {
+            EditExpenseViewModel(
                 this.createSavedStateHandle(),
                 okaneWariApplication().container.okaneWariRepository
             )

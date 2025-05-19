@@ -91,7 +91,8 @@ fun DoneCancelDeleteButtons(
 ) {
     DoneAndCancelButtons(
         doneButtonClick = doneButtonClick,
-        cancelButtonClick = cancelButtonClick
+        cancelButtonClick = cancelButtonClick,
+        enableDone = enableDone
     )
 
     var deleteConfirmationRequired by rememberSaveable { mutableStateOf(false) }
