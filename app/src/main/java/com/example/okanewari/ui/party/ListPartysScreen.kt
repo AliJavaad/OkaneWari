@@ -124,7 +124,6 @@ fun ListPartysBody(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DisplayParties(
     partyList: List<PartyModel>,
