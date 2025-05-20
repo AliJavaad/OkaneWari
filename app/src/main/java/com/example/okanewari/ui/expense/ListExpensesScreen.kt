@@ -129,7 +129,7 @@ fun ListExpensesBody(
             )
         }
     } else {
-        DisplayExpenses(
+        DisplayExpensesAndStats(
             expenseList = expenseList,
             expenseClicked = expenseClicked,
             partyDetails = partyDetails,
@@ -139,15 +139,22 @@ fun ListExpensesBody(
 }
 
 @Composable
-fun DisplayExpenses(
+fun DisplayExpensesAndStats(
     expenseList: List<ExpenseModel>,
     expenseClicked: (List<Int>) -> Unit,
     partyDetails: PartyDetails,
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
+
     LazyColumn(
         modifier = Modifier.padding(contentPadding)
     ) {
+        item{
+            DisplayPartyStats(
+                expenseList = expenseList,
+                currSymbol = partyDetails.currency
+            )
+        }
         items(expenseList) {
             Card(
                 modifier = Modifier
@@ -159,7 +166,7 @@ fun DisplayExpenses(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable.baseline_token_24),
+                        painter = painterResource(id = R.drawable.baseline_sell_8),
                         contentDescription = "",
                         modifier = Modifier
                             .width(dimensionResource(R.dimen.thumbnail_width))
@@ -183,6 +190,44 @@ fun DisplayExpenses(
                         )
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+fun DisplayPartyStats(
+    expenseList: List<ExpenseModel>,
+    currSymbol: String
+){
+    Card (
+        modifier = Modifier.padding(12.dp).fillMaxWidth()
+    ){
+        Row (
+            verticalAlignment = Alignment.CenterVertically
+        ){
+            Image(
+                painter = painterResource(id = R.drawable.baseline_insert_chart_8),
+                contentDescription = "Party Statistics",
+                modifier = Modifier
+                    .width(dimensionResource(R.dimen.thumbnail_width))
+                    .height(dimensionResource(R.dimen.thumbnail_height))
+                    .padding(all = dimensionResource(R.dimen.medium_padding))
+            )
+            Column{
+                Text(
+                    text = stringResource(R.string.total) + ": "
+                            + currSymbol
+                            + getExpenseListSumTotal(expenseList),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    text = stringResource(R.string.number_of_expenses) + ": "
+                            + expenseList.count(),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
             }
         }
     }

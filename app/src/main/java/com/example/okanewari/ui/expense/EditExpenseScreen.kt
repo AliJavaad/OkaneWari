@@ -8,12 +8,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.okanewari.OkaneWareTopAppBar
 import com.example.okanewari.R
 import com.example.okanewari.navigation.NavigationDestination
 import com.example.okanewari.ui.OwViewModelProvider
-import com.example.okanewari.ui.components.DoneAndCancelButtons
 import com.example.okanewari.ui.party.DoneCancelDeleteButtons
 import kotlinx.coroutines.launch
 
@@ -40,8 +40,8 @@ fun EditExpenseScreen(
     Scaffold(
         topBar = {
             OkaneWareTopAppBar(
-                title = viewModel.editExpenseUiState.topBarExpenseName,
-                canNavigateBack = true,
+                title = stringResource(R.string.expense)+ ": " + viewModel.editExpenseUiState.topBarExpenseName,
+                canNavigateBack = canNavigateBackBool,
                 navigateUp = navigateUp
             )
         }
