@@ -21,5 +21,6 @@ data class ExpenseModel (
     val id: Int = 0,
     val partyKey: Int,
     val name: String,
-    val amount: String
+    val amount: String,
+    val dateModded: Long
 )

@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.example.okanewari.data.OkaneWariRepository
 import com.example.okanewari.data.PartyModel
+import java.util.Date
 
 /**
  * ViewModel to validate and insert Party in the Room database.
@@ -57,6 +58,7 @@ data class PartyDetails(
     // Defualt currency symbol for a new party
     val currency: String = "¥",
     val numberOfMems: String = "1",
+    val dateModded: Date = Date()
 )
 
 /**
@@ -68,7 +70,8 @@ fun PartyDetails.toPartyModel(): PartyModel = PartyModel(
     id = id,
     partyName = partyName,
     currency = currency,
-    numberOfMembers = numberOfMems.toIntOrNull() ?: 1
+    numberOfMembers = numberOfMems.toIntOrNull() ?: 1,
+    dateModded = dateModded.time
 )
 
 /**
@@ -86,5 +89,6 @@ fun PartyModel.toPartyDetails(): PartyDetails = PartyDetails(
     id = id,
     partyName = partyName,
     currency = currency,
-    numberOfMems = numberOfMembers.toString()
+    numberOfMems = numberOfMembers.toString(),
+    dateModded = Date(dateModded)
 )

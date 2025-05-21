@@ -45,6 +45,7 @@ import com.example.okanewari.data.ExpenseModel
 import com.example.okanewari.data.GetDummyExpenses
 import com.example.okanewari.navigation.NavigationDestination
 import com.example.okanewari.ui.OwViewModelProvider
+import com.example.okanewari.ui.components.DateHandler
 import com.example.okanewari.ui.components.DisplayFab
 import com.example.okanewari.ui.party.PartyDetails
 
@@ -184,6 +185,14 @@ fun DisplayExpensesAndStats(
                         Text(
                             text = partyDetails.currency + it.amount,
                             fontSize = 16.sp,
+                            textAlign = TextAlign.Center,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Text(
+                            text = stringResource(R.string.last_modified) + ": "
+                                    + DateHandler.formatter.format(it.dateModded),
+                            fontSize = 12.sp,
                             textAlign = TextAlign.Center,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis

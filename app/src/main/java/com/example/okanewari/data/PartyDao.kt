@@ -31,13 +31,13 @@ interface PartyDao {
     @Delete
     suspend fun delete(party: PartyModel)
 
-    @Query("SELECT * from party_table WHERE id = :id")
+    @Query("SELECT * FROM party_table WHERE id = :id")
     fun getParty(id: Int): Flow<PartyModel>
 
-    @Query("SELECT * from party_table")
+    @Query("SELECT * FROM party_table ORDER BY dateModded DESC")
     fun getAllRecords(): Flow<List<PartyModel>>
 
-    @Query("SELECT partyName from party_table")
+    @Query("SELECT partyName FROM party_table")
     fun getAllNames(): Flow<List<String>>
 
     @RawQuery(observedEntities = [PartyModel::class])
