@@ -21,10 +21,10 @@ interface ExpenseDao {
     @Delete
     suspend fun delete(expense: ExpenseModel)
 
-    @Query("SELECT * from expense_table WHERE id = :id AND partyKey = :partyId")
+    @Query("SELECT * FROM expense_table WHERE id = :id AND partyKey = :partyId")
     fun getExpense(id: Int, partyId: Int): Flow<ExpenseModel>
 
-    @Query("SELECT * from expense_table WHERE partyKey = :partyId")
+    @Query("SELECT * from expense_table WHERE partyKey = :partyId ORDER BY dateModded DESC")
     fun getAllExpensesForParty(partyId: Int): Flow<List<ExpenseModel>>
 
     @RawQuery(observedEntities = [ExpenseModel::class])

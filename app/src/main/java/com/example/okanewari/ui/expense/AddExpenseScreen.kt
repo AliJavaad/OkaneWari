@@ -23,7 +23,10 @@ import com.example.okanewari.R
 import com.example.okanewari.navigation.NavigationDestination
 import com.example.okanewari.ui.OwViewModelProvider
 import com.example.okanewari.ui.components.DoneAndCancelButtons
+import com.example.okanewari.ui.party.PartyDetails
+import com.example.okanewari.ui.party.PartyUiState
 import kotlinx.coroutines.launch
+import java.util.Date
 
 object AddExpenseDestination: NavigationDestination{
     override val route = "add_new_expense"
@@ -41,7 +44,6 @@ fun AddExpenseScreen(
     viewModel: AddExpenseViewModel = viewModel(factory = OwViewModelProvider.Factory)
 ){
     val coroutineScope = rememberCoroutineScope()
-    Log.d("PartyKey", "AddExpenseScreenPartyKey: ${viewModel.addExpenseUiState.expenseDetails.partyKey}")
 
     Scaffold(
         topBar = {
@@ -53,12 +55,13 @@ fun AddExpenseScreen(
         }
     ){ innerPadding ->
         ExpenseEntryBody(
-            expenseUiState = viewModel.addExpenseUiState,
+            expenseUiState = viewModel.addExpenseUiState.expenseUiState,
+            partyUiState = viewModel.addExpenseUiState.partyUiState,
             onValueChange = viewModel::updateUiState,
             onDone = {
-                Log.d("PartyKey", "Adding expense to partyKey: ${viewModel.addExpenseUiState.expenseDetails.partyKey}")
                 coroutineScope.launch{
                     viewModel.saveExpense()
+                    viewModel.updateParty()
                     navigateBack()
                 }
             },
@@ -71,7 +74,8 @@ fun AddExpenseScreen(
 @Composable
 fun ExpenseEntryBody(
     expenseUiState: ExpenseUiState,
-    onValueChange: (ExpenseDetails) -> Unit,
+    partyUiState: PartyUiState,
+    onValueChange: (PartyDetails, ExpenseDetails) -> Unit,
     onDone: () -> Unit,
     onCancel: () -> Unit,
     contentPadding: PaddingValues = PaddingValues(0.dp)
@@ -81,6 +85,7 @@ fun ExpenseEntryBody(
     ) {
         ExpenseInputForm(
             expenseDetails = expenseUiState.expenseDetails,
+            partyDetails = partyUiState.partyDetails,
             onValueChange = onValueChange
         )
         DoneAndCancelButtons(
@@ -94,14 +99,16 @@ fun ExpenseEntryBody(
 @Composable
 fun ExpenseInputForm(
     expenseDetails: ExpenseDetails,
-    onValueChange: (ExpenseDetails) -> Unit,
+    partyDetails: PartyDetails,
+    onValueChange: (PartyDetails, ExpenseDetails) -> Unit,
 ) {
     /**
      * Handling the expense name input field
      */
     TextField(
         value = expenseDetails.name,
-        onValueChange = { onValueChange(expenseDetails.copy(name = it)) },
+        onValueChange = {
+            onValueChange(partyDetails.copy(dateModded = Date()), expenseDetails.copy(name = it, dateModded = Date())) },
         label = { Text(stringResource(R.string.expense_name)) },
         placeholder = { Text(stringResource(R.string.expense)) },
         singleLine = true,
@@ -115,7 +122,7 @@ fun ExpenseInputForm(
     TextField(
         value = expenseDetails.amount,
         onValueChange = {
-            onValueChange(expenseDetails.copy(amount = it))
+            onValueChange(partyDetails.copy(dateModded = Date()), expenseDetails.copy(amount = it, dateModded = Date()))
         },
         label = { Text(stringResource(R.string.amount)) },
         placeholder = { Text(stringResource(R.string.zero)) },

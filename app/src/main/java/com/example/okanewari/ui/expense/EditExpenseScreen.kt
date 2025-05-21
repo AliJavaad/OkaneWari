@@ -16,6 +16,7 @@ import com.example.okanewari.navigation.NavigationDestination
 import com.example.okanewari.ui.OwViewModelProvider
 import com.example.okanewari.ui.party.DoneCancelDeleteButtons
 import kotlinx.coroutines.launch
+import java.util.Date
 
 object EditExpenseDestination: NavigationDestination{
     override val route = "edit_expense"
@@ -51,18 +52,26 @@ fun EditExpenseScreen(
         ){
             ExpenseInputForm(
                 expenseDetails = viewModel.editExpenseUiState.expenseUiState.expenseDetails,
+                partyDetails = viewModel.editExpenseUiState.partyUiState.partyDetails,
                 onValueChange = viewModel::updateUiState
             )
             DoneCancelDeleteButtons(
                 doneButtonClick = { coroutineScope.launch{
                     viewModel.updateExpense()
+                    viewModel.updateParty()
                     navigateBack()
                 } },
                 cancelButtonClick = navigateBack,
-                deleteButtonClicked = { coroutineScope.launch{
-                    viewModel.deleteExpense()
-                    navigateBack()
-                } },
+                deleteButtonClicked = {
+                    // Need to update the date modified for the party details so delete is reflected
+                    viewModel.updateUiState(
+                        viewModel.editExpenseUiState.partyUiState.partyDetails.copy(dateModded = Date()),
+                        viewModel.editExpenseUiState.expenseUiState.expenseDetails.copy())
+                    coroutineScope.launch{
+                        viewModel.deleteExpense()
+                        viewModel.updateParty()
+                        navigateBack()
+                    } },
                 enableDone = viewModel.editExpenseUiState.expenseUiState.isEntryValid
             )
         }

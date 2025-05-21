@@ -5,8 +5,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.okanewari.data.ExpenseModel
 import com.example.okanewari.data.OkaneWariRepository
+import com.example.okanewari.ui.party.PartyDetails
+import com.example.okanewari.ui.party.PartyUiState
+import com.example.okanewari.ui.party.toPartyModel
+import com.example.okanewari.ui.party.toPartyUiState
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import java.util.Date
 
 class AddExpenseViewModel(
     savedStateHandle: SavedStateHandle,
@@ -15,36 +24,55 @@ class AddExpenseViewModel(
 
     private val partyId: Int = checkNotNull(savedStateHandle[AddExpenseDestination.partyIdArg])
 
-    var addExpenseUiState by mutableStateOf(ExpenseUiState(ExpenseDetails(partyKey = partyId)))
+    var addExpenseUiState by mutableStateOf(AddExpenseUiState(expenseUiState = ExpenseUiState(ExpenseDetails(partyKey = partyId))))
         private set
+
+    // Get the initial party info when entering the screen
+    init {
+        viewModelScope.launch {
+            addExpenseUiState.partyUiState = owRepository.getPartyStream(partyId)
+                .filterNotNull()
+                .first()
+                .toPartyUiState(true)
+        }
+    }
 
     /**
      * Updates the [addExpenseUiState] with the value provided in the argument.
      * This method also triggers a validation for input values.
      */
-    fun updateUiState(expenseDetails: ExpenseDetails) {
+    fun updateUiState(partyDetails: PartyDetails, expenseDetails: ExpenseDetails) {
         addExpenseUiState =
-            ExpenseUiState(
-                expenseDetails = expenseDetails,
-                isEntryValid = validateInput(expenseDetails)
+            AddExpenseUiState(
+                expenseUiState = ExpenseUiState(expenseDetails, validateExpense(expenseDetails)),
+                partyUiState = PartyUiState(partyDetails, true)
             )
     }
 
     suspend fun saveExpense() {
-        if (validateInput()) {
-            owRepository.insertExpense(addExpenseUiState.expenseDetails.toExpenseModel())
+        if (validateExpense()) {
+            owRepository.insertExpense(addExpenseUiState.expenseUiState.expenseDetails.toExpenseModel())
         }
     }
 
-    private fun validateInput(uiState: ExpenseDetails = addExpenseUiState.expenseDetails): Boolean {
+    suspend fun updateParty(){
+        owRepository.updateParty(addExpenseUiState.partyUiState.partyDetails.toPartyModel())
+    }
+
+    private fun validateExpense(uiState: ExpenseDetails = addExpenseUiState.expenseUiState.expenseDetails): Boolean {
         return with(uiState) {
             name.isNotBlank() && canConvertStringToBigDecimal(amount)
         }
     }
 }
 
+data class AddExpenseUiState(
+    var partyUiState: PartyUiState = PartyUiState(PartyDetails()),
+    val expenseUiState: ExpenseUiState = ExpenseUiState(ExpenseDetails())
+)
+
 /**
- * Represents Ui State for a party.
+ * Represents Ui State for an expense.
  */
 data class ExpenseUiState(
     val expenseDetails: ExpenseDetails = ExpenseDetails(),
@@ -55,7 +83,8 @@ data class ExpenseDetails(
     val id: Int = 0,
     val partyKey: Int = 0,
     val name: String = "",
-    val amount: String = "0.00"
+    val amount: String = "0.00",
+    val dateModded: Date = Date()
 )
 
 /**
@@ -67,7 +96,8 @@ fun ExpenseDetails.toExpenseModel(): ExpenseModel = ExpenseModel(
     id = id,
     partyKey = partyKey,
     name = name,
-    amount = amount
+    amount = amount,
+    dateModded = dateModded.time
 )
 
 /**
@@ -84,7 +114,8 @@ fun ExpenseModel.toExpenseDetails(): ExpenseDetails = ExpenseDetails(
     id = id,
     partyKey = partyKey,
     name = name,
-    amount = amount
+    amount = amount,
+    dateModded = Date(dateModded)
 )
 
 fun canConvertStringToBigDecimal(value: String): Boolean{

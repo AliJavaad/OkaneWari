@@ -7,6 +7,11 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.okanewari.data.OkaneWariRepository
+import com.example.okanewari.ui.party.PartyDetails
+import com.example.okanewari.ui.party.PartyUiState
+import com.example.okanewari.ui.party.toPartyModel
+import com.example.okanewari.ui.party.toPartyUiState
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -27,6 +32,10 @@ class EditExpenseViewModel(
                 .filterNotNull()
                 .first()
                 .toExpenseUiState()
+            editExpenseUiState.partyUiState = owRepository.getPartyStream(partyId)
+                .filterNotNull()
+                .first()
+                .toPartyUiState()
             // The topBarExpenseName should only be updated at the initial screen creation stage.
             // Otherwise it will keep changing as the text field name is edited.
             editExpenseUiState.topBarExpenseName =
@@ -34,10 +43,11 @@ class EditExpenseViewModel(
         }
     }
 
-    fun updateUiState(expenseDetails: ExpenseDetails) {
+    fun updateUiState(partyDetails: PartyDetails, expenseDetails: ExpenseDetails) {
         editExpenseUiState =
             EditExpenseUiState(
                 expenseUiState = ExpenseUiState(expenseDetails, validateInput(expenseDetails)),
+                partyUiState = PartyUiState(partyDetails, true),
                 topBarExpenseName = editExpenseUiState.topBarExpenseName
             )
     }
@@ -46,6 +56,10 @@ class EditExpenseViewModel(
         if (validateInput()) {
             owRepository.updateExpense(editExpenseUiState.expenseUiState.expenseDetails.toExpenseModel())
         }
+    }
+
+    suspend fun updateParty(){
+        owRepository.updateParty(editExpenseUiState.partyUiState.partyDetails.toPartyModel())
     }
 
     /**
@@ -67,5 +81,6 @@ class EditExpenseViewModel(
  */
 data class EditExpenseUiState(
     var expenseUiState: ExpenseUiState = ExpenseUiState(ExpenseDetails()),
+    var partyUiState: PartyUiState = PartyUiState(PartyDetails()),
     var topBarExpenseName: String = ""
 )
