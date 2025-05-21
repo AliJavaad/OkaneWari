@@ -37,6 +37,7 @@ import com.example.okanewari.ui.OwViewModelProvider
 import com.example.okanewari.ui.components.CurrencySymbols
 import com.example.okanewari.ui.components.DoneAndCancelButtons
 import kotlinx.coroutines.launch
+import java.util.Date
 
 
 object AddPartyDestination: NavigationDestination{
@@ -113,7 +114,8 @@ fun PartyInputForm(
      */
     TextField(
         value = partyDetails.partyName,
-        onValueChange = { onValueChange(partyDetails.copy(partyName = it)) },
+        onValueChange = {
+            onValueChange(partyDetails.copy(partyName = it, dateModded = Date()) )},
         label = { Text(stringResource(R.string.party_name)) },
         placeholder = { Text(stringResource(R.string.my_party)) },
         singleLine = true,

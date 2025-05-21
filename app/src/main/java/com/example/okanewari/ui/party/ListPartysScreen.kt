@@ -1,10 +1,8 @@
 package com.example.okanewari.ui.party
 
 import android.util.Log
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -38,12 +36,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.okanewari.OkaneWareTopAppBar
-import com.example.okanewari.Party
 import com.example.okanewari.R
-import com.example.okanewari.data.DummyPartyData
 import com.example.okanewari.data.PartyModel
 import com.example.okanewari.navigation.NavigationDestination
 import com.example.okanewari.ui.OwViewModelProvider
+import com.example.okanewari.ui.components.DateHandler
 import com.example.okanewari.ui.components.DisplayFab
 import com.example.okanewari.ui.components.FabSize
 
@@ -165,6 +162,14 @@ fun DisplayParties(
                             fontSize = 32.sp,
                             textAlign = TextAlign.Center,
                             maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Text(
+                            text = stringResource(R.string.last_modified) + ": " +
+                                    DateHandler.formatter.format(it.dateModded),
+                            fontSize = 14.sp,
+                            textAlign = TextAlign.Center,
+                            maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
                     }

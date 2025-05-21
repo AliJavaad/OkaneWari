@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 
 @Database(
     entities = [PartyModel::class, ExpenseModel::class],
-    version = 3,
+    version = 4,
     // TODO exportSchema
     exportSchema = false
 )

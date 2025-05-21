@@ -9,6 +9,7 @@ import androidx.room.PrimaryKey
  * [partyName]: party name that should be displayed
  * [numberOfMembers]: current number of members in the party
  * [currency]: the currency prefix for displaying numbers
+ * [dateModded]: the date in yyyy-mm-dd
  */
 @Entity(tableName = "party_table")
 data class PartyModel (
@@ -16,5 +17,6 @@ data class PartyModel (
     val id: Int = 0,
     val partyName: String,
     val currency: String,
-    val numberOfMembers: Int
+    val numberOfMembers: Int,
+    val dateModded: Long
 )
