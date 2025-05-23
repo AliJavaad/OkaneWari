@@ -36,6 +36,8 @@ import com.example.okanewari.navigation.NavigationDestination
 import com.example.okanewari.ui.OwViewModelProvider
 import com.example.okanewari.ui.components.CurrencySymbols
 import com.example.okanewari.ui.components.DoneAndCancelButtons
+import com.example.okanewari.ui.components.PartyDetails
+import com.example.okanewari.ui.components.PartyUiState
 import kotlinx.coroutines.launch
 import java.util.Date
 

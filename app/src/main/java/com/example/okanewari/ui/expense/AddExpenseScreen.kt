@@ -1,6 +1,5 @@
 package com.example.okanewari.ui.expense
 
-import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,8 +22,10 @@ import com.example.okanewari.R
 import com.example.okanewari.navigation.NavigationDestination
 import com.example.okanewari.ui.OwViewModelProvider
 import com.example.okanewari.ui.components.DoneAndCancelButtons
-import com.example.okanewari.ui.party.PartyDetails
-import com.example.okanewari.ui.party.PartyUiState
+import com.example.okanewari.ui.components.ExpenseDetails
+import com.example.okanewari.ui.components.ExpenseUiState
+import com.example.okanewari.ui.components.PartyDetails
+import com.example.okanewari.ui.components.PartyUiState
 import kotlinx.coroutines.launch
 import java.util.Date
 

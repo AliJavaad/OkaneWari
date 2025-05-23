@@ -6,16 +6,18 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.okanewari.data.ExpenseModel
 import com.example.okanewari.data.OkaneWariRepository
-import com.example.okanewari.ui.party.PartyDetails
-import com.example.okanewari.ui.party.PartyUiState
-import com.example.okanewari.ui.party.toPartyModel
-import com.example.okanewari.ui.party.toPartyUiState
+import com.example.okanewari.ui.components.ExpenseDetails
+import com.example.okanewari.ui.components.ExpenseUiState
+import com.example.okanewari.ui.components.canConvertStringToBigDecimal
+import com.example.okanewari.ui.components.toExpenseModel
+import com.example.okanewari.ui.components.PartyDetails
+import com.example.okanewari.ui.components.PartyUiState
+import com.example.okanewari.ui.components.toPartyModel
+import com.example.okanewari.ui.components.toPartyUiState
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import java.util.Date
 
 class AddExpenseViewModel(
     savedStateHandle: SavedStateHandle,
@@ -24,7 +26,10 @@ class AddExpenseViewModel(
 
     private val partyId: Int = checkNotNull(savedStateHandle[AddExpenseDestination.partyIdArg])
 
-    var addExpenseUiState by mutableStateOf(AddExpenseUiState(expenseUiState = ExpenseUiState(ExpenseDetails(partyKey = partyId))))
+    var addExpenseUiState by mutableStateOf(AddExpenseUiState(expenseUiState = ExpenseUiState(
+        ExpenseDetails(partyKey = partyId)
+    )
+    ))
         private set
 
     // Get the initial party info when entering the screen
@@ -71,53 +76,4 @@ data class AddExpenseUiState(
     val expenseUiState: ExpenseUiState = ExpenseUiState(ExpenseDetails())
 )
 
-/**
- * Represents Ui State for an expense.
- */
-data class ExpenseUiState(
-    val expenseDetails: ExpenseDetails = ExpenseDetails(),
-    val isEntryValid: Boolean = false
-)
 
-data class ExpenseDetails(
-    val id: Int = 0,
-    val partyKey: Int = 0,
-    val name: String = "",
-    val amount: String = "0.00",
-    val dateModded: Date = Date()
-)
-
-/**
- * Extension function to convert [ExpenseDetails] to [ExpenseModel].
- * If the value of [ExpenseDetails.numberOfMembers] is not a valid [Int],
- * then the numberOfMembers will be set to 1
- */
-fun ExpenseDetails.toExpenseModel(): ExpenseModel = ExpenseModel(
-    id = id,
-    partyKey = partyKey,
-    name = name,
-    amount = amount,
-    dateModded = dateModded.time
-)
-
-/**
- * Extension function to convert [ExpenseModel] to [ExpenseDetails]
- */
-fun ExpenseModel.toExpenseUiState(): ExpenseUiState = ExpenseUiState(
-    expenseDetails = this.toExpenseDetails()
-)
-
-/**
- * Extension function to convert [ExpenseModel] to [ExpenseDetails]
- */
-fun ExpenseModel.toExpenseDetails(): ExpenseDetails = ExpenseDetails(
-    id = id,
-    partyKey = partyKey,
-    name = name,
-    amount = amount,
-    dateModded = Date(dateModded)
-)
-
-fun canConvertStringToBigDecimal(value: String): Boolean{
-    return value.matches(Regex("^\\d{1,8}(\\.\\d{1,2})?\$"))
-}

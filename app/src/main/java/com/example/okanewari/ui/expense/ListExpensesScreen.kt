@@ -27,7 +27,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
@@ -38,16 +37,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.okanewari.Expense
 import com.example.okanewari.OkaneWareTopAppBar
 import com.example.okanewari.R
 import com.example.okanewari.data.ExpenseModel
-import com.example.okanewari.data.GetDummyExpenses
 import com.example.okanewari.navigation.NavigationDestination
 import com.example.okanewari.ui.OwViewModelProvider
 import com.example.okanewari.ui.components.DateHandler
 import com.example.okanewari.ui.components.DisplayFab
-import com.example.okanewari.ui.party.PartyDetails
+import com.example.okanewari.ui.components.PartyDetails
 
 object ListExpensesDestination : NavigationDestination {
     override val route = "list_expenses"
