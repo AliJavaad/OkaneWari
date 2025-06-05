@@ -16,6 +16,7 @@ import com.example.okanewari.ui.components.PartyDetails
 import com.example.okanewari.ui.components.PartyUiState
 import com.example.okanewari.ui.components.toPartyModel
 import com.example.okanewari.ui.components.toPartyUiState
+import com.example.okanewari.ui.components.validateNameInput
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -75,7 +76,7 @@ class EditExpenseViewModel(
 
     private fun validateInput(uiState: ExpenseDetails = editExpenseUiState.expenseUiState.expenseDetails): Boolean {
         return with(uiState) {
-            name.isNotBlank() && canConvertStringToBigDecimal(amount)
+            validateNameInput(name) && canConvertStringToBigDecimal(amount)
         }
     }
 }

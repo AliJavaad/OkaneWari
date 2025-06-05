@@ -76,7 +76,8 @@ fun EditPartyScreen(
                 deleteButtonClicked = { coroutineScope.launch{
                     viewModel.deleteParty()
                     navigateHome()
-                } }
+                } },
+                enableDone = viewModel.editPartyUiState.partyUiState.isEntryValid
             )
         }
     }

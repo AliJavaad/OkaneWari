@@ -112,6 +112,7 @@ fun ExpenseInputForm(
             onValueChange(partyDetails.copy(dateModded = Date()), expenseDetails.copy(name = it, dateModded = Date())) },
         label = { Text(stringResource(R.string.expense_name)) },
         placeholder = { Text(stringResource(R.string.expense)) },
+        supportingText = {Text(stringResource(R.string.name_format_warning))},
         singleLine = true,
         modifier = Modifier
             .fillMaxWidth()

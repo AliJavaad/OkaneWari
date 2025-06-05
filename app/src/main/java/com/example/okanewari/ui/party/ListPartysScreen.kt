@@ -161,7 +161,7 @@ fun DisplayParties(
                             text = it.partyName,
                             fontSize = 32.sp,
                             textAlign = TextAlign.Center,
-                            maxLines = 2,
+                            maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
                         Text(

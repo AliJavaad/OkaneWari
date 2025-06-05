@@ -8,6 +8,7 @@ import com.example.okanewari.data.OkaneWariRepository
 import com.example.okanewari.ui.components.PartyDetails
 import com.example.okanewari.ui.components.PartyUiState
 import com.example.okanewari.ui.components.toPartyModel
+import com.example.okanewari.ui.components.validateNameInput
 
 /**
  * ViewModel to validate and insert Party in the Room database.
@@ -39,8 +40,9 @@ class AddPartyViewModel(
 
     private fun validateInput(uiState: PartyDetails = addPartyUiState.partyDetails): Boolean {
         return with(uiState) {
-            partyName.isNotBlank() && currency.isNotBlank() && numberOfMems.isNotBlank()
+            validateNameInput(partyName) && currency.isNotBlank() && numberOfMems.isNotBlank()
         }
     }
-
 }
+
+

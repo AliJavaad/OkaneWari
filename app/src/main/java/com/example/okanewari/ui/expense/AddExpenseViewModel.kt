@@ -15,6 +15,7 @@ import com.example.okanewari.ui.components.PartyDetails
 import com.example.okanewari.ui.components.PartyUiState
 import com.example.okanewari.ui.components.toPartyModel
 import com.example.okanewari.ui.components.toPartyUiState
+import com.example.okanewari.ui.components.validateNameInput
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -27,9 +28,7 @@ class AddExpenseViewModel(
     private val partyId: Int = checkNotNull(savedStateHandle[AddExpenseDestination.partyIdArg])
 
     var addExpenseUiState by mutableStateOf(AddExpenseUiState(expenseUiState = ExpenseUiState(
-        ExpenseDetails(partyKey = partyId)
-    )
-    ))
+        ExpenseDetails(partyKey = partyId))))
         private set
 
     // Get the initial party info when entering the screen
@@ -66,7 +65,7 @@ class AddExpenseViewModel(
 
     private fun validateExpense(uiState: ExpenseDetails = addExpenseUiState.expenseUiState.expenseDetails): Boolean {
         return with(uiState) {
-            name.isNotBlank() && canConvertStringToBigDecimal(amount)
+            validateNameInput(name) && canConvertStringToBigDecimal(amount)
         }
     }
 }

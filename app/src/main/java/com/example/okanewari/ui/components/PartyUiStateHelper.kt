@@ -51,3 +51,7 @@ fun PartyModel.toPartyDetails(): PartyDetails = PartyDetails(
     numberOfMems = numberOfMembers.toString(),
     dateModded = Date(dateModded)
 )
+
+fun validateNameInput(toCheck: String): Boolean{
+    return toCheck.matches(Regex("^[[:alnum:] ]{1,60}"))
+}

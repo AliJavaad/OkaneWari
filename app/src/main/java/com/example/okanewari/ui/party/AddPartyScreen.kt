@@ -120,6 +120,7 @@ fun PartyInputForm(
             onValueChange(partyDetails.copy(partyName = it, dateModded = Date()) )},
         label = { Text(stringResource(R.string.party_name)) },
         placeholder = { Text(stringResource(R.string.my_party)) },
+        supportingText = {Text(stringResource(R.string.name_format_warning))},
         singleLine = true,
         modifier = Modifier
             .fillMaxWidth()
