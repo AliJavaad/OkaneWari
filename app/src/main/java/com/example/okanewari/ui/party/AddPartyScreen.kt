@@ -10,10 +10,17 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -96,6 +103,10 @@ fun PartyEntryBody(
             partyDetails = partyUiState.partyDetails,
             onValueChange = onValueChange
         )
+        HorizontalDivider(
+            thickness = 4.dp,
+            modifier = Modifier.padding(all = dimensionResource(R.dimen.medium_padding))
+        )
         DoneAndCancelButtons(
             doneButtonClick = onDone,
             cancelButtonClick = onCancel,
@@ -171,4 +182,76 @@ fun PartyInputForm(
         }
     }
     // TODO Number of members input field. Currently set to 1
+    var addNewMember by rememberSaveable { mutableStateOf(false) }
+    HorizontalDivider(
+        thickness = 4.dp,
+        modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.medium_padding))
+    )
+    Text(
+        text = "Add / Modify members:",
+        modifier = Modifier.padding(all  = dimensionResource(R.dimen.medium_padding))
+    )
+    OutlinedTextField(
+        value = "Me",
+        onValueChange = { /* TODO */},
+        label = { Text("Member Name") },
+        singleLine = true,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = dimensionResource(R.dimen.medium_padding))
+    )
+    FilledTonalButton(
+        onClick = { addNewMember = true },
+        modifier = Modifier
+            .padding(horizontal = dimensionResource(R.dimen.medium_padding))
+    ){
+        Text("Add another member")
+    }
+    if (addNewMember){
+        MemberInputDialogue()
+    }
+//    Row(){
+//        OutlinedTextField(
+//            value = "",
+//            onValueChange = { /* TODO */ },
+//            label = { Text("Member Name") },
+//            singleLine = true,
+//            modifier = Modifier.padding(all = dimensionResource(R.dimen.medium_padding))
+//        )
+//        FilledTonalButton(
+//            onClick = { /* TODO */ },
+//            modifier = Modifier
+//                .padding(vertical = dimensionResource(R.dimen.medium_padding))
+//                .align(Alignment.CenterVertically)
+//        ) {
+//            Icon(
+//                imageVector = Icons.Filled.Delete,
+//                contentDescription = stringResource(R.string.delete)
+//            )
+//        }
+//    }
+}
+
+@Composable
+fun MemberInputDialogue(){
+    Row(){
+        OutlinedTextField(
+            value = "",
+            onValueChange = { /* TODO */ },
+            label = { Text("Member Name") },
+            singleLine = true,
+            modifier = Modifier.padding(all = dimensionResource(R.dimen.medium_padding))
+        )
+        FilledTonalButton(
+            onClick = { /* TODO */ },
+            modifier = Modifier
+                .padding(vertical = dimensionResource(R.dimen.medium_padding))
+                .align(Alignment.CenterVertically)
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Delete,
+                contentDescription = stringResource(R.string.delete)
+            )
+        }
+    }
 }
