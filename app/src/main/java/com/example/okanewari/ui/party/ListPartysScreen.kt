@@ -52,7 +52,7 @@ object ListPartiesDestination : NavigationDestination {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListPartysScreen(
-    onPartyCardClicked: (Int) -> Unit,
+    onPartyCardClicked: (Long) -> Unit,
     onAddPartyButtonClicked: () -> Unit,
     canNavigateBackBool: Boolean = false,
     modifier: Modifier = Modifier,
@@ -90,7 +90,7 @@ fun ListPartysScreen(
 @Composable
 fun ListPartysBody(
     partyList: List<PartyModel>,
-    partyClicked: (Int) -> Unit,
+    partyClicked: (Long) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ){
@@ -124,7 +124,7 @@ fun ListPartysBody(
 @Composable
 fun DisplayParties(
     partyList: List<PartyModel>,
-    partyClicked: (Int) -> Unit,
+    partyClicked: (Long) -> Unit,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     modifier: Modifier = Modifier
 ) {

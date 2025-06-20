@@ -22,10 +22,10 @@ interface MemberDao {
     suspend fun delete(member: MemberModel)
 
     @Query("SELECT * FROM member_table WHERE id = :id AND partyKey = :partyId")
-    fun getMember(id: Int, partyId: Int): Flow<MemberModel>
+    fun getMember(id: Long, partyId: Long): Flow<MemberModel>
 
     @Query("SELECT * from member_table WHERE partyKey = :partyId ORDER BY owner DESC")
-    fun getAllMembersForParty(partyId: Int): Flow<List<MemberModel>>
+    fun getAllMembersForParty(partyId: Long): Flow<List<MemberModel>>
 
     @RawQuery(observedEntities = [MemberModel::class])
     fun query(query: SupportSQLiteQuery): Flow<List<MemberModel>>

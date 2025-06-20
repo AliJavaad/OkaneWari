@@ -25,7 +25,7 @@ class AddExpenseViewModel(
     private val owRepository: OkaneWariRepository
 ): ViewModel() {
 
-    private val partyId: Int = checkNotNull(savedStateHandle[AddExpenseDestination.partyIdArg])
+    private val partyId: Long = checkNotNull(savedStateHandle[AddExpenseDestination.partyIdArg])
 
     var addExpenseUiState by mutableStateOf(AddExpenseUiState(expenseUiState = ExpenseUiState(
         ExpenseDetails(partyKey = partyId))))

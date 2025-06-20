@@ -18,8 +18,8 @@ import androidx.room.PrimaryKey
 )
 data class MemberModel (
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
-    val partyKey: Int,
+    val id: Long = 0,
+    val partyKey: Long,
     val name: String,
     val owner: Boolean
 )

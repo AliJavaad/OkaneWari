@@ -14,7 +14,7 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "party_table")
 data class PartyModel (
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    val id: Long = 0,
     val partyName: String,
     val currency: String,
     val numberOfMembers: Int,

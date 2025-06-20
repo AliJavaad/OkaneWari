@@ -12,7 +12,7 @@ data class PartyUiState(
 )
 
 data class PartyDetails(
-    val id: Int = 0,
+    val id: Long = 0,
     val partyName: String = "",
     // Defualt currency symbol for a new party
     val currency: String = "¥",

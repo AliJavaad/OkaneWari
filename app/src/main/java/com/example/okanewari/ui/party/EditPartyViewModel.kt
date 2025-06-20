@@ -7,6 +7,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.okanewari.data.OkaneWariRepository
+import com.example.okanewari.ui.components.MemberDetails
 import com.example.okanewari.ui.components.PartyDetails
 import com.example.okanewari.ui.components.PartyUiState
 import com.example.okanewari.ui.components.toPartyModel
@@ -27,7 +28,7 @@ class EditPartyViewModel(
     var editPartyUiState by mutableStateOf(EditPartyUiState())
         private set
 
-    private val partyId: Int = checkNotNull(savedStateHandle[EditPartyDestination.partyIdArg])
+    private val partyId: Long = checkNotNull(savedStateHandle[EditPartyDestination.partyIdArg])
 
     init {
         viewModelScope.launch {
@@ -51,7 +52,7 @@ class EditPartyViewModel(
      * Updates the [editPartyUiState] with the value provided in the argument. This method also triggers
      * a validation for input values.
      */
-    fun updateUiState(partyDetails: PartyDetails) {
+    fun updateUiState(partyDetails: PartyDetails, memberDetails: MemberDetails) {
         editPartyUiState =
             EditPartyUiState(
                 partyUiState = PartyUiState(partyDetails, validateInput(partyDetails)),

@@ -12,8 +12,8 @@ data class ExpenseUiState(
 )
 
 data class ExpenseDetails(
-    val id: Int = 0,
-    val partyKey: Int = 0,
+    val id: Long = 0,
+    val partyKey: Long = 0,
     val name: String = "",
     val amount: String = "0.00",
     val dateModded: Date = Date()

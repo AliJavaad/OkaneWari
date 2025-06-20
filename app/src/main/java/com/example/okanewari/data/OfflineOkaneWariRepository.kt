@@ -12,9 +12,10 @@ class OfflineOkaneWariRepository(
      */
     override fun getAllPartiesStream(): Flow<List<PartyModel>> = partyDao.getAllRecords()
 
-    override fun getPartyStream(id: Int): Flow<PartyModel?> = partyDao.getParty(id)
+    override fun getPartyStream(id: Long): Flow<PartyModel?> = partyDao.getParty(id)
 
-    override suspend fun insertParty(party: PartyModel) = partyDao.insert(party)
+    override suspend fun insertParty(party: PartyModel): Long = partyDao.insert(party)
+
 
     override suspend fun deleteParty(party: PartyModel) = partyDao.delete(party)
 
@@ -23,10 +24,10 @@ class OfflineOkaneWariRepository(
     /**
      * Expense methods
      */
-    override fun getAllExpensesStream(partyId: Int): Flow<List<ExpenseModel>> =
+    override fun getAllExpensesStream(partyId: Long): Flow<List<ExpenseModel>> =
         expenseDao.getAllExpensesForParty(partyId = partyId)
 
-    override fun getExpense(id: Int, partyId: Int): Flow<ExpenseModel?> =
+    override fun getExpense(id: Long, partyId: Long): Flow<ExpenseModel?> =
         expenseDao.getExpense(id = id, partyId = partyId)
 
     override suspend fun insertExpense(expense: ExpenseModel) = expenseDao.insert(expense)
@@ -38,10 +39,10 @@ class OfflineOkaneWariRepository(
     /**
      * Member methods
      */
-    override fun getAllMembersFromParty(partyId: Int): Flow<List<MemberModel>> =
+    override fun getAllMembersFromParty(partyId: Long): Flow<List<MemberModel>> =
         memberDao.getAllMembersForParty(partyId = partyId)
 
-    override fun getMember(id: Int, partyId: Int): Flow<MemberModel?> =
+    override fun getMember(id: Long, partyId: Long): Flow<MemberModel?> =
         memberDao.getMember(id = id, partyId = partyId)
 
     override suspend fun insertMember(member: MemberModel) = memberDao.insert(member)

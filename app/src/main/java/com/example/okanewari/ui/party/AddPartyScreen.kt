@@ -46,6 +46,8 @@ import com.example.okanewari.navigation.NavigationDestination
 import com.example.okanewari.ui.OwViewModelProvider
 import com.example.okanewari.ui.components.CurrencySymbols
 import com.example.okanewari.ui.components.DoneAndCancelButtons
+import com.example.okanewari.ui.components.MemberDetails
+import com.example.okanewari.ui.components.MemberUiState
 import com.example.okanewari.ui.components.PartyDetails
 import com.example.okanewari.ui.components.PartyUiState
 import kotlinx.coroutines.launch
@@ -78,10 +80,11 @@ fun AddPartyScreen(
         // TODO add in save coroutine
         PartyEntryBody(
             partyUiState = viewModel.addPartyUiState.partyUiState,
+            memberUiState = viewModel.addPartyUiState.memberUiState,
             onValueChange = viewModel::updateUiState,
             onDone = {
                 coroutineScope.launch{
-                    viewModel.saveParty()
+                    viewModel.savePartyAndHostMember()
                     navigateBack()
                 }
             },
@@ -94,7 +97,8 @@ fun AddPartyScreen(
 @Composable
 fun PartyEntryBody(
     partyUiState: PartyUiState,
-    onValueChange: (PartyDetails) -> Unit,
+    memberUiState: MemberUiState,
+    onValueChange: (PartyDetails, MemberDetails) -> Unit,
     onDone: () -> Unit,
     onCancel: () -> Unit,
     contentPadding: PaddingValues = PaddingValues(0.dp)
@@ -106,6 +110,7 @@ fun PartyEntryBody(
     ){
         PartyInputForm(
             partyDetails = partyUiState.partyDetails,
+            memberDetails = memberUiState.memberDetails,
             onValueChange = onValueChange
         )
         HorizontalDivider(
@@ -115,7 +120,7 @@ fun PartyEntryBody(
         DoneAndCancelButtons(
             doneButtonClick = onDone,
             cancelButtonClick = onCancel,
-            enableDone = partyUiState.isEntryValid
+            enableDone = partyUiState.isEntryValid && memberUiState.isEntryValid
         )
     }
 }
@@ -123,7 +128,8 @@ fun PartyEntryBody(
 @Composable
 fun PartyInputForm(
     partyDetails: PartyDetails,
-    onValueChange: (PartyDetails) -> Unit,
+    memberDetails: MemberDetails = MemberDetails(),
+    onValueChange: (PartyDetails, MemberDetails) -> Unit,
     modifier: Modifier = Modifier,
     editingParty: Boolean = false
 ){
@@ -134,7 +140,9 @@ fun PartyInputForm(
     TextField(
         value = partyDetails.partyName,
         onValueChange = {
-            onValueChange(partyDetails.copy(partyName = it, dateModded = Date()) )},
+            onValueChange(
+                partyDetails.copy(partyName = it, dateModded = Date()),
+                memberDetails.copy() )},
         label = { Text(stringResource(R.string.party_name)) },
         placeholder = { Text(stringResource(R.string.my_party)) },
         supportingText = {Text(stringResource(R.string.name_format_warning))},
@@ -155,7 +163,7 @@ fun PartyInputForm(
                 .width(dimensionResource(R.dimen.currency_symbol_spacing))
                 .background(MaterialTheme.colorScheme.secondaryContainer)
                 .clickable {
-                    onValueChange(partyDetails.copy())
+                    onValueChange(partyDetails.copy(), memberDetails.copy())
                     currencyDropdownMenu = true
                 }
         ){
@@ -171,7 +179,7 @@ fun PartyInputForm(
             DropdownMenu(
                 expanded = currencyDropdownMenu,
                 onDismissRequest = {
-                    onValueChange(partyDetails)
+                    onValueChange(partyDetails.copy(), memberDetails.copy())
                     currencyDropdownMenu = false
                 }
             ) {
@@ -179,7 +187,7 @@ fun PartyInputForm(
                     DropdownMenuItem(
                         text = { Text(currency.symbol + "  (${currency.description})")},
                         onClick = {
-                            onValueChange(partyDetails.copy(currency = currency.symbol))
+                            onValueChange(partyDetails.copy(currency = currency.symbol), memberDetails.copy())
                             currencyDropdownMenu = false
                         }
                     )
@@ -190,6 +198,18 @@ fun PartyInputForm(
     /**
      * Handling the members input
      */
+    OutlinedTextField(
+        value = memberDetails.name,
+        onValueChange = {
+            onValueChange(
+                partyDetails.copy(),
+                memberDetails.copy(name = it) )},
+        label = { Text(stringResource(R.string.host_member_name)) },
+        singleLine = true,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = dimensionResource(R.dimen.medium_padding))
+    )
     if (editingParty){
         MemberInputDialogue()
     }

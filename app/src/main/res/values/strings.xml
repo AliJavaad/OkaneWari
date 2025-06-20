@@ -24,6 +24,7 @@
     <string name="last_modified">Last modified</string>
     <string name="currency_format_warning">Please enter in the format "1234" or "1234.56"</string>
     <string name="name_format_warning">AlphaNumeric only. Character limit: 60</string>
+    <string name="host_member_name">Host Member Name</string>
     <!-- Content Description -->
     <string name="settings_buttton_description">Settings.</string>
     <!-- Buttons -->

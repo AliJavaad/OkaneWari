@@ -8,8 +8,8 @@ data class MemberUiState(
 )
 
 data class MemberDetails(
-    val id: Int = 0,
-    val partyKey: Int = 0,
+    val id: Long = 0,
+    val partyKey: Long = 0,
     val name: String = "",
     val owner: Boolean = false
 )
