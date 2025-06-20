@@ -54,4 +54,30 @@ interface OkaneWariRepository {
      */
     suspend fun updateExpense(expense: ExpenseModel)
 
+
+    /**
+     * Retrieve all the members from the the given data source that match with the [partyId].
+     */
+    fun getAllMembersFromParty(partyId: Int): Flow<List<MemberModel>>
+
+    /**
+     * Retrieve a member from the given data source that matches with the [id] and [partyId].
+     */
+    fun getMember(id: Int, partyId: Int): Flow<MemberModel?>
+
+    /**
+     * Insert member in the data source
+     */
+    suspend fun insertMember(member: MemberModel)
+
+    /**
+     * Delete member from the data source
+     */
+    suspend fun deleteMember(member: MemberModel)
+
+    /**
+     * Update member in the data source
+     */
+    suspend fun updateMember(member: MemberModel)
+
 }

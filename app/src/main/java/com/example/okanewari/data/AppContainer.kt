@@ -16,7 +16,8 @@ class AppDataContainer(private val context: Context): AppContainer {
     override val okaneWariRepository: OkaneWariRepository by lazy {
         OfflineOkaneWariRepository(
             OkaneWariDatabase.getDatabase(context).partyDao(),
-            OkaneWariDatabase.getDatabase(context).expenseDao()
+            OkaneWariDatabase.getDatabase(context).expenseDao(),
+            OkaneWariDatabase.getDatabase(context).memberDao()
         )
     }
 }

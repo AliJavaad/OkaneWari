@@ -24,7 +24,7 @@ object OwViewModelProvider {
         }
         // Initializer for AddPartyViewModel:
         /**
-         * okaneWariApplication() is called to get the InventoryApplication instance,
+         * okaneWariApplication() is called to get the OkaneWariApplication instance,
          * then its container provides the partyRepository
          */
         initializer {
