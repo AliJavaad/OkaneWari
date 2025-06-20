@@ -77,7 +77,7 @@ fun AddPartyScreen(
     ){ innerPadding ->
         // TODO add in save coroutine
         PartyEntryBody(
-            partyUiState = viewModel.addPartyUiState,
+            partyUiState = viewModel.addPartyUiState.partyUiState,
             onValueChange = viewModel::updateUiState,
             onDone = {
                 coroutineScope.launch{

@@ -21,8 +21,6 @@ data class ExpenseDetails(
 
 /**
  * Extension function to convert [ExpenseDetails] to [ExpenseModel].
- * If the value of [ExpenseDetails.numberOfMembers] is not a valid [Int],
- * then the numberOfMembers will be set to 1
  */
 fun ExpenseDetails.toExpenseModel(): ExpenseModel = ExpenseModel(
     id = id,

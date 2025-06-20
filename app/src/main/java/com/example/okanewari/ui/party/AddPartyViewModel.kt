@@ -17,7 +17,7 @@ class AddPartyViewModel(
     private val owRepository: OkaneWariRepository
 ): ViewModel() {
 
-    var addPartyUiState by mutableStateOf(PartyUiState())
+    var addPartyUiState by mutableStateOf(AddPartyUiState())
         private set
 
     /**
@@ -26,23 +26,24 @@ class AddPartyViewModel(
      */
     fun updateUiState(partyDetails: PartyDetails) {
         addPartyUiState =
-            PartyUiState(
-                partyDetails = partyDetails,
-                isEntryValid = validateInput(partyDetails)
+            AddPartyUiState(
+                partyUiState = PartyUiState(partyDetails, validateInput(partyDetails))
             )
     }
 
     suspend fun saveParty() {
         if (validateInput()) {
-            owRepository.insertParty(addPartyUiState.partyDetails.toPartyModel())
+            owRepository.insertParty(addPartyUiState.partyUiState.partyDetails.toPartyModel())
         }
     }
 
-    private fun validateInput(uiState: PartyDetails = addPartyUiState.partyDetails): Boolean {
+    private fun validateInput(uiState: PartyDetails = addPartyUiState.partyUiState.partyDetails): Boolean {
         return with(uiState) {
             validateNameInput(partyName) && currency.isNotBlank() && numberOfMems.isNotBlank()
         }
     }
 }
 
-
+data class AddPartyUiState(
+    var partyUiState: PartyUiState = PartyUiState(PartyDetails())
+)
