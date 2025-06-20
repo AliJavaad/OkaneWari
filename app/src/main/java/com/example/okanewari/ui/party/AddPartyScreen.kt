@@ -10,6 +10,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
@@ -97,7 +100,9 @@ fun PartyEntryBody(
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ){
     Column(
-        modifier = Modifier.padding(contentPadding)
+        modifier = Modifier
+            .padding(contentPadding)
+            .verticalScroll(rememberScrollState())
     ){
         PartyInputForm(
             partyDetails = partyUiState.partyDetails,
@@ -120,6 +125,7 @@ fun PartyInputForm(
     partyDetails: PartyDetails,
     onValueChange: (PartyDetails) -> Unit,
     modifier: Modifier = Modifier,
+    editingParty: Boolean = false
 ){
     var currencyDropdownMenu by rememberSaveable { mutableStateOf(false) }
     /**
@@ -181,8 +187,17 @@ fun PartyInputForm(
             }
         }
     }
-    // TODO Number of members input field. Currently set to 1
-    var addNewMember by rememberSaveable { mutableStateOf(false) }
+    /**
+     * Handling the members input
+     */
+    if (editingParty){
+        MemberInputDialogue()
+    }
+}
+
+@Composable
+fun MemberInputDialogue(){
+    var addNewMember by rememberSaveable { mutableStateOf(0) }
     HorizontalDivider(
         thickness = 4.dp,
         modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.medium_padding))
@@ -200,58 +215,33 @@ fun PartyInputForm(
             .fillMaxWidth()
             .padding(horizontal = dimensionResource(R.dimen.medium_padding))
     )
+    for (i: Int in 0 until addNewMember){
+        Row(){
+            OutlinedTextField(
+                value = "",
+                onValueChange = { /* TODO */ },
+                label = { Text("Member Name") },
+                singleLine = true,
+                modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.medium_padding))
+            )
+            FilledTonalButton(
+                onClick = { /* TODO */ },
+                modifier = Modifier
+                    .padding(horizontal = dimensionResource(R.dimen.medium_padding))
+                    .align(Alignment.CenterVertically)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Delete,
+                    contentDescription = stringResource(R.string.delete)
+                )
+            }
+        }
+    }
     FilledTonalButton(
-        onClick = { addNewMember = true },
+        onClick = { addNewMember++ },
         modifier = Modifier
             .padding(horizontal = dimensionResource(R.dimen.medium_padding))
     ){
         Text("Add another member")
-    }
-    if (addNewMember){
-        MemberInputDialogue()
-    }
-//    Row(){
-//        OutlinedTextField(
-//            value = "",
-//            onValueChange = { /* TODO */ },
-//            label = { Text("Member Name") },
-//            singleLine = true,
-//            modifier = Modifier.padding(all = dimensionResource(R.dimen.medium_padding))
-//        )
-//        FilledTonalButton(
-//            onClick = { /* TODO */ },
-//            modifier = Modifier
-//                .padding(vertical = dimensionResource(R.dimen.medium_padding))
-//                .align(Alignment.CenterVertically)
-//        ) {
-//            Icon(
-//                imageVector = Icons.Filled.Delete,
-//                contentDescription = stringResource(R.string.delete)
-//            )
-//        }
-//    }
-}
-
-@Composable
-fun MemberInputDialogue(){
-    Row(){
-        OutlinedTextField(
-            value = "",
-            onValueChange = { /* TODO */ },
-            label = { Text("Member Name") },
-            singleLine = true,
-            modifier = Modifier.padding(all = dimensionResource(R.dimen.medium_padding))
-        )
-        FilledTonalButton(
-            onClick = { /* TODO */ },
-            modifier = Modifier
-                .padding(vertical = dimensionResource(R.dimen.medium_padding))
-                .align(Alignment.CenterVertically)
-        ) {
-            Icon(
-                imageVector = Icons.Filled.Delete,
-                contentDescription = stringResource(R.string.delete)
-            )
-        }
     }
 }
