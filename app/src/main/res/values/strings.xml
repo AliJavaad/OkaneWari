@@ -6,7 +6,9 @@
     <string name="edit_party_details">Editing Party</string>
     <string name="add_new_expense">Add a new Expense</string>
     <string name="edit_expense">Editing Expense</string>
-    <string name="list_expenses">Expenses TODO</string>
+    <string name="list_expenses">Expenses</string>
+    <string name="add_new_member_screen">Add Member</string>
+    <string name="edit_member_screen">Edit Member</string>
     <!-- Text holders -->
     <string name="my_party">My Party</string>
     <string name="expense">Expense</string>
@@ -25,6 +27,8 @@
     <string name="currency_format_warning">Please enter in the format "1234" or "1234.56"</string>
     <string name="name_format_warning">AlphaNumeric only. Character limit: 60</string>
     <string name="my_name">My Name</string>
+    <string name="member_name">Member Name</string>
+    <string name="add_new_member">Add Member</string>
     <!-- Content Description -->
     <string name="settings_buttton_description">Settings.</string>
     <!-- Buttons -->

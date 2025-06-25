@@ -18,6 +18,10 @@ import com.example.okanewari.ui.expense.ListExpensesDestination
 import com.example.okanewari.ui.party.ListPartiesDestination
 import com.example.okanewari.ui.party.ListPartysScreen
 import com.example.okanewari.ui.expense.ListExpensesScreen
+import com.example.okanewari.ui.party.AddMemberDestination
+import com.example.okanewari.ui.party.AddMemberScreen
+import com.example.okanewari.ui.party.EditMemberDestination
+import com.example.okanewari.ui.party.EditMemberScreen
 import com.example.okanewari.ui.party.EditPartyDestination
 import com.example.okanewari.ui.party.EditPartyScreen
 
@@ -57,6 +61,8 @@ fun OkaneWariNavHost(
             EditPartyScreen(
                 navigateUp = { navController.navigateUp() },
                 navigateBack = { navController.popBackStack() },
+                onEditMemberlicked = { navController.navigate(EditMemberDestination.route) },
+                onAddMemberClicked = { navController.navigate(AddMemberDestination.route) },
                 navigateHome = {
                     navController.navigate(ListPartiesDestination.route){
                         // Pop everything in the navigation stack
@@ -65,6 +71,22 @@ fun OkaneWariNavHost(
                         }
                     }
                 }
+            )
+        }
+        composable(
+            route = AddMemberDestination.route
+        ){
+            AddMemberScreen(
+                navigateUp = { navController.navigateUp() },
+                navigateBack = { navController.popBackStack() }
+            )
+        }
+        composable(
+            route = EditMemberDestination.route
+        ){
+            EditMemberScreen(
+                navigateUp = { navController.navigateUp() },
+                navigateBack = { navController.popBackStack() }
             )
         }
         composable(

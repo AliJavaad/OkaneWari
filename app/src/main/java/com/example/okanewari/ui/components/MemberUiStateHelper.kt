@@ -45,10 +45,10 @@ fun MemberModel.toMemberDetails(): MemberDetails = MemberDetails(
 /**
  * Function to convert a list of [MemberModel] to a list of [MemberUiState].
  */
-fun MemberModeListToUiState(modelList: List<MemberModel>): List<MemberUiState> {
-    val toReturn: MutableList<MemberUiState> = mutableListOf()
+fun MemberModelListToDetails(modelList: List<MemberModel>): List<MemberDetails> {
+    val toReturn: MutableList<MemberDetails> = mutableListOf()
     for (memberModel in modelList){
-        toReturn += MemberUiState(memberModel.toMemberDetails(), true)
+        toReturn += memberModel.toMemberDetails()
     }
     return toReturn
 }
