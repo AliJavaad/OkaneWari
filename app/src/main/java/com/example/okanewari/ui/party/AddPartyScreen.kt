@@ -77,11 +77,11 @@ fun AddPartyScreen(
             )
         }
     ){ innerPadding ->
-        // TODO add in save coroutine
         PartyEntryBody(
             partyUiState = viewModel.addPartyUiState.partyUiState,
             memberUiState = viewModel.addPartyUiState.memberUiState,
-            onValueChange = viewModel::updateUiState,
+            onPartyValueChange = viewModel::updatePartyUiState,
+            onMemberValueChange = viewModel::updateMemberUiState,
             onDone = {
                 coroutineScope.launch{
                     viewModel.savePartyAndHostMember()
@@ -98,7 +98,8 @@ fun AddPartyScreen(
 fun PartyEntryBody(
     partyUiState: PartyUiState,
     memberUiState: MemberUiState,
-    onValueChange: (PartyDetails, MemberDetails) -> Unit,
+    onPartyValueChange: (PartyDetails) -> Unit,
+    onMemberValueChange: (MemberDetails) -> Unit,
     onDone: () -> Unit,
     onCancel: () -> Unit,
     contentPadding: PaddingValues = PaddingValues(0.dp)
@@ -110,8 +111,11 @@ fun PartyEntryBody(
     ){
         PartyInputForm(
             partyDetails = partyUiState.partyDetails,
+            onValueChange = onPartyValueChange
+        )
+        MainMemberInput(
             memberDetails = memberUiState.memberDetails,
-            onValueChange = onValueChange
+            onValueChange = onMemberValueChange
         )
         HorizontalDivider(
             thickness = 4.dp,
@@ -128,8 +132,7 @@ fun PartyEntryBody(
 @Composable
 fun PartyInputForm(
     partyDetails: PartyDetails,
-    memberDetails: MemberDetails = MemberDetails(),
-    onValueChange: (PartyDetails, MemberDetails) -> Unit,
+    onValueChange: (PartyDetails) -> Unit,
     modifier: Modifier = Modifier,
     editingParty: Boolean = false
 ){
@@ -140,9 +143,7 @@ fun PartyInputForm(
     TextField(
         value = partyDetails.partyName,
         onValueChange = {
-            onValueChange(
-                partyDetails.copy(partyName = it, dateModded = Date()),
-                memberDetails.copy() )},
+            onValueChange(partyDetails.copy(partyName = it, dateModded = Date())) },
         label = { Text(stringResource(R.string.party_name)) },
         placeholder = { Text(stringResource(R.string.my_party)) },
         supportingText = {Text(stringResource(R.string.name_format_warning))},
@@ -162,10 +163,7 @@ fun PartyInputForm(
             modifier = Modifier
                 .width(dimensionResource(R.dimen.currency_symbol_spacing))
                 .background(MaterialTheme.colorScheme.secondaryContainer)
-                .clickable {
-                    onValueChange(partyDetails.copy(), memberDetails.copy())
-                    currencyDropdownMenu = true
-                }
+                .clickable { currencyDropdownMenu = true }
         ){
             Image(
                 painter = painterResource(R.drawable.baseline_arrow_drop_down_24),
@@ -178,16 +176,13 @@ fun PartyInputForm(
             )
             DropdownMenu(
                 expanded = currencyDropdownMenu,
-                onDismissRequest = {
-                    onValueChange(partyDetails.copy(), memberDetails.copy())
-                    currencyDropdownMenu = false
-                }
+                onDismissRequest = { currencyDropdownMenu = false }
             ) {
                 for(currency in CurrencySymbols.dropdownCurrencyMenu){
                     DropdownMenuItem(
                         text = { Text(currency.symbol + "  (${currency.description})")},
                         onClick = {
-                            onValueChange(partyDetails.copy(currency = currency.symbol), memberDetails.copy())
+                            onValueChange(partyDetails.copy(currency = currency.symbol))
                             currencyDropdownMenu = false
                         }
                     )
@@ -195,24 +190,25 @@ fun PartyInputForm(
             }
         }
     }
+}
+
+@Composable
+fun MainMemberInput(
+    memberDetails: MemberDetails,
+    onValueChange: (MemberDetails) -> Unit
+) {
     /**
      * Handling the members input
      */
     OutlinedTextField(
         value = memberDetails.name,
-        onValueChange = {
-            onValueChange(
-                partyDetails.copy(),
-                memberDetails.copy(name = it) )},
+        onValueChange = { onValueChange(memberDetails.copy(name = it)) },
         label = { Text(stringResource(R.string.my_name)) },
         singleLine = true,
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = dimensionResource(R.dimen.medium_padding))
     )
-    if (editingParty){
-        MemberInputDialogue()
-    }
 }
 
 @Composable

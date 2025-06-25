@@ -35,6 +35,23 @@ class AddPartyViewModel(
             )
     }
 
+    fun updatePartyUiState(partyDetails: PartyDetails) {
+        addPartyUiState =
+            AddPartyUiState(
+                partyUiState = PartyUiState(partyDetails, validatePartyInput(partyDetails)),
+                memberUiState = addPartyUiState.memberUiState
+            )
+    }
+
+    fun updateMemberUiState(memberDetails: MemberDetails) {
+        addPartyUiState =
+            AddPartyUiState(
+                partyUiState = addPartyUiState.partyUiState,
+                memberUiState = MemberUiState(memberDetails, validateMemberInput(memberDetails))
+            )
+    }
+
+
     /**
      * Saves the party and host member into the tables.
      * They MUST be sequential as the party must get stored first so the member can properly

@@ -59,7 +59,7 @@ class EditPartyViewModel(
      * Updates the [editPartyUiState] with the value provided in the argument. This method also triggers
      * a validation for input values.
      */
-    fun updateUiState(partyDetails: PartyDetails, memberDetails: MemberDetails) {
+    fun updateUiState(partyDetails: PartyDetails) {
         editPartyUiState =
             EditPartyUiState(
                 partyUiState = PartyUiState(partyDetails, validateInput(partyDetails)),
