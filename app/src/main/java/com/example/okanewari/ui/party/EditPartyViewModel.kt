@@ -8,6 +8,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.okanewari.data.OkaneWariRepository
 import com.example.okanewari.ui.components.MemberDetails
+import com.example.okanewari.ui.components.MemberModeListToUiState
+import com.example.okanewari.ui.components.MemberUiState
 import com.example.okanewari.ui.components.PartyDetails
 import com.example.okanewari.ui.components.PartyUiState
 import com.example.okanewari.ui.components.toPartyModel
@@ -36,6 +38,11 @@ class EditPartyViewModel(
                 .filterNotNull()
                 .first()
                 .toPartyUiState(true)
+            editPartyUiState.memberUiList = MemberModeListToUiState(
+                owRepository.getAllMembersFromParty(partyId)
+                    .filterNotNull()
+                    .first()
+            )
             // The topBarPartyName should only be updated at the initial screen creation stage.
             // Otherwise it will keep changing as the text field/party name is edited.
             editPartyUiState.topBarPartyName = editPartyUiState.partyUiState.partyDetails.partyName
@@ -79,5 +86,6 @@ class EditPartyViewModel(
  */
 data class EditPartyUiState(
     var partyUiState: PartyUiState = PartyUiState(PartyDetails()),
+    var memberUiList: List<MemberUiState> = listOf(),
     var topBarPartyName: String = ""
 )

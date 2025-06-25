@@ -204,7 +204,7 @@ fun PartyInputForm(
             onValueChange(
                 partyDetails.copy(),
                 memberDetails.copy(name = it) )},
-        label = { Text(stringResource(R.string.host_member_name)) },
+        label = { Text(stringResource(R.string.my_name)) },
         singleLine = true,
         modifier = Modifier
             .fillMaxWidth()
