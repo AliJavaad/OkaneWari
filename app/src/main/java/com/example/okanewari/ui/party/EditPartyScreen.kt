@@ -46,6 +46,7 @@ import com.example.okanewari.data.MemberModel
 import com.example.okanewari.navigation.NavigationDestination
 import com.example.okanewari.ui.OwViewModelProvider
 import com.example.okanewari.ui.components.DoneAndCancelButtons
+import com.example.okanewari.ui.components.PartyDetails
 import kotlinx.coroutines.launch
 
 object EditPartyDestination : NavigationDestination {
@@ -62,7 +63,7 @@ fun EditPartyScreen(
     navigateUp: () -> Unit,
     navigateHome: () -> Unit,
     onEditMemberlicked: () -> Unit,
-    onAddMemberClicked: () -> Unit,
+    onAddMemberClicked: (Long) -> Unit,
     canNavigateBackBool: Boolean = true,
     modifier: Modifier = Modifier,
     viewModel: EditPartyViewModel = viewModel(factory = OwViewModelProvider.Factory)
@@ -96,6 +97,7 @@ fun EditPartyScreen(
             )
             ListPartyMembers(
                 membersList = viewModel.editPartyUiState.memberList,
+                partyDetails = viewModel.editPartyUiState.partyUiState.partyDetails,
                 onModifyMemberClicked = onEditMemberlicked,
                 onAddMemberClicked = onAddMemberClicked
             )
@@ -122,15 +124,16 @@ fun EditPartyScreen(
 @Composable
 fun ListPartyMembers(
     membersList: List<MemberModel>,
+    partyDetails: PartyDetails,
     onModifyMemberClicked: () -> Unit,
-    onAddMemberClicked: () -> Unit
+    onAddMemberClicked: (Long) -> Unit
 ){
     val mediumPadding = dimensionResource(R.dimen.medium_padding)
     for (member in membersList){
         Card(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = mediumPadding)
+                .padding(mediumPadding)
                 .clickable {
                     Log.d("Member Card", "Member Card Clicked: ${member.id}")
                     onModifyMemberClicked()
@@ -160,7 +163,7 @@ fun ListPartyMembers(
     }
     FilledTonalButton(
         modifier = Modifier.padding(mediumPadding),
-        onClick = onAddMemberClicked
+        onClick = { onAddMemberClicked(partyDetails.id) }
     ) {
         Text(
             text = stringResource(R.string.add_new_member),

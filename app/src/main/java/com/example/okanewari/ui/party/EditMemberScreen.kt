@@ -42,9 +42,6 @@ fun EditMemberScreen(
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
         ) {
-            MemberInputDialogue(
-                contentPadding = innerPadding
-            )
             DoneCancelDeleteButtons(
                 doneButtonClick = {},
                 cancelButtonClick = {},
