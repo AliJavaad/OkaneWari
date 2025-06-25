@@ -11,12 +11,12 @@ interface OkaneWariRepository {
     /**
      * Retrieve a party from the given data source that matches with the [id].
      */
-    fun getPartyStream(id: Int): Flow<PartyModel?>
+    fun getPartyStream(id: Long): Flow<PartyModel?>
 
     /**
      * Insert party in the data source
      */
-    suspend fun insertParty(party: PartyModel)
+    suspend fun insertParty(party: PartyModel): Long
 
     /**
      * Delete party from the data source
@@ -32,12 +32,12 @@ interface OkaneWariRepository {
     /**
      * Retrieve all the entries from the the given data source that match with the [partyId].
      */
-    fun getAllExpensesStream(partyId: Int): Flow<List<ExpenseModel>>
+    fun getAllExpensesStream(partyId: Long): Flow<List<ExpenseModel>>
 
     /**
      * Retrieve an entry from the given data source that matches with the [id] and [partyId].
      */
-    fun getExpense(id: Int, partyId: Int): Flow<ExpenseModel?>
+    fun getExpense(id: Long, partyId: Long): Flow<ExpenseModel?>
 
     /**
      * Insert expense in the data source
@@ -53,5 +53,31 @@ interface OkaneWariRepository {
      * Update expense in the data source
      */
     suspend fun updateExpense(expense: ExpenseModel)
+
+
+    /**
+     * Retrieve all the members from the the given data source that match with the [partyId].
+     */
+    fun getAllMembersFromParty(partyId: Long): Flow<List<MemberModel>>
+
+    /**
+     * Retrieve a member from the given data source that matches with the [id] and [partyId].
+     */
+    fun getMember(id: Long, partyId: Long): Flow<MemberModel?>
+
+    /**
+     * Insert member in the data source
+     */
+    suspend fun insertMember(member: MemberModel)
+
+    /**
+     * Delete member from the data source
+     */
+    suspend fun deleteMember(member: MemberModel)
+
+    /**
+     * Update member in the data source
+     */
+    suspend fun updateMember(member: MemberModel)
 
 }

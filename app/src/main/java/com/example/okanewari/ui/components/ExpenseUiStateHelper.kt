@@ -12,8 +12,8 @@ data class ExpenseUiState(
 )
 
 data class ExpenseDetails(
-    val id: Int = 0,
-    val partyKey: Int = 0,
+    val id: Long = 0,
+    val partyKey: Long = 0,
     val name: String = "",
     val amount: String = "0.00",
     val dateModded: Date = Date()
@@ -21,8 +21,6 @@ data class ExpenseDetails(
 
 /**
  * Extension function to convert [ExpenseDetails] to [ExpenseModel].
- * If the value of [ExpenseDetails.numberOfMembers] is not a valid [Int],
- * then the numberOfMembers will be set to 1
  */
 fun ExpenseDetails.toExpenseModel(): ExpenseModel = ExpenseModel(
     id = id,

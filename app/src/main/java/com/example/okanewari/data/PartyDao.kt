@@ -23,7 +23,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface PartyDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insert(party: PartyModel)
+    suspend fun insert(party: PartyModel): Long
 
     @Update
     suspend fun update(party: PartyModel)
@@ -32,7 +32,7 @@ interface PartyDao {
     suspend fun delete(party: PartyModel)
 
     @Query("SELECT * FROM party_table WHERE id = :id")
-    fun getParty(id: Int): Flow<PartyModel>
+    fun getParty(id: Long): Flow<PartyModel>
 
     @Query("SELECT * FROM party_table ORDER BY dateModded DESC")
     fun getAllRecords(): Flow<List<PartyModel>>

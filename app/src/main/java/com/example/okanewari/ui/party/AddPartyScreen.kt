@@ -10,10 +10,20 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -36,6 +46,8 @@ import com.example.okanewari.navigation.NavigationDestination
 import com.example.okanewari.ui.OwViewModelProvider
 import com.example.okanewari.ui.components.CurrencySymbols
 import com.example.okanewari.ui.components.DoneAndCancelButtons
+import com.example.okanewari.ui.components.MemberDetails
+import com.example.okanewari.ui.components.MemberUiState
 import com.example.okanewari.ui.components.PartyDetails
 import com.example.okanewari.ui.components.PartyUiState
 import kotlinx.coroutines.launch
@@ -65,13 +77,14 @@ fun AddPartyScreen(
             )
         }
     ){ innerPadding ->
-        // TODO add in save coroutine
         PartyEntryBody(
-            partyUiState = viewModel.addPartyUiState,
-            onValueChange = viewModel::updateUiState,
+            partyUiState = viewModel.addPartyUiState.partyUiState,
+            memberUiState = viewModel.addPartyUiState.memberUiState,
+            onPartyValueChange = viewModel::updatePartyUiState,
+            onMemberValueChange = viewModel::updateMemberUiState,
             onDone = {
                 coroutineScope.launch{
-                    viewModel.saveParty()
+                    viewModel.savePartyAndHostMember()
                     navigateBack()
                 }
             },
@@ -84,22 +97,34 @@ fun AddPartyScreen(
 @Composable
 fun PartyEntryBody(
     partyUiState: PartyUiState,
-    onValueChange: (PartyDetails) -> Unit,
+    memberUiState: MemberUiState,
+    onPartyValueChange: (PartyDetails) -> Unit,
+    onMemberValueChange: (MemberDetails) -> Unit,
     onDone: () -> Unit,
     onCancel: () -> Unit,
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ){
     Column(
-        modifier = Modifier.padding(contentPadding)
+        modifier = Modifier
+            .padding(contentPadding)
+            .verticalScroll(rememberScrollState())
     ){
         PartyInputForm(
             partyDetails = partyUiState.partyDetails,
-            onValueChange = onValueChange
+            onValueChange = onPartyValueChange
+        )
+        MainMemberInput(
+            memberDetails = memberUiState.memberDetails,
+            onValueChange = onMemberValueChange
+        )
+        HorizontalDivider(
+            thickness = 4.dp,
+            modifier = Modifier.padding(all = dimensionResource(R.dimen.medium_padding))
         )
         DoneAndCancelButtons(
             doneButtonClick = onDone,
             cancelButtonClick = onCancel,
-            enableDone = partyUiState.isEntryValid
+            enableDone = partyUiState.isEntryValid && memberUiState.isEntryValid
         )
     }
 }
@@ -109,6 +134,7 @@ fun PartyInputForm(
     partyDetails: PartyDetails,
     onValueChange: (PartyDetails) -> Unit,
     modifier: Modifier = Modifier,
+    editingParty: Boolean = false
 ){
     var currencyDropdownMenu by rememberSaveable { mutableStateOf(false) }
     /**
@@ -117,7 +143,7 @@ fun PartyInputForm(
     TextField(
         value = partyDetails.partyName,
         onValueChange = {
-            onValueChange(partyDetails.copy(partyName = it, dateModded = Date()) )},
+            onValueChange(partyDetails.copy(partyName = it, dateModded = Date())) },
         label = { Text(stringResource(R.string.party_name)) },
         placeholder = { Text(stringResource(R.string.my_party)) },
         supportingText = {Text(stringResource(R.string.name_format_warning))},
@@ -137,10 +163,7 @@ fun PartyInputForm(
             modifier = Modifier
                 .width(dimensionResource(R.dimen.currency_symbol_spacing))
                 .background(MaterialTheme.colorScheme.secondaryContainer)
-                .clickable {
-                    onValueChange(partyDetails.copy())
-                    currencyDropdownMenu = true
-                }
+                .clickable { currencyDropdownMenu = true }
         ){
             Image(
                 painter = painterResource(R.drawable.baseline_arrow_drop_down_24),
@@ -153,10 +176,7 @@ fun PartyInputForm(
             )
             DropdownMenu(
                 expanded = currencyDropdownMenu,
-                onDismissRequest = {
-                    onValueChange(partyDetails)
-                    currencyDropdownMenu = false
-                }
+                onDismissRequest = { currencyDropdownMenu = false }
             ) {
                 for(currency in CurrencySymbols.dropdownCurrencyMenu){
                     DropdownMenuItem(
@@ -170,5 +190,23 @@ fun PartyInputForm(
             }
         }
     }
-    // TODO Number of members input field. Currently set to 1
+}
+
+@Composable
+fun MainMemberInput(
+    memberDetails: MemberDetails,
+    onValueChange: (MemberDetails) -> Unit
+) {
+    /**
+     * Handling the members input
+     */
+    OutlinedTextField(
+        value = memberDetails.name,
+        onValueChange = { onValueChange(memberDetails.copy(name = it)) },
+        label = { Text(stringResource(R.string.my_name)) },
+        singleLine = true,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = dimensionResource(R.dimen.medium_padding))
+    )
 }

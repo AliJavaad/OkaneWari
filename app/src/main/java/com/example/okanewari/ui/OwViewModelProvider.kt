@@ -9,6 +9,7 @@ import com.example.okanewari.OkaneWariApplication
 import com.example.okanewari.ui.expense.ListExpensesViewModel
 import com.example.okanewari.ui.expense.AddExpenseViewModel
 import com.example.okanewari.ui.expense.EditExpenseViewModel
+import com.example.okanewari.ui.party.AddMemberViewModel
 import com.example.okanewari.ui.party.AddPartyViewModel
 import com.example.okanewari.ui.party.EditPartyViewModel
 import com.example.okanewari.ui.party.ListPartysViewModel
@@ -24,11 +25,18 @@ object OwViewModelProvider {
         }
         // Initializer for AddPartyViewModel:
         /**
-         * okaneWariApplication() is called to get the InventoryApplication instance,
+         * okaneWariApplication() is called to get the OkaneWariApplication instance,
          * then its container provides the partyRepository
          */
         initializer {
             AddPartyViewModel(okaneWariApplication().container.okaneWariRepository)
+        }
+        // Initializer for AddMemberViewModel
+        initializer {
+            AddMemberViewModel(
+                this.createSavedStateHandle(),
+                okaneWariApplication().container.okaneWariRepository
+            )
         }
         // Initializer for ListExpensesViewModel
         initializer {

@@ -22,7 +22,7 @@ class ListExpensesViewModel(
     private val owRepository: OkaneWariRepository
 ) : ViewModel(){
 
-    private val partyId: Int = checkNotNull(savedStateHandle[ListExpensesDestination.partyIdArg])
+    private val partyId: Long = checkNotNull(savedStateHandle[ListExpensesDestination.partyIdArg])
 
     /**
      * Holds the screen details ui state. The data is retrieved from [owRepository] and mapped to

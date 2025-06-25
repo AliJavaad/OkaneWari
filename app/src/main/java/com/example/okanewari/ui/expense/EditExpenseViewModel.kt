@@ -25,8 +25,8 @@ class EditExpenseViewModel(
     savedStateHandle: SavedStateHandle,
     private val owRepository: OkaneWariRepository
 ): ViewModel() {
-    private val partyId: Int = checkNotNull(savedStateHandle[EditExpenseDestination.partyIdArg])
-    private val expenseId: Int = checkNotNull(savedStateHandle[EditExpenseDestination.expenseIdArg])
+    private val partyId: Long = checkNotNull(savedStateHandle[EditExpenseDestination.partyIdArg])
+    private val expenseId: Long = checkNotNull(savedStateHandle[EditExpenseDestination.expenseIdArg])
 
     var editExpenseUiState by mutableStateOf(EditExpenseUiState())
         private set

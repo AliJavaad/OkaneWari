@@ -61,9 +61,9 @@ object ListExpensesDestination : NavigationDestination {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListExpensesScreen(
-    onAddExpenseButtonClicked: (Int) -> Unit,
-    onSettingsButtonClicked: (Int) -> Unit,
-    onExpenseCardClick: (List<Int>) -> Unit,
+    onAddExpenseButtonClicked: (Long) -> Unit,
+    onSettingsButtonClicked: (Long) -> Unit,
+    onExpenseCardClick: (List<Long>) -> Unit,
     navigateUp: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ListExpensesViewModel = viewModel(factory = OwViewModelProvider.Factory)
@@ -110,7 +110,7 @@ fun ListExpensesScreen(
 @Composable
 fun ListExpensesBody(
     expenseList: List<ExpenseModel>,
-    expenseClicked: (List<Int>) -> Unit,
+    expenseClicked: (List<Long>) -> Unit,
     partyDetails: PartyDetails,
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
@@ -139,7 +139,7 @@ fun ListExpensesBody(
 @Composable
 fun DisplayExpensesAndStats(
     expenseList: List<ExpenseModel>,
-    expenseClicked: (List<Int>) -> Unit,
+    expenseClicked: (List<Long>) -> Unit,
     partyDetails: PartyDetails,
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {

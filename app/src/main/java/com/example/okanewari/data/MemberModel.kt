@@ -5,7 +5,7 @@ import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 
 @Entity(
-    tableName = "expense_table",
+    tableName = "member_table",
     foreignKeys = [
         ForeignKey(
             entity = PartyModel::class,
@@ -16,11 +16,10 @@ import androidx.room.PrimaryKey
         )
     ]
 )
-data class ExpenseModel (
+data class MemberModel (
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val partyKey: Long,
     val name: String,
-    val amount: String,
-    val dateModded: Long
+    val owner: Boolean
 )

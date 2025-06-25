@@ -6,7 +6,10 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.okanewari.data.MemberModel
 import com.example.okanewari.data.OkaneWariRepository
+import com.example.okanewari.ui.components.MemberDetails
+import com.example.okanewari.ui.components.MemberModelListToDetails
 import com.example.okanewari.ui.components.PartyDetails
 import com.example.okanewari.ui.components.PartyUiState
 import com.example.okanewari.ui.components.toPartyModel
@@ -27,7 +30,7 @@ class EditPartyViewModel(
     var editPartyUiState by mutableStateOf(EditPartyUiState())
         private set
 
-    private val partyId: Int = checkNotNull(savedStateHandle[EditPartyDestination.partyIdArg])
+    private val partyId: Long = checkNotNull(savedStateHandle[EditPartyDestination.partyIdArg])
 
     init {
         viewModelScope.launch {
@@ -35,6 +38,9 @@ class EditPartyViewModel(
                 .filterNotNull()
                 .first()
                 .toPartyUiState(true)
+            editPartyUiState.memberList = owRepository.getAllMembersFromParty(partyId)
+                .filterNotNull()
+                .first()
             // The topBarPartyName should only be updated at the initial screen creation stage.
             // Otherwise it will keep changing as the text field/party name is edited.
             editPartyUiState.topBarPartyName = editPartyUiState.partyUiState.partyDetails.partyName
@@ -48,13 +54,14 @@ class EditPartyViewModel(
     }
 
     /**
-     * Updates the [editPartyUiState] with the value provided in the argument. This method also triggers
-     * a validation for input values.
+     * Updates only the partyUiState [editPartyUiState] with the value provided in the argument.
+     * This method also triggers a validation for input values.
      */
-    fun updateUiState(partyDetails: PartyDetails) {
+    fun updatePartyUiState(partyDetails: PartyDetails) {
         editPartyUiState =
             EditPartyUiState(
                 partyUiState = PartyUiState(partyDetails, validateInput(partyDetails)),
+                memberList = editPartyUiState.memberList,
                 topBarPartyName = editPartyUiState.topBarPartyName
             )
     }
@@ -74,9 +81,10 @@ class EditPartyViewModel(
 }
 
 /**
- * Represents Ui State for adding a Party.
+ * Represents Ui State for editing a Party.
  */
 data class EditPartyUiState(
     var partyUiState: PartyUiState = PartyUiState(PartyDetails()),
+    var memberList: List<MemberModel> = listOf(),
     var topBarPartyName: String = ""
 )
