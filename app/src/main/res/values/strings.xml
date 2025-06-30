@@ -29,6 +29,8 @@
     <string name="my_name">My Name</string>
     <string name="member_name">Member Name</string>
     <string name="add_new_member">Add Member</string>
+    <string name="editing_member">Editing Member</string>
+    <string name="delete_member_dialogue_text_simple">This will delete the member and transfer all their expenses evenly to the rest of the party. \n\nDo you wish to continue?</string>
     <!-- Content Description -->
     <string name="settings_buttton_description">Settings.</string>
     <!-- Buttons -->

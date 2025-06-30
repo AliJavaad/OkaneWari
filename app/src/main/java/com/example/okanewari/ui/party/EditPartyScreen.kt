@@ -46,6 +46,7 @@ import com.example.okanewari.data.MemberModel
 import com.example.okanewari.navigation.NavigationDestination
 import com.example.okanewari.ui.OwViewModelProvider
 import com.example.okanewari.ui.components.DoneAndCancelButtons
+import com.example.okanewari.ui.components.DoneCancelDeleteButtons
 import com.example.okanewari.ui.components.PartyDetails
 import kotlinx.coroutines.launch
 
@@ -56,13 +57,19 @@ object EditPartyDestination : NavigationDestination {
     val routeWithArgs = "$route/{$partyIdArg}"
 }
 
+
+/**
+ * onEditMemberClicked: (List<Int>)
+ *      [0] = party id
+ *      [1] = member id
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditPartyScreen(
     navigateBack: () -> Unit,
     navigateUp: () -> Unit,
     navigateHome: () -> Unit,
-    onEditMemberlicked: () -> Unit,
+    onEditMemberClicked: (List<Long>) -> Unit,
     onAddMemberClicked: (Long) -> Unit,
     canNavigateBackBool: Boolean = true,
     modifier: Modifier = Modifier,
@@ -98,7 +105,7 @@ fun EditPartyScreen(
             ListPartyMembers(
                 membersList = viewModel.editPartyUiState.memberList,
                 partyDetails = viewModel.editPartyUiState.partyUiState.partyDetails,
-                onModifyMemberClicked = onEditMemberlicked,
+                onModifyMemberClicked = onEditMemberClicked,
                 onAddMemberClicked = onAddMemberClicked
             )
             HorizontalDivider(
@@ -125,7 +132,7 @@ fun EditPartyScreen(
 fun ListPartyMembers(
     membersList: List<MemberModel>,
     partyDetails: PartyDetails,
-    onModifyMemberClicked: () -> Unit,
+    onModifyMemberClicked: (List<Long>) -> Unit,
     onAddMemberClicked: (Long) -> Unit
 ){
     val mediumPadding = dimensionResource(R.dimen.medium_padding)
@@ -136,7 +143,7 @@ fun ListPartyMembers(
                 .padding(mediumPadding)
                 .clickable {
                     Log.d("Member Card", "Member Card Clicked: ${member.id}")
-                    onModifyMemberClicked()
+                    onModifyMemberClicked(listOf(partyDetails.id, member.id))
                 }
         ) {
             Row(
@@ -172,75 +179,4 @@ fun ListPartyMembers(
     }
 }
 
-@Composable
-fun DoneCancelDeleteButtons(
-    doneButtonClick: () -> Unit,
-    cancelButtonClick: () -> Unit,
-    deleteButtonClicked: () -> Unit,
-    enableDone: Boolean = true
-) {
-    DoneAndCancelButtons(
-        doneButtonClick = doneButtonClick,
-        cancelButtonClick = cancelButtonClick,
-        enableDone = enableDone
-    )
 
-    var deleteConfirmationRequired by rememberSaveable { mutableStateOf(false) }
-    val mediumPadding = dimensionResource(R.dimen.medium_padding)
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(mediumPadding),
-        verticalArrangement = Arrangement.spacedBy(mediumPadding),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        FilledTonalButton(
-            onClick = { deleteConfirmationRequired = true },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Row(
-                modifier = Modifier
-            ){
-                Icon(
-                    imageVector = Icons.Filled.Delete,
-                    contentDescription = stringResource(R.string.delete)
-                )
-                Text(
-                    text = stringResource(R.string.delete),
-                    fontSize = 16.sp
-                )
-            }
-        }
-        if (deleteConfirmationRequired){
-            DeleteConfirmationDialog(
-                onConfirm = {
-                    deleteConfirmationRequired = false
-                    deleteButtonClicked() },
-                onCancel = { deleteConfirmationRequired = false }
-            )
-        }
-    }
-}
-
-@Composable
-fun DeleteConfirmationDialog(
-    onConfirm: () -> Unit,
-    onCancel: () -> Unit,
-) {
-    AlertDialog(
-        onDismissRequest = { /* Do nothing */ },
-        title = { Text(stringResource(R.string.attention)) },
-        text = { Text(stringResource(R.string.delete_question)) },
-        dismissButton = {
-            TextButton(onClick = onCancel) {
-                Text(text = stringResource(R.string.no))
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = onConfirm) {
-                Text(text = stringResource(R.string.yes))
-            }
-        }
-    )
-}

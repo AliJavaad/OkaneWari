@@ -11,6 +11,7 @@ import com.example.okanewari.ui.expense.AddExpenseViewModel
 import com.example.okanewari.ui.expense.EditExpenseViewModel
 import com.example.okanewari.ui.party.AddMemberViewModel
 import com.example.okanewari.ui.party.AddPartyViewModel
+import com.example.okanewari.ui.party.EditMemberViewModel
 import com.example.okanewari.ui.party.EditPartyViewModel
 import com.example.okanewari.ui.party.ListPartysViewModel
 
@@ -34,6 +35,12 @@ object OwViewModelProvider {
         // Initializer for AddMemberViewModel
         initializer {
             AddMemberViewModel(
+                this.createSavedStateHandle(),
+                okaneWariApplication().container.okaneWariRepository
+            )
+        }// Initializer for EditMemberViewModel
+        initializer {
+            EditMemberViewModel(
                 this.createSavedStateHandle(),
                 okaneWariApplication().container.okaneWariRepository
             )

@@ -27,8 +27,9 @@ fun MemberDetails.toMemberModel(): MemberModel = MemberModel(
 /**
  * Extension function to convert [MemberModel] to [MemberUiState].
  */
-fun MemberModel.toMemberUiState(): MemberUiState = MemberUiState(
-    memberDetails = this.toMemberDetails()
+fun MemberModel.toMemberUiState(isEntryValid: Boolean = false): MemberUiState = MemberUiState(
+    memberDetails = this.toMemberDetails(),
+    isEntryValid = isEntryValid
 )
 
 /**

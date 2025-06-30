@@ -8,8 +8,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.okanewari.data.MemberModel
 import com.example.okanewari.data.OkaneWariRepository
-import com.example.okanewari.ui.components.MemberDetails
-import com.example.okanewari.ui.components.MemberModelListToDetails
 import com.example.okanewari.ui.components.PartyDetails
 import com.example.okanewari.ui.components.PartyUiState
 import com.example.okanewari.ui.components.toPartyModel
@@ -34,16 +32,23 @@ class EditPartyViewModel(
 
     init {
         viewModelScope.launch {
+            // One time get for party
             editPartyUiState.partyUiState = owRepository.getPartyStream(partyId)
                 .filterNotNull()
                 .first()
                 .toPartyUiState(true)
-            editPartyUiState.memberList = owRepository.getAllMembersFromParty(partyId)
-                .filterNotNull()
-                .first()
             // The topBarPartyName should only be updated at the initial screen creation stage.
             // Otherwise it will keep changing as the text field/party name is edited.
             editPartyUiState.topBarPartyName = editPartyUiState.partyUiState.partyDetails.partyName
+            // Reactive flow state for member list
+            owRepository.getAllMembersFromParty(partyId)
+                .filterNotNull()
+                .collect{ dbMembers ->
+                    editPartyUiState = editPartyUiState.copy(
+                        memberList = dbMembers
+                    )
+                }
+
         }
     }
 

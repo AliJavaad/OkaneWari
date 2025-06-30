@@ -61,8 +61,8 @@ fun OkaneWariNavHost(
             EditPartyScreen(
                 navigateUp = { navController.navigateUp() },
                 navigateBack = { navController.popBackStack() },
-                onEditMemberlicked = {
-                    navController.navigate(EditMemberDestination.route) },
+                onEditMemberClicked = {
+                    navController.navigate("${EditMemberDestination.route}/${it[0]}/${it[1]}") },
                 onAddMemberClicked = {
                     navController.navigate("${AddMemberDestination.route}/${it}") },
                 navigateHome = {
@@ -86,7 +86,11 @@ fun OkaneWariNavHost(
             )
         }
         composable(
-            route = EditMemberDestination.route
+            route = EditMemberDestination.routeWithArg,
+            arguments = listOf(
+                navArgument(EditMemberDestination.partyIdArg){ type = NavType.IntType},
+                navArgument(EditMemberDestination.memberIdArg){ type = NavType.IntType}
+            )
         ){
             EditMemberScreen(
                 navigateUp = { navController.navigateUp() },

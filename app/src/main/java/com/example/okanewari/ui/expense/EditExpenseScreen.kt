@@ -14,7 +14,7 @@ import com.example.okanewari.OkaneWareTopAppBar
 import com.example.okanewari.R
 import com.example.okanewari.navigation.NavigationDestination
 import com.example.okanewari.ui.OwViewModelProvider
-import com.example.okanewari.ui.party.DoneCancelDeleteButtons
+import com.example.okanewari.ui.components.DoneCancelDeleteButtons
 import kotlinx.coroutines.launch
 import java.util.Date
 
