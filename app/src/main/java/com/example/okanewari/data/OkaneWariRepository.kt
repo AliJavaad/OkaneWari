@@ -80,4 +80,21 @@ interface OkaneWariRepository {
      */
     suspend fun updateMember(member: MemberModel)
 
+    /**
+     * Split table methods
+     */
+    fun getSplit(id: Long): Flow<SplitModel?>
+
+    fun getSplitFromExpAndMemKeys(expenseKey: Long, memberKey: Long): Flow<SplitModel>
+
+    fun getAllSplitsForExpense(expenseKey: Long): Flow<List<SplitModel>>
+
+    fun getAllSplitsForMember(memberKey: Long): Flow<List<SplitModel>>
+
+    suspend fun insertSplit(split: SplitModel)
+
+    suspend fun deleteSplit(split: SplitModel)
+
+    suspend fun updateSplit(split: SplitModel)
+
 }

@@ -1,11 +1,13 @@
 package com.example.okanewari.data
 
 import kotlinx.coroutines.flow.Flow
+import kotlin.math.exp
 
 class OfflineOkaneWariRepository(
     private val partyDao: PartyDao,
     private val expenseDao: ExpenseDao,
-    private val memberDao: MemberDao
+    private val memberDao: MemberDao,
+    private val splitDao: SplitDao
 ): OkaneWariRepository {
     /**
      * Party methods
@@ -50,4 +52,24 @@ class OfflineOkaneWariRepository(
     override suspend fun deleteMember(member: MemberModel) = memberDao.delete(member)
 
     override suspend fun updateMember(member: MemberModel) = memberDao.update(member)
+
+    /**
+     * Split methods
+     */
+    override fun getSplit(id: Long): Flow<SplitModel?> = splitDao.getSplit(id = id)
+
+    override fun getAllSplitsForExpense(expenseKey: Long): Flow<List<SplitModel>> =
+        splitDao.getAllSplitsForExpense(expenseKey = expenseKey)
+
+    override fun getAllSplitsForMember(memberKey: Long): Flow<List<SplitModel>> =
+        splitDao.getAllSplitsForMember(memberKey = memberKey)
+
+    override fun getSplitFromExpAndMemKeys(expenseKey: Long, memberKey: Long): Flow<SplitModel> =
+        splitDao.getSplitFromExpAndMemKeys(expenseKey = expenseKey, memberKey = memberKey)
+
+    override suspend fun deleteSplit(split: SplitModel) = splitDao.insert(split)
+
+    override suspend fun insertSplit(split: SplitModel) = splitDao.insert(split)
+
+    override suspend fun updateSplit(split: SplitModel) = splitDao.insert(split)
 }
