@@ -67,6 +67,8 @@ class OfflineOkaneWariRepository(
     override fun getSplitFromExpAndMemKeys(expenseKey: Long, memberKey: Long): Flow<SplitModel> =
         splitDao.getSplitFromExpAndMemKeys(expenseKey = expenseKey, memberKey = memberKey)
 
+    override suspend fun deleteSplitByExpense(expenseKey: Long) = splitDao.deleteSplitByExpense(expenseKey = expenseKey)
+
     override suspend fun deleteSplit(split: SplitModel) = splitDao.delete(split)
 
     override suspend fun insertSplit(split: SplitModel): Long = splitDao.insert(split)

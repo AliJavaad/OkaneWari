@@ -91,10 +91,13 @@ interface OkaneWariRepository {
 
     fun getAllSplitsForMember(memberKey: Long): Flow<List<SplitModel>>
 
+    suspend fun deleteSplitByExpense(expenseKey: Long)
+
     suspend fun insertSplit(split: SplitModel): Long
 
     suspend fun deleteSplit(split: SplitModel)
 
     suspend fun updateSplit(split: SplitModel)
+
 
 }

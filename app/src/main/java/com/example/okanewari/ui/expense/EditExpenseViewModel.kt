@@ -1,25 +1,33 @@
 package com.example.okanewari.ui.expense
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.okanewari.data.MemberModel
 import com.example.okanewari.data.OkaneWariRepository
+import com.example.okanewari.data.SplitModel
+import com.example.okanewari.data.SplitType
 import com.example.okanewari.ui.components.ExpenseDetails
 import com.example.okanewari.ui.components.ExpenseUiState
+import com.example.okanewari.ui.components.MemberDetails
 import com.example.okanewari.ui.components.canConvertStringToBigDecimal
 import com.example.okanewari.ui.components.toExpenseModel
 import com.example.okanewari.ui.components.toExpenseUiState
 import com.example.okanewari.ui.components.PartyDetails
 import com.example.okanewari.ui.components.PartyUiState
+import com.example.okanewari.ui.components.toMemberDetails
 import com.example.okanewari.ui.components.toPartyModel
 import com.example.okanewari.ui.components.toPartyUiState
 import com.example.okanewari.ui.components.validateNameInput
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import java.math.BigDecimal
+import kotlin.math.exp
 
 class EditExpenseViewModel(
     savedStateHandle: SavedStateHandle,
@@ -33,10 +41,12 @@ class EditExpenseViewModel(
 
     init {
         viewModelScope.launch {
+            // Get expense uiState
             editExpenseUiState.expenseUiState = owRepository.getExpense(expenseId, partyId)
                 .filterNotNull()
                 .first()
                 .toExpenseUiState()
+            // Get Party uiState
             editExpenseUiState.partyUiState = owRepository.getPartyStream(partyId)
                 .filterNotNull()
                 .first()
@@ -45,14 +55,46 @@ class EditExpenseViewModel(
             // Otherwise it will keep changing as the text field name is edited.
             editExpenseUiState.topBarExpenseName =
                 editExpenseUiState.expenseUiState.expenseDetails.name
+            // Get list of all members
+            editExpenseUiState.memberList = owRepository.getAllMembersFromParty(partyId)
+                .filterNotNull()
+                .first()
+            // Get list of all splits
+            owRepository.getAllSplitsForExpense(expenseId)
+                .filterNotNull()
+                .collect{ splitList ->
+                    for(split in splitList){
+                        if(split.splitType == SplitType.PAY){
+                            editExpenseUiState.payingMember = editExpenseUiState.memberList.filter { it.id == split.memberKey }[0].toMemberDetails()
+                        }else{
+                            editExpenseUiState.owingMembers =
+                                editExpenseUiState.owingMembers.plus(editExpenseUiState.memberList.filter { it.id == split.memberKey }[0])
+                        }
+                    }
+                }
         }
     }
 
-    fun updateUiState(partyDetails: PartyDetails, expenseDetails: ExpenseDetails) {
+    fun updateExpenseUiState(partyDetails: PartyDetails, expenseDetails: ExpenseDetails) {
         editExpenseUiState =
             EditExpenseUiState(
                 expenseUiState = ExpenseUiState(expenseDetails, validateInput(expenseDetails)),
                 partyUiState = PartyUiState(partyDetails, true),
+                memberList = editExpenseUiState.memberList,
+                payingMember = editExpenseUiState.payingMember,
+                owingMembers = editExpenseUiState.owingMembers,
+                topBarExpenseName = editExpenseUiState.topBarExpenseName
+            )
+    }
+
+    fun updateSplitUiState(payingMember: MemberDetails, owingMembers: List<MemberModel>){
+        editExpenseUiState =
+            EditExpenseUiState(
+                expenseUiState = editExpenseUiState.expenseUiState,
+                partyUiState = editExpenseUiState.partyUiState,
+                memberList = editExpenseUiState.memberList,
+                payingMember = payingMember,
+                owingMembers = owingMembers,
                 topBarExpenseName = editExpenseUiState.topBarExpenseName
             )
     }
@@ -60,6 +102,36 @@ class EditExpenseViewModel(
     suspend fun updateExpense() {
         if (validateInput()) {
             owRepository.updateExpense(editExpenseUiState.expenseUiState.expenseDetails.toExpenseModel())
+        }
+    }
+
+    suspend fun updateExpenseAndSplit() {
+        if (validateInput() && editExpenseUiState.owingMembers.isNotEmpty()) {
+            // First delete all the splits
+            owRepository.deleteSplitByExpense(expenseId)
+            // Update the expense
+            owRepository.updateExpense(editExpenseUiState.expenseUiState.expenseDetails.toExpenseModel())
+            // Calculate the split value
+            val total = BigDecimal(editExpenseUiState.expenseUiState.expenseDetails.amount)
+            val split = calculateExpenseSplit(total, BigDecimal(editExpenseUiState.owingMembers.size + 1))
+            // Now, save the split for the PAYER as (total - split).
+            owRepository.insertSplit(
+                SplitModel(
+                    partyKey = partyId,
+                    expenseKey = expenseId,
+                    memberKey = editExpenseUiState.payingMember.id,
+                    splitType = SplitType.PAY,
+                    splitAmount = total.subtract(split).toString()))
+            // Next insert all splits for members that OWE as negative of the split
+            for(member in editExpenseUiState.owingMembers){
+                owRepository.insertSplit(
+                    SplitModel(
+                        partyKey = partyId,
+                        expenseKey = expenseId,
+                        memberKey = member.id,
+                        splitType = SplitType.OWE,
+                        splitAmount = split.negate().toString()))
+            }
         }
     }
 
@@ -87,5 +159,8 @@ class EditExpenseViewModel(
 data class EditExpenseUiState(
     var expenseUiState: ExpenseUiState = ExpenseUiState(ExpenseDetails()),
     var partyUiState: PartyUiState = PartyUiState(PartyDetails()),
-    var topBarExpenseName: String = ""
+    var topBarExpenseName: String = "",
+    var memberList: List<MemberModel> = listOf(),
+    var payingMember: MemberDetails = MemberDetails(),
+    var owingMembers: List<MemberModel> = listOf()
 )

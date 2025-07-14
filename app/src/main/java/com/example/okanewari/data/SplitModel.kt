@@ -40,7 +40,7 @@ data class SplitModel (
     val partyKey: Long,
     val expenseKey: Long,
     val memberKey: Long,
-    // val splitType: SplitType,
+    val splitType: SplitType,
     val splitAmount: String
 )
 

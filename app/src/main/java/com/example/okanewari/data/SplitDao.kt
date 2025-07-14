@@ -21,6 +21,9 @@ interface SplitDao {
     @Delete
     suspend fun delete(expSplit: SplitModel)
 
+    @Query("DELETE FROM split_table WHERE expenseKey = :expenseKey")
+    suspend fun deleteSplitByExpense(expenseKey: Long)
+
     @Query("SELECT * FROM split_table WHERE id = :id")
     fun getSplit(id: Long): Flow<SplitModel>
 
