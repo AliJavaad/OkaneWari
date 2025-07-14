@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface SplitDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insert(expSplit: SplitModel)
+    suspend fun insert(expSplit: SplitModel): Long
 
     @Update
     suspend fun update(expSplit: SplitModel)

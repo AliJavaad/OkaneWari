@@ -87,7 +87,7 @@ fun AddExpenseScreen(
             onSplitValueChange = viewModel::updateSplitUiState,
             onDone = {
                 coroutineScope.launch{
-                    viewModel.saveExpense()
+                    viewModel.saveExpenseAndSplit()
                     viewModel.updateParty()
                     navigateBack()
                 }
@@ -138,7 +138,7 @@ fun ExpenseEntryBody(
         DoneAndCancelButtons(
             doneButtonClick = onDone,
             cancelButtonClick = onCancel,
-            enableDone = expenseUiState.isEntryValid
+            enableDone = expenseUiState.isEntryValid && owingMembers.isNotEmpty()
         )
     }
 }
@@ -244,7 +244,6 @@ fun SplitExpenseForm(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                //.height(56.dp)
                 .padding(horizontal = dimensionResource(R.dimen.large_padding))
         ){
             Checkbox(
@@ -269,11 +268,11 @@ fun SplitExpenseForm(
             )
         }
     }
-    HorizontalDivider(
-        thickness = 4.dp,
-        modifier = Modifier.padding(all = dimensionResource(R.dimen.medium_padding))
-    )
-    for(member in owingMembers){
-        Text(text = member.name, modifier = Modifier.padding(all = medPadding))
-    }
+//    HorizontalDivider(
+//        thickness = 4.dp,
+//        modifier = Modifier.padding(all = dimensionResource(R.dimen.medium_padding))
+//    )
+//    for(member in owingMembers){
+//        Text(text = member.name, modifier = Modifier.padding(all = medPadding))
+//    }
 }

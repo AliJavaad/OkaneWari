@@ -32,7 +32,7 @@ class OfflineOkaneWariRepository(
     override fun getExpense(id: Long, partyId: Long): Flow<ExpenseModel?> =
         expenseDao.getExpense(id = id, partyId = partyId)
 
-    override suspend fun insertExpense(expense: ExpenseModel) = expenseDao.insert(expense)
+    override suspend fun insertExpense(expense: ExpenseModel): Long = expenseDao.insert(expense)
 
     override suspend fun deleteExpense(expense: ExpenseModel) = expenseDao.delete(expense)
 
@@ -47,7 +47,7 @@ class OfflineOkaneWariRepository(
     override fun getMember(id: Long, partyId: Long): Flow<MemberModel?> =
         memberDao.getMember(id = id, partyId = partyId)
 
-    override suspend fun insertMember(member: MemberModel) = memberDao.insert(member)
+    override suspend fun insertMember(member: MemberModel): Long = memberDao.insert(member)
 
     override suspend fun deleteMember(member: MemberModel) = memberDao.delete(member)
 
@@ -67,9 +67,9 @@ class OfflineOkaneWariRepository(
     override fun getSplitFromExpAndMemKeys(expenseKey: Long, memberKey: Long): Flow<SplitModel> =
         splitDao.getSplitFromExpAndMemKeys(expenseKey = expenseKey, memberKey = memberKey)
 
-    override suspend fun deleteSplit(split: SplitModel) = splitDao.insert(split)
+    override suspend fun deleteSplit(split: SplitModel) = splitDao.delete(split)
 
-    override suspend fun insertSplit(split: SplitModel) = splitDao.insert(split)
+    override suspend fun insertSplit(split: SplitModel): Long = splitDao.insert(split)
 
-    override suspend fun updateSplit(split: SplitModel) = splitDao.insert(split)
+    override suspend fun updateSplit(split: SplitModel) = splitDao.update(split)
 }

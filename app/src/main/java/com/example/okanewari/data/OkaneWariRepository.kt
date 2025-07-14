@@ -42,7 +42,7 @@ interface OkaneWariRepository {
     /**
      * Insert expense in the data source
      */
-    suspend fun insertExpense(expense: ExpenseModel)
+    suspend fun insertExpense(expense: ExpenseModel): Long
 
     /**
      * Delete expense from the data source
@@ -68,7 +68,7 @@ interface OkaneWariRepository {
     /**
      * Insert member in the data source
      */
-    suspend fun insertMember(member: MemberModel)
+    suspend fun insertMember(member: MemberModel): Long
 
     /**
      * Delete member from the data source
@@ -91,7 +91,7 @@ interface OkaneWariRepository {
 
     fun getAllSplitsForMember(memberKey: Long): Flow<List<SplitModel>>
 
-    suspend fun insertSplit(split: SplitModel)
+    suspend fun insertSplit(split: SplitModel): Long
 
     suspend fun deleteSplit(split: SplitModel)
 

@@ -1,13 +1,16 @@
 package com.example.okanewari.ui.expense
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.okanewari.Split
 import com.example.okanewari.data.MemberModel
 import com.example.okanewari.data.OkaneWariRepository
+import com.example.okanewari.data.SplitModel
 import com.example.okanewari.ui.components.ExpenseDetails
 import com.example.okanewari.ui.components.ExpenseUiState
 import com.example.okanewari.ui.components.MemberDetails
@@ -22,6 +25,8 @@ import com.example.okanewari.ui.components.validateNameInput
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import java.math.BigDecimal
+import java.math.RoundingMode
 
 class AddExpenseViewModel(
     savedStateHandle: SavedStateHandle,
@@ -86,6 +91,33 @@ class AddExpenseViewModel(
         }
     }
 
+    suspend fun saveExpenseAndSplit() {
+        if (validateExpense() && addExpenseUiState.owingMembers.isNotEmpty()) {
+            // First save the expense in general and get the id.
+            val expKey = owRepository.insertExpense(addExpenseUiState.expenseUiState.expenseDetails.toExpenseModel())
+            // Calculate the split value
+            val total = BigDecimal(addExpenseUiState.expenseUiState.expenseDetails.amount)
+            val split = getExpenseSplit(total = total, splitBy = BigDecimal(addExpenseUiState.owingMembers.size + 1 ))
+            Log.d("Split", "The total is $total the split is $split")
+            // Now, save the split for the PAYER as (total - split).
+            owRepository.insertSplit(
+                SplitModel(
+                    partyKey = partyId,
+                    expenseKey = expKey,
+                    memberKey = addExpenseUiState.payingMember.id,
+                    splitAmount = total.subtract(split).toString()))
+            // Next insert all splits for members that OWE as negative of the split
+            for(member in addExpenseUiState.owingMembers){
+                owRepository.insertSplit(
+                    SplitModel(
+                        partyKey = partyId,
+                        expenseKey = expKey,
+                        memberKey = member.id,
+                        splitAmount = split.negate().toString()))
+            }
+        }
+    }
+
     suspend fun updateParty(){
         owRepository.updateParty(addExpenseUiState.partyUiState.partyDetails.toPartyModel())
     }
@@ -105,4 +137,10 @@ data class AddExpenseUiState(
     var owingMembers: List<MemberModel> = listOf()
 )
 
-
+fun getExpenseSplit(total: BigDecimal, splitBy: BigDecimal): BigDecimal{
+    var split = BigDecimal.ZERO
+    if (total != BigDecimal.ZERO){
+        split = total.divide(splitBy, 2, RoundingMode.UP)
+    }
+    return split
+}
