@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface MemberDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insert(member: MemberModel)
+    suspend fun insert(member: MemberModel): Long
 
     @Update
     suspend fun update(member: MemberModel)

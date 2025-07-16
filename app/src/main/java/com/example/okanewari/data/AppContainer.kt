@@ -17,7 +17,8 @@ class AppDataContainer(private val context: Context): AppContainer {
         OfflineOkaneWariRepository(
             OkaneWariDatabase.getDatabase(context).partyDao(),
             OkaneWariDatabase.getDatabase(context).expenseDao(),
-            OkaneWariDatabase.getDatabase(context).memberDao()
+            OkaneWariDatabase.getDatabase(context).memberDao(),
+            OkaneWariDatabase.getDatabase(context).splitDao()
         )
     }
 }

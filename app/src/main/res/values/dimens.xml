@@ -5,8 +5,10 @@
     <dimen name="small_thumbnail_height">65dp</dimen>
     <dimen name="small_thumbnail_width">65dp</dimen>
     <!-- Padding -->
+    <dimen name="large_padding">24dp</dimen>
     <dimen name="medium_padding">12dp</dimen>
     <dimen name="small_padding">6dp</dimen>
     <!-- Spacers -->
     <dimen name="currency_symbol_spacing">42dp</dimen>
+    <dimen name="member_name_spacing">256dp</dimen>
 </resources>

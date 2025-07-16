@@ -6,8 +6,8 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 
 @Database(
-    entities = [PartyModel::class, ExpenseModel::class, MemberModel::class],
-    version = 6,
+    entities = [PartyModel::class, ExpenseModel::class, MemberModel::class, SplitModel::class],
+    version = 8,
     // TODO exportSchema
     exportSchema = false
 )
@@ -15,6 +15,7 @@ abstract class OkaneWariDatabase: RoomDatabase() {
     abstract fun partyDao(): PartyDao
     abstract fun expenseDao(): ExpenseDao
     abstract fun memberDao(): MemberDao
+    abstract fun splitDao(): SplitDao
 
     companion object {
         // Instance helps maintain a single instance of the database opened at a given time

@@ -49,5 +49,5 @@ fun ExpenseModel.toExpenseDetails(): ExpenseDetails = ExpenseDetails(
 )
 
 fun canConvertStringToBigDecimal(value: String): Boolean{
-    return value.matches(Regex("^\\d{1,8}(\\.\\d{1,2})?\$"))
+    return value.matches(Regex("^(?!0+\\.?0*\$)\\d{1,8}(\\.\\d{1,2})?\$"))
 }
