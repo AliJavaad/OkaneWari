@@ -33,8 +33,9 @@ fun ExpenseDetails.toExpenseModel(): ExpenseModel = ExpenseModel(
 /**
  * Extension function to convert [ExpenseModel] to [ExpenseDetails]
  */
-fun ExpenseModel.toExpenseUiState(): ExpenseUiState = ExpenseUiState(
-    expenseDetails = this.toExpenseDetails()
+fun ExpenseModel.toExpenseUiState(isEntryValid: Boolean = false): ExpenseUiState = ExpenseUiState(
+    expenseDetails = this.toExpenseDetails(),
+    isEntryValid = isEntryValid
 )
 
 /**

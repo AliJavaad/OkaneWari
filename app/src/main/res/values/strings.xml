@@ -9,6 +9,7 @@
     <string name="list_expenses">Expenses</string>
     <string name="add_new_member_screen">Add Member</string>
     <string name="edit_member_screen">Edit Member</string>
+    <string name="show_splits_screen">Party Splits</string>
     <!-- Text holders -->
     <string name="my_party">My Party</string>
     <string name="expense">Expense</string>

@@ -50,8 +50,8 @@ class EditExpenseViewModel(
             // The topBarExpenseName should only be updated at the initial screen creation stage.
             // Otherwise it will keep changing as the text field name is edited.
             editExpenseUiState = editExpenseUiState.copy(
-                expenseUiState = expenseModel.toExpenseUiState(),
-                partyUiState = partyModel.toPartyUiState(),
+                expenseUiState = expenseModel.toExpenseUiState(true),
+                partyUiState = partyModel.toPartyUiState(true),
                 topBarExpenseName = expenseModel.name
             )
 

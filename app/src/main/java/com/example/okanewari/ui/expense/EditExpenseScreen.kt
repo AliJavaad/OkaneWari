@@ -93,7 +93,8 @@ fun EditExpenseScreen(
                         viewModel.updateParty()
                         navigateBack()
                     } },
-                enableDone = viewModel.editExpenseUiState.expenseUiState.isEntryValid
+                enableDone = viewModel.editExpenseUiState.expenseUiState.isEntryValid &&
+                        viewModel.editExpenseUiState.owingMembers.isNotEmpty()
             )
         }
     }
