@@ -1,6 +1,5 @@
 package com.example.okanewari.ui.expense
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -14,20 +13,20 @@ import com.example.okanewari.data.SplitType
 import com.example.okanewari.ui.components.ExpenseDetails
 import com.example.okanewari.ui.components.ExpenseUiState
 import com.example.okanewari.ui.components.MemberDetails
+import com.example.okanewari.ui.components.PartyDetails
+import com.example.okanewari.ui.components.PartyUiState
 import com.example.okanewari.ui.components.canConvertStringToBigDecimal
 import com.example.okanewari.ui.components.toExpenseModel
 import com.example.okanewari.ui.components.toExpenseUiState
-import com.example.okanewari.ui.components.PartyDetails
-import com.example.okanewari.ui.components.PartyUiState
 import com.example.okanewari.ui.components.toMemberDetails
 import com.example.okanewari.ui.components.toPartyModel
 import com.example.okanewari.ui.components.toPartyUiState
 import com.example.okanewari.ui.components.validateNameInput
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
-import kotlin.math.exp
 
 class EditExpenseViewModel(
     savedStateHandle: SavedStateHandle,
@@ -41,36 +40,50 @@ class EditExpenseViewModel(
 
     init {
         viewModelScope.launch {
-            // Get expense uiState
-            editExpenseUiState.expenseUiState = owRepository.getExpense(expenseId, partyId)
+            // Load in the initial data (expense and party info)
+            val expenseModel = owRepository.getExpense(expenseId, partyId)
                 .filterNotNull()
                 .first()
-                .toExpenseUiState()
-            // Get Party uiState
-            editExpenseUiState.partyUiState = owRepository.getPartyStream(partyId)
+            val partyModel = owRepository.getPartyStream(partyId)
                 .filterNotNull()
                 .first()
-                .toPartyUiState()
             // The topBarExpenseName should only be updated at the initial screen creation stage.
             // Otherwise it will keep changing as the text field name is edited.
-            editExpenseUiState.topBarExpenseName =
-                editExpenseUiState.expenseUiState.expenseDetails.name
-            // Get list of all members
-            editExpenseUiState.memberList = owRepository.getAllMembersFromParty(partyId)
+            editExpenseUiState = editExpenseUiState.copy(
+                expenseUiState = expenseModel.toExpenseUiState(),
+                partyUiState = partyModel.toPartyUiState(),
+                topBarExpenseName = expenseModel.name
+            )
+
+            // Load and parse the Member and split info
+            owRepository.getAllMembersFromParty(partyId)
                 .filterNotNull()
-                .first()
-            // Get list of all splits
-            owRepository.getAllSplitsForExpense(expenseId)
-                .filterNotNull()
-                .collect{ splitList ->
-                    for(split in splitList){
+                .combine(owRepository.getAllSplitsForExpense(expenseId).filterNotNull()){
+                    allMems, allSplits ->
+                    Pair(allMems, allSplits)
+                }
+                .collect{ (rawMembers, splitList) ->
+                    // Process the members
+                    val memberMap = rawMembers.associateBy { it.id }
+                    editExpenseUiState = editExpenseUiState.copy(memberList = memberMap)
+
+                    // Process Splits
+                    var owingMembers: List<MemberModel> = listOf()
+                    var payingMember: MemberDetails? = null
+
+                    splitList.forEach{ split ->
                         if(split.splitType == SplitType.PAY){
-                            editExpenseUiState.payingMember = editExpenseUiState.memberList.filter { it.id == split.memberKey }[0].toMemberDetails()
+                            payingMember = memberMap[split.memberKey]?.toMemberDetails()
                         }else{
-                            editExpenseUiState.owingMembers =
-                                editExpenseUiState.owingMembers.plus(editExpenseUiState.memberList.filter { it.id == split.memberKey }[0])
+                            owingMembers = owingMembers.plus(memberMap[split.memberKey]!!)
                         }
                     }
+
+                    // Update the state
+                    editExpenseUiState = editExpenseUiState.copy(
+                        payingMember = payingMember ?: MemberDetails(),
+                        owingMembers = owingMembers
+                    )
                 }
         }
     }
@@ -97,12 +110,6 @@ class EditExpenseViewModel(
                 owingMembers = owingMembers,
                 topBarExpenseName = editExpenseUiState.topBarExpenseName
             )
-    }
-
-    suspend fun updateExpense() {
-        if (validateInput()) {
-            owRepository.updateExpense(editExpenseUiState.expenseUiState.expenseDetails.toExpenseModel())
-        }
     }
 
     suspend fun updateExpenseAndSplit() {
@@ -160,7 +167,7 @@ data class EditExpenseUiState(
     var expenseUiState: ExpenseUiState = ExpenseUiState(ExpenseDetails()),
     var partyUiState: PartyUiState = PartyUiState(PartyDetails()),
     var topBarExpenseName: String = "",
-    var memberList: List<MemberModel> = listOf(),
+    var memberList: Map<Long, MemberModel> = mapOf(),
     var payingMember: MemberDetails = MemberDetails(),
     var owingMembers: List<MemberModel> = listOf()
 )

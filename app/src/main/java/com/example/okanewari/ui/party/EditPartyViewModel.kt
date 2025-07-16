@@ -33,13 +33,15 @@ class EditPartyViewModel(
     init {
         viewModelScope.launch {
             // One time get for party
-            editPartyUiState.partyUiState = owRepository.getPartyStream(partyId)
+            val partyModel = owRepository.getPartyStream(partyId)
                 .filterNotNull()
                 .first()
-                .toPartyUiState(true)
             // The topBarPartyName should only be updated at the initial screen creation stage.
             // Otherwise it will keep changing as the text field/party name is edited.
-            editPartyUiState.topBarPartyName = editPartyUiState.partyUiState.partyDetails.partyName
+            editPartyUiState = editPartyUiState.copy(
+                partyUiState = partyModel.toPartyUiState(true),
+                topBarPartyName = partyModel.partyName
+            )
             // Reactive flow state for member list
             owRepository.getAllMembersFromParty(partyId)
                 .filterNotNull()

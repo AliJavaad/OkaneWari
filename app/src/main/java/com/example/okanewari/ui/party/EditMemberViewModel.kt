@@ -37,15 +37,18 @@ class EditMemberViewModel(
     // Get the initial party and member info when entering the screen
     init {
         viewModelScope.launch {
-            editMemberUiState.partyUiState = owRepository.getPartyStream(partyId)
+            val partyModel = owRepository.getPartyStream(partyId)
                 .filterNotNull()
                 .first()
-                .toPartyUiState(true)
-            editMemberUiState.memberUiState = owRepository.getMember(memberId, partyId)
+            val memberModel = owRepository.getMember(memberId, partyId)
                 .filterNotNull()
                 .first()
-                .toMemberUiState(true)
-            editMemberUiState.topBarPartyName = editMemberUiState.memberUiState.memberDetails.name
+
+            editMemberUiState = editMemberUiState.copy(
+                partyUiState = partyModel.toPartyUiState(true),
+                memberUiState = memberModel.toMemberUiState(true),
+                topBarPartyName = memberModel.name
+            )
         }
     }
 

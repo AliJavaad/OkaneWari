@@ -67,7 +67,7 @@ fun EditExpenseScreen(
                 modifier = Modifier.padding(all = dimensionResource(R.dimen.medium_padding))
             )
             SplitExpenseForm(
-                memberList = viewModel.editExpenseUiState.memberList,
+                memberList = viewModel.editExpenseUiState.memberList.values.toList(),
                 payingMember = viewModel.editExpenseUiState.payingMember,
                 owingMembers = viewModel.editExpenseUiState.owingMembers,
                 onValueChange = viewModel::updateSplitUiState

@@ -34,10 +34,12 @@ class AddMemberViewModel(
     // Get the initial party info when entering the screen
     init {
         viewModelScope.launch {
-            addMemberUiState.partyUiState = owRepository.getPartyStream(partyId)
+            val partyModel = owRepository.getPartyStream(partyId)
                 .filterNotNull()
                 .first()
-                .toPartyUiState(true)
+            addMemberUiState = addMemberUiState.copy(
+                partyUiState = partyModel.toPartyUiState(true)
+            )
         }
     }
 
