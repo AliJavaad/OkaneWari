@@ -42,10 +42,12 @@ class AddExpenseViewModel(
     // Get the initial party info when entering the screen
     init {
         viewModelScope.launch {
-            addExpenseUiState.partyUiState = owRepository.getPartyStream(partyId)
+            val partyModel = owRepository.getPartyStream(partyId)
                 .filterNotNull()
                 .first()
-                .toPartyUiState(true)
+            addExpenseUiState = addExpenseUiState.copy(
+                partyUiState = partyModel.toPartyUiState(true)
+            )
             // Reactive flow state for member list
             owRepository.getAllMembersFromParty(partyId)
                 .filterNotNull()
@@ -83,12 +85,6 @@ class AddExpenseViewModel(
                 payingMember = payingMember,
                 owingMembers = owingMembers
             )
-    }
-
-    suspend fun saveExpense() {
-        if (validateExpense()) {
-            owRepository.insertExpense(addExpenseUiState.expenseUiState.expenseDetails.toExpenseModel())
-        }
     }
 
     suspend fun saveExpenseAndSplit() {
