@@ -1,5 +1,6 @@
 package com.example.okanewari.ui.expense
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -113,31 +114,41 @@ class EditExpenseViewModel(
     }
 
     suspend fun updateExpenseAndSplit() {
-        if (validateInput() && editExpenseUiState.owingMembers.isNotEmpty()) {
-            // First delete all the splits
-            owRepository.deleteSplitByExpense(expenseId)
-            // Update the expense
-            owRepository.updateExpense(editExpenseUiState.expenseUiState.expenseDetails.toExpenseModel())
-            // Calculate the split value
-            val total = BigDecimal(editExpenseUiState.expenseUiState.expenseDetails.amount)
-            val split = calculateExpenseSplit(total, BigDecimal(editExpenseUiState.owingMembers.size + 1))
-            // Now, save the split for the PAYER as (total - split).
-            owRepository.insertSplit(
-                SplitModel(
-                    partyKey = partyId,
-                    expenseKey = expenseId,
-                    memberKey = editExpenseUiState.payingMember.id,
-                    splitType = SplitType.PAY,
-                    splitAmount = total.subtract(split).toString()))
-            // Next insert all splits for members that OWE as negative of the split
-            for(member in editExpenseUiState.owingMembers){
+        // Capture all states needed
+        val currentState = editExpenseUiState
+        val currentPayingMember = currentState.payingMember
+        val currentOwingMembers = currentState.owingMembers
+
+        if (validateInput() && currentOwingMembers.isNotEmpty()) {
+            try{
+                // First delete all the splits
+                owRepository.deleteSplitByExpense(expenseId)
+                // Update the expense
+                owRepository.updateExpense(currentState.expenseUiState.expenseDetails.toExpenseModel())
+                // Calculate the split value
+                val total = BigDecimal(currentState.expenseUiState.expenseDetails.amount)
+                val split = calculateExpenseSplit(total, BigDecimal(currentState.owingMembers.size + 1))
+                // Now, save the split for the PAYER as (total - split).
                 owRepository.insertSplit(
                     SplitModel(
                         partyKey = partyId,
                         expenseKey = expenseId,
-                        memberKey = member.id,
-                        splitType = SplitType.OWE,
-                        splitAmount = split.negate().toString()))
+                        memberKey = currentPayingMember.id,
+                        splitType = SplitType.PAY,
+                        splitAmount = total.subtract(split).toString()))
+                // Next insert all splits for members that OWE as negative of the split
+                for(member in currentOwingMembers){
+                    Log.d("InsertOweLoop", "Owing mem: ${member.name}")
+                    owRepository.insertSplit(
+                        SplitModel(
+                            partyKey = partyId,
+                            expenseKey = expenseId,
+                            memberKey = member.id,
+                            splitType = SplitType.OWE,
+                            splitAmount = split.negate().toString()))
+                }
+            }catch(e: Exception){
+                Log.e("updateExpenseAndSplit", e.toString())
             }
         }
     }

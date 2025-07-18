@@ -88,30 +88,39 @@ class AddExpenseViewModel(
     }
 
     suspend fun saveExpenseAndSplit() {
-        if (validateExpense() && addExpenseUiState.owingMembers.isNotEmpty()) {
-            // First save the expense in general and get the id.
-            val expKey = owRepository.insertExpense(addExpenseUiState.expenseUiState.expenseDetails.toExpenseModel())
-            // Calculate the split value
-            val total = BigDecimal(addExpenseUiState.expenseUiState.expenseDetails.amount)
-            val split = calculateExpenseSplit(total = total, splitBy = BigDecimal(addExpenseUiState.owingMembers.size + 1 ))
-            Log.d("Split", "The total is $total the split is $split")
-            // Now, save the split for the PAYER as (total - split).
-            owRepository.insertSplit(
-                SplitModel(
-                    partyKey = partyId,
-                    expenseKey = expKey,
-                    memberKey = addExpenseUiState.payingMember.id,
-                    splitType = SplitType.PAY,
-                    splitAmount = total.subtract(split).toString()))
-            // Next insert all splits for members that OWE as negative of the split
-            for(member in addExpenseUiState.owingMembers){
+        // Capture all states needed
+        val currentState = addExpenseUiState
+        val currentPayingMember = currentState.payingMember
+        val currentOwingMembers = currentState.owingMembers
+
+        if (validateExpense() && currentOwingMembers.isNotEmpty()) {
+            try{
+                // First save the expense in general and get the id.
+                val expKey = owRepository.insertExpense(currentState.expenseUiState.expenseDetails.toExpenseModel())
+                // Calculate the split value
+                val total = BigDecimal(currentState.expenseUiState.expenseDetails.amount)
+                val split = calculateExpenseSplit(total = total, splitBy = BigDecimal(currentState.owingMembers.size + 1 ))
+                Log.d("Split", "The total is $total the split is $split")
+                // Now, save the split for the PAYER as (total - split).
                 owRepository.insertSplit(
                     SplitModel(
                         partyKey = partyId,
                         expenseKey = expKey,
-                        memberKey = member.id,
-                        splitType = SplitType.OWE,
-                        splitAmount = split.negate().toString()))
+                        memberKey = currentPayingMember.id,
+                        splitType = SplitType.PAY,
+                        splitAmount = total.subtract(split).toString()))
+                // Next insert all splits for members that OWE as negative of the split
+                for(member in currentOwingMembers){
+                    owRepository.insertSplit(
+                        SplitModel(
+                            partyKey = partyId,
+                            expenseKey = expKey,
+                            memberKey = member.id,
+                            splitType = SplitType.OWE,
+                            splitAmount = split.negate().toString()))
+                }
+            }catch(e: Exception){
+                Log.e("saveExpenseAndSplit", e.toString())
             }
         }
     }

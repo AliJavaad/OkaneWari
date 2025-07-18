@@ -73,7 +73,7 @@ fun ListExpensesScreen(
     val listExpensesUiState by viewModel.listExpensesUiState.collectAsState()
 
     // For debug
-    Log.d("PartyKey", "ListExpensesScreen partykey: ${listExpensesUiState.partyDetails.id}")
+    // Log.d("PartyKey", "ListExpensesScreen partykey: ${listExpensesUiState.partyDetails.id}")
 
     Scaffold (
         topBar = {
