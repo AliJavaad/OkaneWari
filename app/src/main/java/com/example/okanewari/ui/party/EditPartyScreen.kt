@@ -21,6 +21,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -100,6 +101,7 @@ fun EditPartyScreen(
             )
             Text(
                 text = "Add / Modify members:",
+                style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(all  = dimensionResource(R.dimen.medium_padding))
             )
             ListPartyMembers(
@@ -160,7 +162,7 @@ fun ListPartyMembers(
                 )
                 Text(
                     text = member.name,
-                    fontSize = 18.sp,
+                    style = MaterialTheme.typography.bodyLarge,
                     textAlign = TextAlign.Center,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -174,7 +176,7 @@ fun ListPartyMembers(
     ) {
         Text(
             text = stringResource(R.string.add_new_member),
-            fontSize = 16.sp
+            style = MaterialTheme.typography.bodyLarge
         )
     }
 }

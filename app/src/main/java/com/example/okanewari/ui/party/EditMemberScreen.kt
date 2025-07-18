@@ -18,6 +18,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -102,8 +103,8 @@ fun EditMemberScreen(
             )
             if (viewModel.editMemberUiState.memberUiState.memberDetails.owner){
                 Text(
-                    text = "The owner of the party cannot be deleted.",
-                    color = Color.Red,
+                    text = stringResource(R.string.owning_party_member_warning),
+                    color = MaterialTheme.colorScheme.error,
                     modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.medium_padding))
                 )
             }

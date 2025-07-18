@@ -156,8 +156,6 @@ fun DisplayParties(
                     )
                     Column{
                         Text(
-                            // TODO align text in the column
-                            // TODO move constants to resource folder
                             text = it.partyName,
                             style = MaterialTheme.typography.headlineMedium,
                             maxLines = 1,

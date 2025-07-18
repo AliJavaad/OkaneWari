@@ -90,13 +90,13 @@ fun TableScreen(
             Row(
                 modifier = Modifier.background(MaterialTheme.colorScheme.tertiaryContainer)
             ) {
-                // Column 1 heading
+                // Column 1 heading - Member Name
                 TableCell(
                     text = stringResource(R.string.member_name),
                     style = MaterialTheme.typography.titleMedium,
                     weight = column1Weight
                 )
-                // Column 2 heading
+                // Column 2 heading - Net total ($)
                 TableCell(
                     text = "${stringResource(R.string.net_total_column)} (in ${partyDetails.currency})",
                     style = MaterialTheme.typography.titleMedium,
@@ -121,6 +121,14 @@ fun TableScreen(
                     weight = column2Weight
                 )
             }
+        }
+        item{
+            Text(
+                text = "If the net total is POSITIVE, you ARE OWED money.\n" +
+                        "If the net total is NEGATIVE, you OWE money.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.error
+            )
         }
     }
 }
