@@ -72,7 +72,7 @@ fun ShowSplitsScreen(
     ){ innerPadding ->
         Column(
             modifier = Modifier
-                // .verticalScroll(rememberScrollState())
+                .verticalScroll(rememberScrollState())
                 .padding(innerPadding)
         ) {
             ShowSimplifiedTransactions(
@@ -129,7 +129,7 @@ fun ShowSettleUpButton(
         AlertDialog(
             onDismissRequest = { settleConfirmationRequired = false },
             title = { Text(stringResource(R.string.attention)) },
-            text = { Text("By settling up, all expenses will be DELETED.\n\nHowever, all party and member details will remain.") },
+            text = { Text("By settling up, all expenses will be DELETED (reset).\n\nHowever, all party and member details will remain.") },
             dismissButton = {
                 TextButton(
                     onClick = { settleConfirmationRequired = false }
@@ -193,60 +193,57 @@ fun ShowNetSplitsTable(
     memberList: Map<Long, MemberModel>,
     memberSplitTotals: Map<Long, BigDecimal>
 ) {
+    val medPadding = dimensionResource(R.dimen.medium_padding)
     // Each cell of a column must have the same weight.
     val column1Weight = .5f // 50%
     val column2Weight = .5f // 50%
-    // The LazyColumn will be our table. Notice the use of the weights below
-    LazyColumn(
-        modifier = Modifier
-            .padding(dimensionResource(R.dimen.medium_padding))
-    ) {
-        // Column Headers
-        item {
-            Row(
-                modifier = Modifier.background(MaterialTheme.colorScheme.tertiaryContainer)
-            ) {
-                // Column 1 heading - Member Name
-                TableCell(
-                    text = stringResource(R.string.member_name),
-                    style = MaterialTheme.typography.titleMedium,
-                    weight = column1Weight
-                )
-                // Column 2 heading - Net total ($)
-                TableCell(
-                    text = "${stringResource(R.string.net_total_column)} (in ${partyDetails.currency})",
-                    style = MaterialTheme.typography.titleMedium,
-                    weight = column2Weight
-                )
-            }
-        }
 
-        // All data lines of your table.
-        items(memberSplitTotals.keys.toList()) { memId ->
-            Row(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                // Column 1 - Member name
-                TableCell(
-                    text = memberList[memId]!!.name,
-                    weight = column1Weight
-                )
-                // Column 2 - Net Total
-                TableCell(
-                    text = memberSplitTotals[memId].toString(),
-                    weight = column2Weight
-                )
-            }
-        }
-        item{
-            Text(
-                text = "If the net total is POSITIVE, you ARE OWED money.\n" +
-                        "If the net total is NEGATIVE, you OWE money.",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.error
+    Row(
+        modifier = Modifier
+            .padding(horizontal = medPadding)
+            .background(MaterialTheme.colorScheme.tertiaryContainer)
+    ) {
+        // Column 1 heading - Member Name
+        TableCell(
+            text = stringResource(R.string.member_name),
+            style = MaterialTheme.typography.titleMedium,
+            weight = column1Weight
+        )
+        // Column 2 heading - Net total ($)
+        TableCell(
+            text = "${stringResource(R.string.net_total_column)} (in ${partyDetails.currency})",
+            style = MaterialTheme.typography.titleMedium,
+            weight = column2Weight
+        )
+    }
+
+    // All data lines of your table.
+    memberSplitTotals.keys.forEach { memId ->
+        Row(
+            modifier = Modifier
+                .padding(horizontal = medPadding)
+                .fillMaxWidth()
+        ) {
+            // Column 1 - Member name
+            TableCell(
+                text = memberList[memId]!!.name,
+                weight = column1Weight
+            )
+            // Column 2 - Net Total
+            TableCell(
+                text = memberSplitTotals[memId].toString(),
+                weight = column2Weight
             )
         }
     }
+    // Table description
+    Text(
+        text = "If the net total is POSITIVE, you ARE OWED money.\n" +
+                "If the net total is NEGATIVE, you OWE money.",
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.error,
+        modifier = Modifier.padding(horizontal = medPadding)
+    )
 }
 
 @Composable
