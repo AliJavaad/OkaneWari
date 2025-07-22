@@ -46,4 +46,5 @@
     <string name="attention">Attention</string>
     <string name="no">No</string>
     <string name="yes">Yes</string>
+    <string name="ok">Ok</string>
 </resources>

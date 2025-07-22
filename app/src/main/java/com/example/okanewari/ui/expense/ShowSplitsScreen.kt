@@ -10,19 +10,29 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.okanewari.OkaneWareTopAppBar
 import com.example.okanewari.R
@@ -30,6 +40,7 @@ import com.example.okanewari.data.MemberModel
 import com.example.okanewari.navigation.NavigationDestination
 import com.example.okanewari.ui.OwViewModelProvider
 import com.example.okanewari.ui.components.PartyDetails
+import kotlinx.coroutines.launch
 import java.math.BigDecimal
 
 object ShowSplitsDestination: NavigationDestination {
@@ -48,6 +59,7 @@ fun ShowSplitsScreen(
     viewModel: ShowSplitsViewModel = viewModel(factory = OwViewModelProvider.Factory)
 ){
     val coroutineScope = rememberCoroutineScope()
+    val medPadding = dimensionResource(R.dimen.medium_padding)
 
     Scaffold(
         topBar = {
@@ -60,6 +72,7 @@ fun ShowSplitsScreen(
     ){ innerPadding ->
         Column(
             modifier = Modifier
+                // .verticalScroll(rememberScrollState())
                 .padding(innerPadding)
         ) {
             ShowSimplifiedTransactions(
@@ -69,14 +82,72 @@ fun ShowSplitsScreen(
             )
             HorizontalDivider(
                 thickness = 4.dp,
-                modifier = Modifier.padding(all = dimensionResource(R.dimen.medium_padding))
+                modifier = Modifier.padding(all = medPadding)
             )
-            TableScreen(
+            ShowNetSplitsTable(
                 partyDetails = viewModel.showSplitsUiState.partyUiState.partyDetails,
                 memberList = viewModel.showSplitsUiState.memberList,
                 memberSplitTotals = viewModel.showSplitsUiState.memberSplitTotals
             )
+            HorizontalDivider(
+                thickness = 4.dp,
+                modifier = Modifier.padding(all = medPadding)
+            )
+            ShowSettleUpButton(
+                onConfirm = {
+                    coroutineScope.launch {
+                        viewModel.deleteAllExpenses()
+                        navigateBack()
+                    }
+                }
+            )
         }
+    }
+}
+
+@Composable
+fun ShowSettleUpButton(
+    onConfirm: () -> Unit,
+    enableSettle: Boolean = true
+){
+    var settleConfirmationRequired by rememberSaveable { mutableStateOf(false) }
+
+    Button(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = dimensionResource(R.dimen.medium_padding)),
+        enabled = enableSettle,
+        onClick = { settleConfirmationRequired = true }
+    ) {
+        Text(
+            text = "Settle Up",
+            style = MaterialTheme.typography.labelLarge,
+        )
+    }
+
+    if(settleConfirmationRequired){
+        AlertDialog(
+            onDismissRequest = { settleConfirmationRequired = false },
+            title = { Text(stringResource(R.string.attention)) },
+            text = { Text("By settling up, all expenses will be DELETED.\n\nHowever, all party and member details will remain.") },
+            dismissButton = {
+                TextButton(
+                    onClick = { settleConfirmationRequired = false }
+                ) {
+                    Text(text = stringResource(R.string.cancel))
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        settleConfirmationRequired = false
+                        onConfirm()
+                    }
+                ) {
+                    Text(text = stringResource(R.string.ok))
+                }
+            }
+        )
     }
 }
 
@@ -92,6 +163,16 @@ fun ShowSimplifiedTransactions(
         style = MaterialTheme.typography.titleLarge,
         modifier = Modifier.padding(horizontal = medPadding)
     )
+    if(transactions.isEmpty()){
+        Text(
+            text = "No splits to show.",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier
+                .padding(horizontal = medPadding * 2)
+                .padding(vertical = dimensionResource(R.dimen.small_padding))
+        )
+        return
+    }
     transactions.forEach{ trans ->
         val debtorName = memberList[trans.fromKey]?.name
         val creditorName = memberList[trans.toKey]?.name
@@ -100,14 +181,14 @@ fun ShowSimplifiedTransactions(
             text = "$debtorName owes $creditorName ${partyDetails.currency}${trans.amount}",
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier
-                .padding(horizontal = medPadding*2)
+                .padding(horizontal = medPadding * 2)
                 .padding(vertical = dimensionResource(R.dimen.small_padding))
         )
     }
 }
 
 @Composable
-fun TableScreen(
+fun ShowNetSplitsTable(
     partyDetails: PartyDetails,
     memberList: Map<Long, MemberModel>,
     memberSplitTotals: Map<Long, BigDecimal>
@@ -118,7 +199,6 @@ fun TableScreen(
     // The LazyColumn will be our table. Notice the use of the weights below
     LazyColumn(
         modifier = Modifier
-            .fillMaxSize()
             .padding(dimensionResource(R.dimen.medium_padding))
     ) {
         // Column Headers

@@ -54,6 +54,11 @@ interface OkaneWariRepository {
      */
     suspend fun updateExpense(expense: ExpenseModel)
 
+    /**
+     * Delete all expenses in the party [partyId]
+     */
+    suspend fun deleteAllExpensesInParty(partyId: Long)
+
 
     /**
      * Retrieve all the members from the the given data source that match with the [partyId].

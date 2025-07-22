@@ -70,6 +70,10 @@ class ShowSplitsViewModel(
                 }
         }
     }
+
+    suspend fun deleteAllExpenses(){
+        owRepository.deleteAllExpensesInParty(partyId)
+    }
 }
 
 /**
@@ -91,8 +95,8 @@ fun calculateTransactions(splitTotals: Map<Long, BigDecimal>): List<Transaction>
     // Separate into people who are owed (creditors) and people who owe (debtors)
     splitTotals.forEach{
         when{
-            it.value > BigDecimal.ZERO -> creditors.add(NetTotals(it.key, it.value))
-            it.value < BigDecimal.ZERO -> debtors.add(NetTotals(it.key, it.value))
+            it.value > BigDecimal("0.1") -> creditors.add(NetTotals(it.key, it.value))
+            it.value < BigDecimal("-0.1") -> debtors.add(NetTotals(it.key, it.value))
         }
     }.also{
         creditors.sortByDescending { it.total }

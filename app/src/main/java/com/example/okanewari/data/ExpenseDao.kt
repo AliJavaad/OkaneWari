@@ -21,6 +21,9 @@ interface ExpenseDao {
     @Delete
     suspend fun delete(expense: ExpenseModel)
 
+    @Query("DELETE FROM expense_table WHERE partyKey = :partyId")
+    suspend fun deleteAllExpensesInParty(partyId: Long)
+
     @Query("SELECT * FROM expense_table WHERE id = :id AND partyKey = :partyId")
     fun getExpense(id: Long, partyId: Long): Flow<ExpenseModel>
 
