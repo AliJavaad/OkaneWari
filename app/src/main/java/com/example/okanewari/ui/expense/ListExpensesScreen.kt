@@ -34,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -64,6 +65,7 @@ fun ListExpensesScreen(
     onAddExpenseButtonClicked: (Long) -> Unit,
     onSettingsButtonClicked: (Long) -> Unit,
     onExpenseCardClick: (List<Long>) -> Unit,
+    onStatCardClicked: (Long) -> Unit,
     navigateUp: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ListExpensesViewModel = viewModel(factory = OwViewModelProvider.Factory)
@@ -71,7 +73,7 @@ fun ListExpensesScreen(
     val listExpensesUiState by viewModel.listExpensesUiState.collectAsState()
 
     // For debug
-    Log.d("PartyKey", "ListExpensesScreen partykey: ${listExpensesUiState.partyDetails.id}")
+    // Log.d("PartyKey", "ListExpensesScreen partykey: ${listExpensesUiState.partyDetails.id}")
 
     Scaffold (
         topBar = {
@@ -101,6 +103,7 @@ fun ListExpensesScreen(
         ListExpensesBody(
             expenseList = listExpensesUiState.expenseList,
             expenseClicked = onExpenseCardClick,
+            statCardClicked = onStatCardClicked,
             partyDetails = listExpensesUiState.partyDetails,
             contentPadding = innerPadding
         )
@@ -111,6 +114,7 @@ fun ListExpensesScreen(
 fun ListExpensesBody(
     expenseList: List<ExpenseModel>,
     expenseClicked: (List<Long>) -> Unit,
+    statCardClicked: (Long) -> Unit,
     partyDetails: PartyDetails,
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
@@ -130,6 +134,7 @@ fun ListExpensesBody(
         DisplayExpensesAndStats(
             expenseList = expenseList,
             expenseClicked = expenseClicked,
+            statCardClicked = statCardClicked,
             partyDetails = partyDetails,
             contentPadding = contentPadding
         )
@@ -140,6 +145,7 @@ fun ListExpensesBody(
 fun DisplayExpensesAndStats(
     expenseList: List<ExpenseModel>,
     expenseClicked: (List<Long>) -> Unit,
+    statCardClicked: (Long) -> Unit,
     partyDetails: PartyDetails,
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
@@ -150,7 +156,9 @@ fun DisplayExpensesAndStats(
         item{
             DisplayPartyStats(
                 expenseList = expenseList,
-                currSymbol = partyDetails.currency
+                partyDetails = partyDetails,
+                currSymbol = partyDetails.currency,
+                statCardClicked = statCardClicked
             )
         }
         items(expenseList) {
@@ -174,23 +182,20 @@ fun DisplayExpensesAndStats(
                     Column {
                         Text(
                             text = it.name,
-                            fontSize = 18.sp,
-                            textAlign = TextAlign.Center,
+                            style = MaterialTheme.typography.titleLarge,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
                         Text(
                             text = partyDetails.currency + it.amount,
-                            fontSize = 16.sp,
-                            textAlign = TextAlign.Center,
+                            style = MaterialTheme.typography.titleLarge,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
                         Text(
                             text = stringResource(R.string.last_modified) + ": "
                                     + DateHandler.formatter.format(it.dateModded),
-                            fontSize = 12.sp,
-                            textAlign = TextAlign.Center,
+                            style = MaterialTheme.typography.labelLarge,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
@@ -204,10 +209,14 @@ fun DisplayExpensesAndStats(
 @Composable
 fun DisplayPartyStats(
     expenseList: List<ExpenseModel>,
-    currSymbol: String
+    partyDetails: PartyDetails,
+    currSymbol: String,
+    statCardClicked: (Long) -> Unit
 ){
     Card (
-        modifier = Modifier.padding(12.dp).fillMaxWidth()
+        modifier = Modifier
+            .padding(12.dp).fillMaxWidth()
+            .clickable { statCardClicked(partyDetails.id) }
     ){
         Row (
             verticalAlignment = Alignment.CenterVertically
@@ -226,11 +235,19 @@ fun DisplayPartyStats(
                             + currSymbol
                             + getExpenseListSumTotal(expenseList),
                     maxLines = 1,
+                    style = MaterialTheme.typography.titleLarge,
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
                     text = stringResource(R.string.number_of_expenses) + ": "
                             + expenseList.count(),
+                    style = MaterialTheme.typography.titleSmall,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    text = "Click here for split info",
+                    style = MaterialTheme.typography.titleMedium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )

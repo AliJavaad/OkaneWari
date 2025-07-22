@@ -39,8 +39,9 @@ fun EditExpenseScreen(
     canNavigateBackBool: Boolean = true,
     viewModel: EditExpenseViewModel = viewModel(factory = OwViewModelProvider.Factory)
 ){
-    Log.d("PartyKey", "AddExpenseScreen Party Key: ${viewModel.editExpenseUiState.expenseUiState.expenseDetails.partyKey}")
-    Log.d("ExpenseKey", "AddExpenseScreen Expense Key: ${viewModel.editExpenseUiState.expenseUiState.expenseDetails.id}")
+    // Log.d("PartyKey", "EditExpenseScreen Party Key: ${viewModel.editExpenseUiState.expenseUiState.expenseDetails.partyKey}")
+    // Log.d("ExpenseKey", "EditExpenseScreen Expense Key: ${viewModel.editExpenseUiState.expenseUiState.expenseDetails.id}")
+    Log.d("EditExpScreen", "Buying member name: ${viewModel.editExpenseUiState.payingMember.name}")
 
     val coroutineScope = rememberCoroutineScope()
     Scaffold(
@@ -93,7 +94,8 @@ fun EditExpenseScreen(
                         viewModel.updateParty()
                         navigateBack()
                     } },
-                enableDone = viewModel.editExpenseUiState.expenseUiState.isEntryValid
+                enableDone = viewModel.editExpenseUiState.expenseUiState.isEntryValid &&
+                        viewModel.editExpenseUiState.owingMembers.isNotEmpty()
             )
         }
     }

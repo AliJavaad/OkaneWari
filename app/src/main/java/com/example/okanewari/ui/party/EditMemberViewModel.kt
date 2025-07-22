@@ -7,18 +7,23 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.okanewari.data.OkaneWariRepository
+import com.example.okanewari.data.SplitModel
+import com.example.okanewari.data.SplitType
 import com.example.okanewari.ui.components.MemberDetails
 import com.example.okanewari.ui.components.MemberUiState
 import com.example.okanewari.ui.components.PartyDetails
 import com.example.okanewari.ui.components.PartyUiState
+import com.example.okanewari.ui.components.toExpenseDetails
 import com.example.okanewari.ui.components.toMemberModel
 import com.example.okanewari.ui.components.toMemberUiState
 import com.example.okanewari.ui.components.toPartyModel
 import com.example.okanewari.ui.components.toPartyUiState
 import com.example.okanewari.ui.components.validateNameInput
+import com.example.okanewari.ui.expense.calculateExpenseSplit
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import java.math.BigDecimal
 
 /**
  * ViewModel to retrieve, update, or delete a member from the [OkaneWariRepository]'s data source.
@@ -68,6 +73,64 @@ class EditMemberViewModel(
     }
 
     suspend fun deleteMember(){
+        // Get split for specific member
+        val splitList = owRepository
+            .getAllSplitsForMember(editMemberUiState.memberUiState.memberDetails.id)
+            .filterNotNull()
+            .first()
+
+        // Check if there are any splits involving the member. If not, it is safe to delete.
+        if(splitList.isEmpty()){
+            owRepository.deleteMember(editMemberUiState.memberUiState.memberDetails.toMemberModel())
+            return
+        }
+
+        // For each expense, go in and adjust the split values
+        splitList.forEach{ split ->
+            // Get the expense
+            val expense = owRepository.getExpense(split.expenseKey, partyId)
+                .filterNotNull()
+                .first()
+            // Delete the split
+            owRepository.deleteSplit(split)
+
+            if (split.splitType == SplitType.PAY){
+                // if the member was the person who paid, delete the expense entirely
+                owRepository.deleteExpense(expense)
+            }else{
+                // else, must get a new split with the remaining members and update the split table
+                val expSplits = owRepository.getAllSplitsForExpense(expense.id).filterNotNull().first()
+                val newSplitAmount = calculateExpenseSplit(expense.amount.toBigDecimal(), BigDecimal(expSplits.size))
+                expSplits.forEach{ newSplit ->
+                    when (newSplit.splitType){
+                        SplitType.PAY -> {
+                            owRepository.updateSplit(
+                                SplitModel(
+                                    id = newSplit.id,
+                                    partyKey = newSplit.partyKey,
+                                    expenseKey = newSplit.expenseKey,
+                                    memberKey = newSplit.memberKey,
+                                    splitType = newSplit.splitType,
+                                    splitAmount = (expense.amount.toBigDecimal() - newSplitAmount).toString()
+                                )
+                            )
+                        }
+                        SplitType.OWE -> {
+                            owRepository.updateSplit(
+                                SplitModel(
+                                    id = newSplit.id,
+                                    partyKey = newSplit.partyKey,
+                                    expenseKey = newSplit.expenseKey,
+                                    memberKey = newSplit.memberKey,
+                                    splitType = newSplit.splitType,
+                                    splitAmount = newSplitAmount.negate().toString()
+                                )
+                            )
+                        }
+                    }
+                }
+            }
+        }
         owRepository.deleteMember(editMemberUiState.memberUiState.memberDetails.toMemberModel())
     }
 

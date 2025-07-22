@@ -18,6 +18,8 @@ import com.example.okanewari.ui.expense.ListExpensesDestination
 import com.example.okanewari.ui.party.ListPartiesDestination
 import com.example.okanewari.ui.party.ListPartysScreen
 import com.example.okanewari.ui.expense.ListExpensesScreen
+import com.example.okanewari.ui.expense.ShowSplitsDestination
+import com.example.okanewari.ui.expense.ShowSplitsScreen
 import com.example.okanewari.ui.party.AddMemberDestination
 import com.example.okanewari.ui.party.AddMemberScreen
 import com.example.okanewari.ui.party.EditMemberDestination
@@ -109,7 +111,9 @@ fun OkaneWariNavHost(
                 onSettingsButtonClicked = {
                     navController.navigate("${EditPartyDestination.route}/${it}") },
                 onExpenseCardClick = {
-                    navController.navigate("${EditExpenseDestination.route}/${it[0]}/${it[1]}") }
+                    navController.navigate("${EditExpenseDestination.route}/${it[0]}/${it[1]}") },
+                onStatCardClicked = {
+                    navController.navigate("${ShowSplitsDestination.route}/${it}")}
             )
         }
         composable(
@@ -130,6 +134,16 @@ fun OkaneWariNavHost(
                 )
         ) {
             EditExpenseScreen(
+                navigateUp = { navController.navigateUp() },
+                navigateBack = { navController.popBackStack() }
+            )
+        }
+        composable(
+            route = ShowSplitsDestination.routeWithArg,
+            arguments = listOf(navArgument(ShowSplitsDestination.partyIdArg){
+                type = NavType.IntType })
+        ) {
+            ShowSplitsScreen(
                 navigateUp = { navController.navigateUp() },
                 navigateBack = { navController.popBackStack() }
             )

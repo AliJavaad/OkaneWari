@@ -9,6 +9,7 @@ import com.example.okanewari.OkaneWariApplication
 import com.example.okanewari.ui.expense.ListExpensesViewModel
 import com.example.okanewari.ui.expense.AddExpenseViewModel
 import com.example.okanewari.ui.expense.EditExpenseViewModel
+import com.example.okanewari.ui.expense.ShowSplitsViewModel
 import com.example.okanewari.ui.party.AddMemberViewModel
 import com.example.okanewari.ui.party.AddPartyViewModel
 import com.example.okanewari.ui.party.EditMemberViewModel
@@ -69,6 +70,13 @@ object OwViewModelProvider {
         // Initializer for EditExpenseViewModel
         initializer {
             EditExpenseViewModel(
+                this.createSavedStateHandle(),
+                okaneWariApplication().container.okaneWariRepository
+            )
+        }
+        // Initializer for ShowSplitsViewModel
+        initializer {
+            ShowSplitsViewModel(
                 this.createSavedStateHandle(),
                 okaneWariApplication().container.okaneWariRepository
             )

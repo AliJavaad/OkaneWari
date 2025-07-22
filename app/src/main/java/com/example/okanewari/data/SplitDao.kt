@@ -36,6 +36,9 @@ interface SplitDao {
     @Query("SELECT * FROM split_table WHERE memberKey = :memberKey")
     fun getAllSplitsForMember(memberKey: Long): Flow<List<SplitModel>>
 
+    @Query("SELECT * FROM split_table WHERE partyKey = :partyKey")
+    fun getAllSplitsForParty(partyKey: Long): Flow<List<SplitModel>>
+
     @RawQuery(observedEntities = [SplitModel::class])
     fun query(query: SupportSQLiteQuery): Flow<List<SplitModel>>
 }

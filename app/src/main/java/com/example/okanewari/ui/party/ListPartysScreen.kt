@@ -156,19 +156,15 @@ fun DisplayParties(
                     )
                     Column{
                         Text(
-                            // TODO align text in the column
-                            // TODO move constants to resource folder
                             text = it.partyName,
-                            fontSize = 32.sp,
-                            textAlign = TextAlign.Center,
+                            style = MaterialTheme.typography.headlineMedium,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
                         Text(
                             text = stringResource(R.string.last_modified) + ": " +
                                     DateHandler.formatter.format(it.dateModded),
-                            fontSize = 14.sp,
-                            textAlign = TextAlign.Center,
+                            style = MaterialTheme.typography.labelMedium,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )

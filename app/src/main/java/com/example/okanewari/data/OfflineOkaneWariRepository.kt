@@ -18,7 +18,6 @@ class OfflineOkaneWariRepository(
 
     override suspend fun insertParty(party: PartyModel): Long = partyDao.insert(party)
 
-
     override suspend fun deleteParty(party: PartyModel) = partyDao.delete(party)
 
     override suspend fun updateParty(party: PartyModel) = partyDao.update(party)
@@ -37,6 +36,9 @@ class OfflineOkaneWariRepository(
     override suspend fun deleteExpense(expense: ExpenseModel) = expenseDao.delete(expense)
 
     override suspend fun updateExpense(expense: ExpenseModel) = expenseDao.update(expense)
+
+    override suspend fun deleteAllExpensesInParty(partyId: Long) =
+        expenseDao.deleteAllExpensesInParty(partyId)
 
     /**
      * Member methods
@@ -66,6 +68,9 @@ class OfflineOkaneWariRepository(
 
     override fun getSplitFromExpAndMemKeys(expenseKey: Long, memberKey: Long): Flow<SplitModel> =
         splitDao.getSplitFromExpAndMemKeys(expenseKey = expenseKey, memberKey = memberKey)
+
+    override fun getAllSplitsForParty(partyKey: Long): Flow<List<SplitModel>> =
+        splitDao.getAllSplitsForParty(partyKey = partyKey)
 
     override suspend fun deleteSplitByExpense(expenseKey: Long) = splitDao.deleteSplitByExpense(expenseKey = expenseKey)
 

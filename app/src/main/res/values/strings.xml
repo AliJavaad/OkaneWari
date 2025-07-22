@@ -9,6 +9,7 @@
     <string name="list_expenses">Expenses</string>
     <string name="add_new_member_screen">Add Member</string>
     <string name="edit_member_screen">Edit Member</string>
+    <string name="show_splits_screen">Party Splits</string>
     <!-- Text holders -->
     <string name="my_party">My Party</string>
     <string name="expense">Expense</string>
@@ -31,8 +32,10 @@
     <string name="add_new_member">Add Member</string>
     <string name="editing_member">Editing Member</string>
     <string name="split_with">Split with</string>
+    <string name="net_total_column">Net Total</string>
     <string name="paid_by">Paid by</string>
-    <string name="delete_member_dialogue_text_simple">This will delete the member and transfer all their expenses evenly to the rest of the party. \n\nDo you wish to continue?</string>
+    <string name="owning_party_member_warning">The owner of the party cannot be deleted.</string>
+    <string name="delete_member_dialogue_text_simple">This will delete the member.\n\n If the member OWES money for an expenses, the debt will be evenly transferred evenly.\n\nIf the member PAID for an expense. The expense will be deleted entirely.\n\nDo you wish to continue?</string>
     <!-- Content Description -->
     <string name="settings_buttton_description">Settings.</string>
     <!-- Buttons -->
@@ -43,4 +46,5 @@
     <string name="attention">Attention</string>
     <string name="no">No</string>
     <string name="yes">Yes</string>
+    <string name="ok">Ok</string>
 </resources>

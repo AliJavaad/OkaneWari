@@ -54,6 +54,11 @@ interface OkaneWariRepository {
      */
     suspend fun updateExpense(expense: ExpenseModel)
 
+    /**
+     * Delete all expenses in the party [partyId]
+     */
+    suspend fun deleteAllExpensesInParty(partyId: Long)
+
 
     /**
      * Retrieve all the members from the the given data source that match with the [partyId].
@@ -91,6 +96,8 @@ interface OkaneWariRepository {
 
     fun getAllSplitsForMember(memberKey: Long): Flow<List<SplitModel>>
 
+    fun getAllSplitsForParty(partyKey: Long): Flow<List<SplitModel>>
+
     suspend fun deleteSplitByExpense(expenseKey: Long)
 
     suspend fun insertSplit(split: SplitModel): Long
@@ -98,6 +105,5 @@ interface OkaneWariRepository {
     suspend fun deleteSplit(split: SplitModel)
 
     suspend fun updateSplit(split: SplitModel)
-
 
 }
