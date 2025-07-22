@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -61,12 +62,47 @@ fun ShowSplitsScreen(
             modifier = Modifier
                 .padding(innerPadding)
         ) {
+            ShowSimplifiedTransactions(
+                memberList = viewModel.showSplitsUiState.memberList,
+                transactions = viewModel.showSplitsUiState.transactions,
+                partyDetails = viewModel.showSplitsUiState.partyUiState.partyDetails
+            )
+            HorizontalDivider(
+                thickness = 4.dp,
+                modifier = Modifier.padding(all = dimensionResource(R.dimen.medium_padding))
+            )
             TableScreen(
                 partyDetails = viewModel.showSplitsUiState.partyUiState.partyDetails,
                 memberList = viewModel.showSplitsUiState.memberList,
                 memberSplitTotals = viewModel.showSplitsUiState.memberSplitTotals
             )
         }
+    }
+}
+
+@Composable
+fun ShowSimplifiedTransactions(
+    memberList: Map<Long, MemberModel>,
+    transactions: List<Transaction>,
+    partyDetails: PartyDetails
+){
+    val medPadding = dimensionResource(R.dimen.medium_padding)
+    Text(
+        text = "Splits:",
+        style = MaterialTheme.typography.titleLarge,
+        modifier = Modifier.padding(horizontal = medPadding)
+    )
+    transactions.forEach{ trans ->
+        val debtorName = memberList[trans.fromKey]?.name
+        val creditorName = memberList[trans.toKey]?.name
+
+        Text(
+            text = "$debtorName owes $creditorName ${partyDetails.currency}${trans.amount}",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier
+                .padding(horizontal = medPadding*2)
+                .padding(vertical = dimensionResource(R.dimen.small_padding))
+        )
     }
 }
 
@@ -85,7 +121,7 @@ fun TableScreen(
             .fillMaxSize()
             .padding(dimensionResource(R.dimen.medium_padding))
     ) {
-        // Here is the header
+        // Column Headers
         item {
             Row(
                 modifier = Modifier.background(MaterialTheme.colorScheme.tertiaryContainer)
@@ -105,7 +141,7 @@ fun TableScreen(
             }
         }
 
-        // Here are all the lines of your table.
+        // All data lines of your table.
         items(memberSplitTotals.keys.toList()) { memId ->
             Row(
                 modifier = Modifier.fillMaxWidth()
