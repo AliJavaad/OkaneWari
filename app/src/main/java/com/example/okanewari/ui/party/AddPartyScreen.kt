@@ -127,8 +127,7 @@ fun PartyEntryBody(
 fun PartyInputForm(
     partyDetails: PartyDetails,
     onValueChange: (PartyDetails) -> Unit,
-    modifier: Modifier = Modifier,
-    editingParty: Boolean = false
+    modifier: Modifier = Modifier
 ){
     var currencyDropdownMenu by rememberSaveable { mutableStateOf(false) }
     /**

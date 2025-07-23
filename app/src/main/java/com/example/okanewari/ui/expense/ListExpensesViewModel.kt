@@ -1,9 +1,13 @@
 package com.example.okanewari.ui.expense
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.okanewari.data.ExpenseModel
+import com.example.okanewari.data.MemberModel
 import com.example.okanewari.data.OkaneWariRepository
 import com.example.okanewari.ui.components.PartyDetails
 import com.example.okanewari.ui.components.toPartyDetails
@@ -11,7 +15,9 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import java.math.BigDecimal
 
 /**
@@ -24,27 +30,42 @@ class ListExpensesViewModel(
 
     private val partyId: Long = checkNotNull(savedStateHandle[ListExpensesDestination.partyIdArg])
 
+    var listExpensesUiState by mutableStateOf(ListExpensesUiState())
+        private set
+
+
     /**
      * Holds the screen details ui state. The data is retrieved from [owRepository] and mapped to
      * the UI state.
      */
-    val listExpensesUiState: StateFlow<ListExpensesUiState> =
-        owRepository.getPartyStream(partyId)
-            .filterNotNull()
-            .combine(owRepository.getAllExpensesStream(partyId).filterNotNull()){party, expenses ->
-                ListExpensesUiState(
-                    partyDetails = party.toPartyDetails(),
-                    expenseList = expenses
-                )
-            }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = ListExpensesUiState()
+    init{
+        viewModelScope.launch {
+            // One time get for party
+            val partyModel = owRepository.getPartyStream(partyId)
+                .filterNotNull()
+                .first()
+            listExpensesUiState = listExpensesUiState.copy(
+                partyDetails = partyModel.toPartyDetails()
             )
 
-    companion object {
-        private const val TIMEOUT_MILLIS = 5_000L
+            // Reactive flow state for expense list
+            owRepository.getAllExpensesStream(partyId)
+                .filterNotNull()
+                .collect{ expenses ->
+                    listExpensesUiState = listExpensesUiState.copy(
+                        expenseList = expenses
+                    )
+                }
+
+            // Reactive flow state for member list
+            owRepository.getAllMembersFromParty(partyId)
+                .filterNotNull()
+                .collect{ mems ->
+                    listExpensesUiState = listExpensesUiState.copy(
+                        memberList = mems
+                    )
+                }
+        }
     }
 }
 
@@ -53,7 +74,8 @@ class ListExpensesViewModel(
  */
 data class ListExpensesUiState(
     var partyDetails: PartyDetails = PartyDetails(),
-    var expenseList: List<ExpenseModel> = listOf()
+    var expenseList: List<ExpenseModel> = listOf(),
+    var memberList: List<MemberModel> = listOf()
 )
 
 /**

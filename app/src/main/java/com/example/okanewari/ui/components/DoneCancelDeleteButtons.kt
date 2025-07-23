@@ -109,7 +109,7 @@ fun DoneCancelDeleteButtons(
             }
         }
         if (deleteConfirmationRequired){
-            DeleteConfirmationDialog(
+            ConfirmationDialog(
                 onConfirm = {
                     deleteConfirmationRequired = false
                     deleteButtonClicked() },
@@ -122,25 +122,41 @@ fun DoneCancelDeleteButtons(
 }
 
 @Composable
-fun DeleteConfirmationDialog(
+fun ConfirmationDialog(
     onConfirm: () -> Unit,
     onCancel: () -> Unit,
     title: String,
-    text: String
+    text: String,
+    dismissText: String = "No",
+    confirmText: String = "Yes",
+    showDismissButton: Boolean = true
 ) {
-    AlertDialog(
-        onDismissRequest = onCancel,
-        title = { Text(title) },
-        text = { Text(text) },
-        dismissButton = {
-            TextButton(onClick = onCancel) {
-                Text(text = stringResource(R.string.no))
+    if(showDismissButton){
+        AlertDialog(
+            onDismissRequest = onCancel,
+            title = { Text(title) },
+            text = { Text(text) },
+            dismissButton = {
+                TextButton(onClick = onCancel) {
+                    Text(text = dismissText)
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = onConfirm) {
+                    Text(text = confirmText)
+                }
             }
-        },
-        confirmButton = {
-            TextButton(onClick = onConfirm) {
-                Text(text = stringResource(R.string.yes))
+        )
+    }else{
+        AlertDialog(
+            onDismissRequest = onCancel,
+            title = { Text(title) },
+            text = { Text(text) },
+            confirmButton = {
+                TextButton(onClick = onConfirm) {
+                    Text(text = confirmText)
+                }
             }
-        }
-    )
+        )
+    }
 }

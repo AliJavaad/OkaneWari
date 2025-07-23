@@ -73,13 +73,22 @@ class EditMemberViewModel(
     }
 
     suspend fun deleteMember(){
-        // Get split for specific member
+        // If there are only 2 members left, cannot perform a proper transfer of debts so
+        // delete all remaining expenses and then delete the member.
+        val memList = owRepository.getAllMembersFromParty(partyId).filterNotNull().first()
+        if(memList.size < 3){
+            owRepository.deleteAllExpensesInParty(partyId)
+            owRepository.deleteMember(editMemberUiState.memberUiState.memberDetails.toMemberModel())
+            return
+        }
+
+        // Get split (ie. expense) for specific member
         val splitList = owRepository
             .getAllSplitsForMember(editMemberUiState.memberUiState.memberDetails.id)
             .filterNotNull()
             .first()
 
-        // Check if there are any splits involving the member. If not, it is safe to delete.
+        // Check if there are any expenses involving the member. If not, it is safe to delete.
         if(splitList.isEmpty()){
             owRepository.deleteMember(editMemberUiState.memberUiState.memberDetails.toMemberModel())
             return
