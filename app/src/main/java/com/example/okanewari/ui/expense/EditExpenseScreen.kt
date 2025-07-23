@@ -71,6 +71,7 @@ fun EditExpenseScreen(
                 memberList = viewModel.editExpenseUiState.memberList.values.toList(),
                 payingMember = viewModel.editExpenseUiState.payingMember,
                 owingMembers = viewModel.editExpenseUiState.owingMembers,
+                payType = viewModel.editExpenseUiState.payType,
                 onValueChange = viewModel::updateSplitUiState
             )
             HorizontalDivider(

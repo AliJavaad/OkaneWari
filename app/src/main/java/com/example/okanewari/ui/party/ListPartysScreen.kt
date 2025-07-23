@@ -24,6 +24,9 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -33,13 +36,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.okanewari.OkaneWareTopAppBar
 import com.example.okanewari.R
 import com.example.okanewari.data.PartyModel
 import com.example.okanewari.navigation.NavigationDestination
 import com.example.okanewari.ui.OwViewModelProvider
+import com.example.okanewari.ui.components.ConfirmationDialog
 import com.example.okanewari.ui.components.DateHandler
 import com.example.okanewari.ui.components.DisplayFab
 import com.example.okanewari.ui.components.FabSize
@@ -58,11 +61,12 @@ fun ListPartysScreen(
     modifier: Modifier = Modifier,
     viewModel: ListPartysViewModel = viewModel(factory = OwViewModelProvider.Factory)
 ){
-    // TODO Get info passed by click
-    // val myPartys = DummyPartyData()
-    val listPartysUiState by viewModel.listPartysUiState.collectAsState()
 
+    val listPartysUiState by viewModel.listPartysUiState.collectAsState()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+
+    var checkPartyLimit by rememberSaveable { mutableStateOf(false) }
+
     Scaffold (
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
@@ -74,7 +78,7 @@ fun ListPartysScreen(
         },
         floatingActionButton = {
             DisplayFab(
-                myClick = onAddPartyButtonClicked,
+                myClick = { checkPartyLimit = true },
                 fabSize = FabSize.LARGE
             )
         }
@@ -84,6 +88,21 @@ fun ListPartysScreen(
             partyClicked = onPartyCardClicked,
             contentPadding = innerPadding
         )
+        if(checkPartyLimit){
+            if (listPartysUiState.partyList.size > 128){
+                ConfirmationDialog(
+                    onConfirm = { checkPartyLimit = false },
+                    onCancel = { checkPartyLimit = false },
+                    title = stringResource(R.string.attention),
+                    text = "Party limit reached.",
+                    confirmText = stringResource(R.string.ok),
+                    showDismissButton = false
+                )
+            }else{
+                checkPartyLimit = false
+                onAddPartyButtonClicked()
+            }
+        }
     }
 }
 
@@ -107,7 +126,9 @@ fun ListPartysBody(
                     text = stringResource(R.string.empty_party_list),
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.padding(contentPadding).fillMaxWidth()
+                    modifier = Modifier
+                        .padding(contentPadding)
+                        .fillMaxWidth()
                 )
             }
         } else{

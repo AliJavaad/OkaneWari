@@ -73,13 +73,22 @@ class EditMemberViewModel(
     }
 
     suspend fun deleteMember(){
-        // Get split for specific member
+        // If there are only 2 members left, cannot perform a proper transfer of debts so
+        // delete all remaining expenses and then delete the member.
+        val memList = owRepository.getAllMembersFromParty(partyId).filterNotNull().first()
+        if(memList.size < 3){
+            owRepository.deleteAllExpensesInParty(partyId)
+            owRepository.deleteMember(editMemberUiState.memberUiState.memberDetails.toMemberModel())
+            return
+        }
+
+        // Get split (ie. expense) for specific member
         val splitList = owRepository
             .getAllSplitsForMember(editMemberUiState.memberUiState.memberDetails.id)
             .filterNotNull()
             .first()
 
-        // Check if there are any splits involving the member. If not, it is safe to delete.
+        // Check if there are any expenses involving the member. If not, it is safe to delete.
         if(splitList.isEmpty()){
             owRepository.deleteMember(editMemberUiState.memberUiState.memberDetails.toMemberModel())
             return
@@ -94,16 +103,28 @@ class EditMemberViewModel(
             // Delete the split
             owRepository.deleteSplit(split)
 
-            if (split.splitType == SplitType.PAY){
+            if (split.splitType == SplitType.PAID_AND_SPLIT || split.splitType == SplitType.PAID_IN_FULL){
                 // if the member was the person who paid, delete the expense entirely
                 owRepository.deleteExpense(expense)
             }else{
                 // else, must get a new split with the remaining members and update the split table
                 val expSplits = owRepository.getAllSplitsForExpense(expense.id).filterNotNull().first()
-                val newSplitAmount = calculateExpenseSplit(expense.amount.toBigDecimal(), BigDecimal(expSplits.size))
+                // The split retrieval is always ordered so that the creditor is the first entry
+                val payType = expSplits[0].splitType
+                assert(payType == SplitType.PAID_AND_SPLIT || payType == SplitType.PAID_IN_FULL)
+                // Calculate the splits based on the payType
+                val total = expense.amount.toBigDecimal()
+                var creditSplit = total
+                val debtSplit: BigDecimal?
+                if(payType == SplitType.PAID_IN_FULL){
+                    debtSplit = calculateExpenseSplit(total = total, splitBy = BigDecimal(expSplits.size - 1))
+                }else{
+                    debtSplit = calculateExpenseSplit(total = total, splitBy = BigDecimal(expSplits.size))
+                    creditSplit = total.subtract(debtSplit)
+                }
                 expSplits.forEach{ newSplit ->
                     when (newSplit.splitType){
-                        SplitType.PAY -> {
+                        SplitType.PAID_IN_FULL, SplitType.PAID_AND_SPLIT-> {
                             owRepository.updateSplit(
                                 SplitModel(
                                     id = newSplit.id,
@@ -111,7 +132,7 @@ class EditMemberViewModel(
                                     expenseKey = newSplit.expenseKey,
                                     memberKey = newSplit.memberKey,
                                     splitType = newSplit.splitType,
-                                    splitAmount = (expense.amount.toBigDecimal() - newSplitAmount).toString()
+                                    splitAmount = creditSplit.toString()
                                 )
                             )
                         }
@@ -123,7 +144,7 @@ class EditMemberViewModel(
                                     expenseKey = newSplit.expenseKey,
                                     memberKey = newSplit.memberKey,
                                     splitType = newSplit.splitType,
-                                    splitAmount = newSplitAmount.negate().toString()
+                                    splitAmount = debtSplit.negate().toString()
                                 )
                             )
                         }

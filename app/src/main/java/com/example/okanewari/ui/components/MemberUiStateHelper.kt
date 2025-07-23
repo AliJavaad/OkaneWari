@@ -10,8 +10,7 @@ data class MemberUiState(
 data class MemberDetails(
     val id: Long = 0,
     val partyKey: Long = 0,
-    val name: String = "",
-    val owner: Boolean = false
+    val name: String = ""
 )
 
 /**
@@ -20,8 +19,7 @@ data class MemberDetails(
 fun MemberDetails.toMemberModel(): MemberModel = MemberModel(
     id = id,
     partyKey = partyKey,
-    name = name,
-    owner = owner
+    name = name
 )
 
 /**
@@ -38,8 +36,7 @@ fun MemberModel.toMemberUiState(isEntryValid: Boolean = false): MemberUiState = 
 fun MemberModel.toMemberDetails(): MemberDetails = MemberDetails(
     id = id,
     partyKey = partyKey,
-    name = name,
-    owner = owner
+    name = name
 )
 
 

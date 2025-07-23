@@ -45,6 +45,7 @@ data class SplitModel (
 )
 
 enum class SplitType {
-    PAY,
+    PAID_IN_FULL,
+    PAID_AND_SPLIT,
     OWE
 }

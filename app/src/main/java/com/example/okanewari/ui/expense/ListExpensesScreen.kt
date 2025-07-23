@@ -27,14 +27,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -43,6 +44,7 @@ import com.example.okanewari.R
 import com.example.okanewari.data.ExpenseModel
 import com.example.okanewari.navigation.NavigationDestination
 import com.example.okanewari.ui.OwViewModelProvider
+import com.example.okanewari.ui.components.ConfirmationDialog
 import com.example.okanewari.ui.components.DateHandler
 import com.example.okanewari.ui.components.DisplayFab
 import com.example.okanewari.ui.components.PartyDetails
@@ -71,14 +73,11 @@ fun ListExpensesScreen(
     viewModel: ListExpensesViewModel = viewModel(factory = OwViewModelProvider.Factory)
 ){
     val listExpensesUiState by viewModel.listExpensesUiState.collectAsState()
-
-    // For debug
-    // Log.d("PartyKey", "ListExpensesScreen partykey: ${listExpensesUiState.partyDetails.id}")
+    var checkExpenseLimit by rememberSaveable { mutableStateOf(false) }
 
     Scaffold (
         topBar = {
             OkaneWareTopAppBar(
-                // TODO title should be the current party name
                 title = listExpensesUiState.partyDetails.partyName,
                 canNavigateBack = true,
                 navigateUp = navigateUp,
@@ -96,7 +95,7 @@ fun ListExpensesScreen(
         },
         floatingActionButton = {
             DisplayFab(
-                myClick = { onAddExpenseButtonClicked(listExpensesUiState.partyDetails.id) }
+                myClick = { checkExpenseLimit = true }
             )
         }
     ) { innerPadding ->
@@ -107,6 +106,32 @@ fun ListExpensesScreen(
             partyDetails = listExpensesUiState.partyDetails,
             contentPadding = innerPadding
         )
+        if(checkExpenseLimit){
+            Log.d("ListExpenses", "MemList size: ${listExpensesUiState.memberList.size}")
+            if (listExpensesUiState.memberList.size < 2){
+                ConfirmationDialog(
+                    onConfirm = { checkExpenseLimit = false },
+                    onCancel = { checkExpenseLimit = false },
+                    title = stringResource(R.string.attention),
+                    text = "At least 2 members are needed to add an expense.\n\nClick the settings button in the top right to add/modify members.",
+                    confirmText = stringResource(R.string.ok),
+                    showDismissButton = false
+                )
+            }
+            else if (listExpensesUiState.expenseList.size > 1024){
+                ConfirmationDialog(
+                    onConfirm = { checkExpenseLimit = false },
+                    onCancel = { checkExpenseLimit = false },
+                    title = stringResource(R.string.attention),
+                    text = "Expense limit reached.",
+                    confirmText = stringResource(R.string.ok),
+                    showDismissButton = false
+                )
+            }else{
+                checkExpenseLimit = false
+                onAddExpenseButtonClicked(listExpensesUiState.partyDetails.id)
+            }
+        }
     }
 }
 

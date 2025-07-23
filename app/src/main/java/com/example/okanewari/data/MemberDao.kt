@@ -24,7 +24,7 @@ interface MemberDao {
     @Query("SELECT * FROM member_table WHERE id = :id AND partyKey = :partyId")
     fun getMember(id: Long, partyId: Long): Flow<MemberModel>
 
-    @Query("SELECT * from member_table WHERE partyKey = :partyId ORDER BY owner DESC")
+    @Query("SELECT * from member_table WHERE partyKey = :partyId ORDER BY id ASC")
     fun getAllMembersForParty(partyId: Long): Flow<List<MemberModel>>
 
     @RawQuery(observedEntities = [MemberModel::class])

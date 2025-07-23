@@ -1,9 +1,14 @@
 package com.example.okanewari.ui.expense
 
+import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.okanewari.data.ExpenseModel
+import com.example.okanewari.data.MemberModel
 import com.example.okanewari.data.OkaneWariRepository
 import com.example.okanewari.ui.components.PartyDetails
 import com.example.okanewari.ui.components.toPartyDetails
@@ -11,7 +16,9 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import java.math.BigDecimal
 
 /**
@@ -32,9 +39,12 @@ class ListExpensesViewModel(
         owRepository.getPartyStream(partyId)
             .filterNotNull()
             .combine(owRepository.getAllExpensesStream(partyId).filterNotNull()){party, expenses ->
+                Pair(party, expenses)
+            }.combine(owRepository.getAllMembersFromParty(partyId).filterNotNull()){ (party, expenses), mems ->
                 ListExpensesUiState(
                     partyDetails = party.toPartyDetails(),
-                    expenseList = expenses
+                    expenseList = expenses,
+                    memberList = mems
                 )
             }
             .stateIn(
@@ -53,7 +63,8 @@ class ListExpensesViewModel(
  */
 data class ListExpensesUiState(
     var partyDetails: PartyDetails = PartyDetails(),
-    var expenseList: List<ExpenseModel> = listOf()
+    var expenseList: List<ExpenseModel> = listOf(),
+    var memberList: List<MemberModel> = listOf()
 )
 
 /**

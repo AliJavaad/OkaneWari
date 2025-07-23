@@ -66,25 +66,18 @@ class AddExpenseViewModel(
      * This method also triggers a validation for input values.
      */
     fun updateExpenseUiState(partyDetails: PartyDetails, expenseDetails: ExpenseDetails) {
-        addExpenseUiState =
-            AddExpenseUiState(
-                expenseUiState = ExpenseUiState(expenseDetails, validateExpense(expenseDetails)),
-                partyUiState = PartyUiState(partyDetails, true),
-                memberList = addExpenseUiState.memberList,
-                payingMember = addExpenseUiState.payingMember,
-                owingMembers = addExpenseUiState.owingMembers
-            )
+        addExpenseUiState = addExpenseUiState.copy(
+            expenseUiState = ExpenseUiState(expenseDetails, validateExpense(expenseDetails)),
+            partyUiState = PartyUiState(partyDetails, true)
+        )
     }
 
-    fun updateSplitUiState(payingMember: MemberDetails, owingMembers: List<MemberModel>){
-        addExpenseUiState =
-            AddExpenseUiState(
-                expenseUiState = addExpenseUiState.expenseUiState,
-                partyUiState = addExpenseUiState.partyUiState,
-                memberList = addExpenseUiState.memberList,
-                payingMember = payingMember,
-                owingMembers = owingMembers
-            )
+    fun updateSplitUiState(payingMember: MemberDetails, owingMembers: List<MemberModel>, payType: SplitType){
+        addExpenseUiState = addExpenseUiState.copy(
+            payingMember = payingMember,
+            owingMembers = owingMembers,
+            payType = payType
+        )
     }
 
     suspend fun saveExpenseAndSplit() {
@@ -92,6 +85,7 @@ class AddExpenseViewModel(
         val currentState = addExpenseUiState
         val currentPayingMember = currentState.payingMember
         val currentOwingMembers = currentState.owingMembers
+        val currentPayType = currentState.payType
 
         if (validateExpense() && currentOwingMembers.isNotEmpty()) {
             try{
@@ -99,16 +93,23 @@ class AddExpenseViewModel(
                 val expKey = owRepository.insertExpense(currentState.expenseUiState.expenseDetails.toExpenseModel())
                 // Calculate the split value
                 val total = BigDecimal(currentState.expenseUiState.expenseDetails.amount)
-                val split = calculateExpenseSplit(total = total, splitBy = BigDecimal(currentState.owingMembers.size + 1 ))
-                Log.d("Split", "The total is $total the split is $split")
+                var creditSplit = total
+                val debtSplit: BigDecimal?
+                if(currentPayType == SplitType.PAID_IN_FULL){
+                    debtSplit = calculateExpenseSplit(total = total, splitBy = BigDecimal(currentState.owingMembers.size))
+                }else{
+                    debtSplit = calculateExpenseSplit(total = total, splitBy = BigDecimal(currentState.owingMembers.size + 1 ))
+                    creditSplit = total.subtract(debtSplit)
+                }
+                Log.d("Split", "The total is $total the credit is $creditSplit and debt is $debtSplit")
                 // Now, save the split for the PAYER as (total - split).
                 owRepository.insertSplit(
                     SplitModel(
                         partyKey = partyId,
                         expenseKey = expKey,
                         memberKey = currentPayingMember.id,
-                        splitType = SplitType.PAY,
-                        splitAmount = total.subtract(split).toString()))
+                        splitType = currentPayType,
+                        splitAmount = creditSplit.toString()))
                 // Next insert all splits for members that OWE as negative of the split
                 for(member in currentOwingMembers){
                     owRepository.insertSplit(
@@ -117,7 +118,7 @@ class AddExpenseViewModel(
                             expenseKey = expKey,
                             memberKey = member.id,
                             splitType = SplitType.OWE,
-                            splitAmount = split.negate().toString()))
+                            splitAmount = debtSplit.negate().toString()))
                 }
             }catch(e: Exception){
                 Log.e("saveExpenseAndSplit", e.toString())
@@ -141,7 +142,8 @@ data class AddExpenseUiState(
     val expenseUiState: ExpenseUiState = ExpenseUiState(ExpenseDetails()),
     val memberList: List<MemberModel> = listOf(),
     var payingMember: MemberDetails = MemberDetails(),
-    var owingMembers: List<MemberModel> = listOf()
+    var owingMembers: List<MemberModel> = listOf(),
+    var payType: SplitType = SplitType.PAID_AND_SPLIT
 )
 
 fun calculateExpenseSplit(total: BigDecimal, splitBy: BigDecimal): BigDecimal{
