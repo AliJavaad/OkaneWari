@@ -1,5 +1,6 @@
 package com.example.okanewari.ui.expense
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -30,42 +31,30 @@ class ListExpensesViewModel(
 
     private val partyId: Long = checkNotNull(savedStateHandle[ListExpensesDestination.partyIdArg])
 
-    var listExpensesUiState by mutableStateOf(ListExpensesUiState())
-        private set
-
-
     /**
      * Holds the screen details ui state. The data is retrieved from [owRepository] and mapped to
      * the UI state.
      */
-    init{
-        viewModelScope.launch {
-            // One time get for party
-            val partyModel = owRepository.getPartyStream(partyId)
-                .filterNotNull()
-                .first()
-            listExpensesUiState = listExpensesUiState.copy(
-                partyDetails = partyModel.toPartyDetails()
+    val listExpensesUiState: StateFlow<ListExpensesUiState> =
+        owRepository.getPartyStream(partyId)
+            .filterNotNull()
+            .combine(owRepository.getAllExpensesStream(partyId).filterNotNull()){party, expenses ->
+                Pair(party, expenses)
+            }.combine(owRepository.getAllMembersFromParty(partyId).filterNotNull()){ (party, expenses), mems ->
+                ListExpensesUiState(
+                    partyDetails = party.toPartyDetails(),
+                    expenseList = expenses,
+                    memberList = mems
+                )
+            }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+                initialValue = ListExpensesUiState()
             )
 
-            // Reactive flow state for expense list
-            owRepository.getAllExpensesStream(partyId)
-                .filterNotNull()
-                .collect{ expenses ->
-                    listExpensesUiState = listExpensesUiState.copy(
-                        expenseList = expenses
-                    )
-                }
-
-            // Reactive flow state for member list
-            owRepository.getAllMembersFromParty(partyId)
-                .filterNotNull()
-                .collect{ mems ->
-                    listExpensesUiState = listExpensesUiState.copy(
-                        memberList = mems
-                    )
-                }
-        }
+    companion object {
+        private const val TIMEOUT_MILLIS = 5_000L
     }
 }
 

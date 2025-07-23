@@ -1,5 +1,6 @@
 package com.example.okanewari.ui.expense
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -71,17 +72,18 @@ fun ListExpensesScreen(
     modifier: Modifier = Modifier,
     viewModel: ListExpensesViewModel = viewModel(factory = OwViewModelProvider.Factory)
 ){
+    val listExpensesUiState by viewModel.listExpensesUiState.collectAsState()
     var checkExpenseLimit by rememberSaveable { mutableStateOf(false) }
 
     Scaffold (
         topBar = {
             OkaneWareTopAppBar(
-                title = viewModel.listExpensesUiState.partyDetails.partyName,
+                title = listExpensesUiState.partyDetails.partyName,
                 canNavigateBack = true,
                 navigateUp = navigateUp,
                 actionButtons = {
                     IconButton(
-                        onClick = {onSettingsButtonClicked(viewModel.listExpensesUiState.partyDetails.id)}
+                        onClick = {onSettingsButtonClicked(listExpensesUiState.partyDetails.id)}
                     ){
                         Icon(
                             imageVector = Icons.Filled.Settings,
@@ -98,14 +100,15 @@ fun ListExpensesScreen(
         }
     ) { innerPadding ->
         ListExpensesBody(
-            expenseList = viewModel.listExpensesUiState.expenseList,
+            expenseList = listExpensesUiState.expenseList,
             expenseClicked = onExpenseCardClick,
             statCardClicked = onStatCardClicked,
-            partyDetails = viewModel.listExpensesUiState.partyDetails,
+            partyDetails = listExpensesUiState.partyDetails,
             contentPadding = innerPadding
         )
         if(checkExpenseLimit){
-            if (viewModel.listExpensesUiState.memberList.size < 2){
+            Log.d("ListExpenses", "MemList size: ${listExpensesUiState.memberList.size}")
+            if (listExpensesUiState.memberList.size < 2){
                 ConfirmationDialog(
                     onConfirm = { checkExpenseLimit = false },
                     onCancel = { checkExpenseLimit = false },
@@ -115,7 +118,7 @@ fun ListExpensesScreen(
                     showDismissButton = false
                 )
             }
-            else if (viewModel.listExpensesUiState.expenseList.size > 1024){
+            else if (listExpensesUiState.expenseList.size > 1024){
                 ConfirmationDialog(
                     onConfirm = { checkExpenseLimit = false },
                     onCancel = { checkExpenseLimit = false },
@@ -126,7 +129,7 @@ fun ListExpensesScreen(
                 )
             }else{
                 checkExpenseLimit = false
-                onAddExpenseButtonClicked(viewModel.listExpensesUiState.partyDetails.id)
+                onAddExpenseButtonClicked(listExpensesUiState.partyDetails.id)
             }
         }
     }

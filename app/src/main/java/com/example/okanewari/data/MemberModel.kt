@@ -20,6 +20,5 @@ data class MemberModel (
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val partyKey: Long,
-    val name: String,
-    val owner: Boolean
+    val name: String
 )

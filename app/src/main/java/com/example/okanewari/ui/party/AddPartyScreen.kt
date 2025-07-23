@@ -17,7 +17,6 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -40,8 +39,6 @@ import com.example.okanewari.navigation.NavigationDestination
 import com.example.okanewari.ui.OwViewModelProvider
 import com.example.okanewari.ui.components.CurrencySymbols
 import com.example.okanewari.ui.components.DoneAndCancelButtons
-import com.example.okanewari.ui.components.MemberDetails
-import com.example.okanewari.ui.components.MemberUiState
 import com.example.okanewari.ui.components.PartyDetails
 import com.example.okanewari.ui.components.PartyUiState
 import kotlinx.coroutines.launch
@@ -73,9 +70,7 @@ fun AddPartyScreen(
     ){ innerPadding ->
         PartyEntryBody(
             partyUiState = viewModel.addPartyUiState.partyUiState,
-            memberUiState = viewModel.addPartyUiState.memberUiState,
-            onPartyValueChange = viewModel::updatePartyUiState,
-            onMemberValueChange = viewModel::updateMemberUiState,
+            onPartyValueChange = viewModel::updateUiState,
             onDone = {
                 coroutineScope.launch{
                     viewModel.savePartyAndHostMember()
@@ -91,9 +86,7 @@ fun AddPartyScreen(
 @Composable
 fun PartyEntryBody(
     partyUiState: PartyUiState,
-    memberUiState: MemberUiState,
     onPartyValueChange: (PartyDetails) -> Unit,
-    onMemberValueChange: (MemberDetails) -> Unit,
     onDone: () -> Unit,
     onCancel: () -> Unit,
     contentPadding: PaddingValues = PaddingValues(0.dp)
@@ -107,10 +100,6 @@ fun PartyEntryBody(
             partyDetails = partyUiState.partyDetails,
             onValueChange = onPartyValueChange
         )
-        MainMemberInput(
-            memberDetails = memberUiState.memberDetails,
-            onValueChange = onMemberValueChange
-        )
         HorizontalDivider(
             thickness = 4.dp,
             modifier = Modifier.padding(all = dimensionResource(R.dimen.medium_padding))
@@ -118,7 +107,7 @@ fun PartyEntryBody(
         DoneAndCancelButtons(
             doneButtonClick = onDone,
             cancelButtonClick = onCancel,
-            enableDone = partyUiState.isEntryValid && memberUiState.isEntryValid
+            enableDone = partyUiState.isEntryValid
         )
     }
 }
@@ -183,23 +172,4 @@ fun PartyInputForm(
             }
         }
     }
-}
-
-@Composable
-fun MainMemberInput(
-    memberDetails: MemberDetails,
-    onValueChange: (MemberDetails) -> Unit
-) {
-    /**
-     * Handling the members input
-     */
-    OutlinedTextField(
-        value = memberDetails.name,
-        onValueChange = { onValueChange(memberDetails.copy(name = it)) },
-        label = { Text(stringResource(R.string.my_name)) },
-        singleLine = true,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = dimensionResource(R.dimen.medium_padding))
-    )
 }
