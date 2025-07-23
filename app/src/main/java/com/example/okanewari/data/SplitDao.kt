@@ -30,7 +30,7 @@ interface SplitDao {
     @Query("SELECT * FROM split_table WHERE expenseKey = :expenseKey AND memberKey = :memberKey")
     fun getSplitFromExpAndMemKeys(expenseKey: Long, memberKey: Long): Flow<SplitModel>
 
-    @Query("SELECT * FROM split_table WHERE expenseKey = :expenseKey")
+    @Query("SELECT * FROM split_table WHERE expenseKey = :expenseKey ORDER BY splitType DESC")
     fun getAllSplitsForExpense(expenseKey: Long): Flow<List<SplitModel>>
 
     @Query("SELECT * FROM split_table WHERE memberKey = :memberKey")

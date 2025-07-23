@@ -39,6 +39,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.okanewari.OkaneWareTopAppBar
 import com.example.okanewari.R
 import com.example.okanewari.data.MemberModel
+import com.example.okanewari.data.SplitType
 import com.example.okanewari.navigation.NavigationDestination
 import com.example.okanewari.ui.OwViewModelProvider
 import com.example.okanewari.ui.components.DoneAndCancelButtons
@@ -83,6 +84,7 @@ fun AddExpenseScreen(
             memberList = viewModel.addExpenseUiState.memberList,
             payingMember = viewModel.addExpenseUiState.payingMember,
             owingMembers = viewModel.addExpenseUiState.owingMembers,
+            payType = viewModel.addExpenseUiState.payType,
             onExpenseValueChange = viewModel::updateExpenseUiState,
             onSplitValueChange = viewModel::updateSplitUiState,
             onDone = {
@@ -105,8 +107,9 @@ fun ExpenseEntryBody(
     memberList: List<MemberModel>,
     payingMember: MemberDetails,
     owingMembers: List<MemberModel>,
+    payType: SplitType,
     onExpenseValueChange: (PartyDetails, ExpenseDetails) -> Unit,
-    onSplitValueChange: (MemberDetails, List<MemberModel>) -> Unit,
+    onSplitValueChange: (MemberDetails, List<MemberModel>, SplitType) -> Unit,
     onDone: () -> Unit,
     onCancel: () -> Unit,
     contentPadding: PaddingValues = PaddingValues(0.dp)
@@ -129,6 +132,7 @@ fun ExpenseEntryBody(
             memberList = memberList,
             payingMember = payingMember,
             owingMembers = owingMembers,
+            payType = payType,
             onValueChange = onSplitValueChange
         )
         HorizontalDivider(
@@ -188,7 +192,8 @@ fun SplitExpenseForm(
     memberList: List<MemberModel>,
     payingMember: MemberDetails,
     owingMembers: List<MemberModel>,
-    onValueChange: (MemberDetails, List<MemberModel>) -> Unit
+    payType: SplitType,
+    onValueChange: (MemberDetails, List<MemberModel>, SplitType) -> Unit
 ){
     val medPadding = dimensionResource(R.dimen.medium_padding)
     /**
@@ -222,11 +227,71 @@ fun SplitExpenseForm(
                     DropdownMenuItem(
                         text = { Text(member.name)},
                         onClick = {
-                            onValueChange(member.toMemberDetails().copy(), owingMembers.filterNot { it.id == member.id })
+                            onValueChange(
+                                member.toMemberDetails().copy(),
+                                owingMembers.filterNot { it.id == member.id },
+                                payType
+                                )
                             selectPayerDropdownMenu = false
                         }
                     )
                 }
+            }
+        }
+    }
+    /**
+     * Handling dropdown selection for pay type
+     */
+    var selectPayerType by rememberSaveable { mutableStateOf(false) }
+    var displayedText = stringResource(R.string.split_evenly)
+    if(payType == SplitType.PAID_IN_FULL){
+        displayedText = stringResource(R.string.owed_entire_amount)
+    }
+    Row (
+        modifier = Modifier.padding(all = medPadding)
+    ) {
+        Text("Split Type: ")
+        Box(
+            modifier = Modifier
+                .width(dimensionResource(R.dimen.member_name_spacing))
+                .background(MaterialTheme.colorScheme.secondaryContainer)
+                .clickable { selectPayerType = true }
+        ){
+            Image(
+                painter = painterResource(R.drawable.baseline_arrow_drop_down_24),
+                contentDescription = "asdf",
+                modifier = Modifier.align(Alignment.TopEnd)
+            )
+            Text(
+                text = displayedText,
+                modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.small_padding))
+            )
+            DropdownMenu(
+                expanded = selectPayerType,
+                onDismissRequest = { selectPayerType = false }
+            ) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.split_evenly))},
+                    onClick = {
+                        onValueChange(
+                            payingMember,
+                            owingMembers,
+                            SplitType.PAID_AND_SPLIT
+                        )
+                        selectPayerType = false
+                    }
+                )
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.owed_entire_amount))},
+                    onClick = {
+                        onValueChange(
+                            payingMember,
+                            owingMembers,
+                            SplitType.PAID_IN_FULL
+                        )
+                        selectPayerType = false
+                    }
+                )
             }
         }
     }
@@ -253,10 +318,17 @@ fun SplitExpenseForm(
                     // so we need to remove it
                     if (owingMembers.contains(member)){
                         onValueChange(
-                            payingMember.copy(), owingMembers.filterNot { it.id == member.id })
+                            payingMember.copy(),
+                            owingMembers.filterNot { it.id == member.id },
+                            payType
+                        )
                     }else{
                         // Means the member isnt in the list so we need to add it
-                        onValueChange(payingMember.copy(), owingMembers.plus(member))
+                        onValueChange(
+                            payingMember.copy(),
+                            owingMembers.plus(member),
+                            payType
+                        )
                     }
                 }
             )

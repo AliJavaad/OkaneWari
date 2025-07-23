@@ -36,6 +36,8 @@
     <string name="paid_by">Paid by</string>
     <string name="owning_party_member_warning">The owner of the party cannot be deleted.</string>
     <string name="delete_member_dialogue_text_simple">This will delete the member.\n\n If the member OWES money for an expenses, the debt will be evenly transferred evenly.\n\nIf the member PAID for an expense. The expense will be deleted entirely.\n\nDo you wish to continue?</string>
+    <string name="split_evenly">Split evenly</string>
+    <string name="owed_entire_amount">Is owed the entire amount</string>
     <!-- Content Description -->
     <string name="settings_buttton_description">Settings.</string>
     <!-- Buttons -->
