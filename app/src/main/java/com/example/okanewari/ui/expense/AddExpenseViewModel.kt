@@ -22,6 +22,7 @@ import com.example.okanewari.ui.components.toMemberDetails
 import com.example.okanewari.ui.components.toPartyModel
 import com.example.okanewari.ui.components.toPartyUiState
 import com.example.okanewari.ui.components.validateNameInput
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -60,6 +61,7 @@ class AddExpenseViewModel(
                         )
                     }
             } catch(e: Exception){
+                coroutineContext.ensureActive()
                 Log.e("AddExpenseVM", "Failed to initialize the data.", e)
             }
         }
@@ -92,51 +94,42 @@ class AddExpenseViewModel(
         val currentPayType = currentState.payType
 
         if (validateExpense() && currentOwingMembers.isNotEmpty()) {
-            try{
-                // First save the expense in general and get the id.
-                val expKey = owRepository.insertExpense(currentState.expenseUiState.expenseDetails.toExpenseModel())
-                // Calculate the split value
-                val total = BigDecimal(currentState.expenseUiState.expenseDetails.amount)
-                var creditSplit = total
-                val debtSplit: BigDecimal?
-                if(currentPayType == SplitType.PAID_IN_FULL){
-                    debtSplit = calculateExpenseSplit(total = total, splitBy = BigDecimal(currentState.owingMembers.size))
-                }else{
-                    debtSplit = calculateExpenseSplit(total = total, splitBy = BigDecimal(currentState.owingMembers.size + 1 ))
-                    creditSplit = total.subtract(debtSplit)
-                }
-                Log.d("Split", "The total is $total the credit is $creditSplit and debt is $debtSplit")
-                // Now, save the split for the PAYER as (total - split).
+            // First save the expense in general and get the id.
+            val expKey = owRepository.insertExpense(currentState.expenseUiState.expenseDetails.toExpenseModel())
+            // Calculate the split value
+            val total = BigDecimal(currentState.expenseUiState.expenseDetails.amount)
+            var creditSplit = total
+            val debtSplit: BigDecimal?
+            if(currentPayType == SplitType.PAID_IN_FULL){
+                debtSplit = calculateExpenseSplit(total = total, splitBy = BigDecimal(currentState.owingMembers.size))
+            }else{
+                debtSplit = calculateExpenseSplit(total = total, splitBy = BigDecimal(currentState.owingMembers.size + 1 ))
+                creditSplit = total.subtract(debtSplit)
+            }
+            Log.d("Split", "The total is $total the credit is $creditSplit and debt is $debtSplit")
+            // Now, save the split for the PAYER as (total - split).
+            owRepository.insertSplit(
+                SplitModel(
+                    partyKey = partyId,
+                    expenseKey = expKey,
+                    memberKey = currentPayingMember.id,
+                    splitType = currentPayType,
+                    splitAmount = creditSplit.toString()))
+            // Next insert all splits for members that OWE as negative of the split
+            for(member in currentOwingMembers){
                 owRepository.insertSplit(
                     SplitModel(
                         partyKey = partyId,
                         expenseKey = expKey,
-                        memberKey = currentPayingMember.id,
-                        splitType = currentPayType,
-                        splitAmount = creditSplit.toString()))
-                // Next insert all splits for members that OWE as negative of the split
-                for(member in currentOwingMembers){
-                    owRepository.insertSplit(
-                        SplitModel(
-                            partyKey = partyId,
-                            expenseKey = expKey,
-                            memberKey = member.id,
-                            splitType = SplitType.OWE,
-                            splitAmount = debtSplit.negate().toString()))
-                }
-            }catch(e: Exception){
-                Log.e("AddExpenseVM", "Failed to save expense and splits.", e)
+                        memberKey = member.id,
+                        splitType = SplitType.OWE,
+                        splitAmount = debtSplit.negate().toString()))
             }
         }
     }
 
     suspend fun updateParty(){
-        try{
-            owRepository.updateParty(addExpenseUiState.partyUiState.partyDetails.toPartyModel())
-        }catch(e: Exception){
-            Log.e("AddExpenseVM", "Failed to update the party.", e)
-        }
-
+        owRepository.updateParty(addExpenseUiState.partyUiState.partyDetails.toPartyModel())
     }
 
     private fun validateExpense(uiState: ExpenseDetails = addExpenseUiState.expenseUiState.expenseDetails): Boolean {

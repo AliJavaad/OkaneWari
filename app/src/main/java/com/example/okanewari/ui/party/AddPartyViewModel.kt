@@ -37,11 +37,7 @@ class AddPartyViewModel(
      */
     suspend fun saveParty() {
         if (validatePartyInput()) {
-            try{
-                owRepository.insertParty(addPartyUiState.partyUiState.partyDetails.toPartyModel())
-            }catch (e: Exception){
-                Log.e("AddPartyVM", "Failed to save party.", e)
-            }
+            owRepository.insertParty(addPartyUiState.partyUiState.partyDetails.toPartyModel())
         }
     }
 

@@ -1,5 +1,6 @@
 package com.example.okanewari.ui.party
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -16,6 +17,7 @@ import com.example.okanewari.R
 import com.example.okanewari.navigation.NavigationDestination
 import com.example.okanewari.ui.OwViewModelProvider
 import com.example.okanewari.ui.components.DoneCancelDeleteButtons
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 
 
@@ -60,16 +62,26 @@ fun EditMemberScreen(
             DoneCancelDeleteButtons(
                 doneButtonClick = {
                     coroutineScope.launch {
-                        viewModel.updateParty()
-                        viewModel.updateMember()
-                        navigateBack()
+                        try{
+                            viewModel.updateParty()
+                            viewModel.updateMember()
+                            navigateBack()
+                        }catch (e: Exception){
+                            coroutineContext.ensureActive()
+                            Log.e("EditMember", "Failed to update member.", e)
+                        }
                     }
                 },
                 cancelButtonClick = navigateBack,
                 deleteButtonClicked = {
                     coroutineScope.launch {
-                        viewModel.deleteMember()
-                        navigateBack()
+                        try{
+                            viewModel.deleteMember()
+                            navigateBack()
+                        }catch (e: Exception){
+                            coroutineContext.ensureActive()
+                            Log.e("EditMember", "Failed to delete member.", e)
+                        }
                     }
                 },
                 enableDone = viewModel.editMemberUiState.memberUiState.isEntryValid,

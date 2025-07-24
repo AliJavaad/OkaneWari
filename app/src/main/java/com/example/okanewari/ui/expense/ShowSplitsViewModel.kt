@@ -12,6 +12,7 @@ import com.example.okanewari.data.OkaneWariRepository
 import com.example.okanewari.ui.components.PartyDetails
 import com.example.okanewari.ui.components.PartyUiState
 import com.example.okanewari.ui.components.toPartyUiState
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
@@ -70,17 +71,14 @@ class ShowSplitsViewModel(
                         )
                     }
             }catch (e: Exception){
+                coroutineContext.ensureActive()
                 Log.e("ShowSplitVM", "Failed to initialize the data.", e)
             }
         }
     }
 
     suspend fun deleteAllExpenses(){
-        try{
-            owRepository.deleteAllExpensesInParty(partyId)
-        }catch(e: Exception){
-            Log.e("ShowSplitVM", "Failed to delete all expenses.", e)
-        }
+        owRepository.deleteAllExpensesInParty(partyId)
     }
 }
 

@@ -21,6 +21,7 @@ import com.example.okanewari.ui.components.toPartyModel
 import com.example.okanewari.ui.components.toPartyUiState
 import com.example.okanewari.ui.components.validateNameInput
 import com.example.okanewari.ui.expense.calculateExpenseSplit
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -57,6 +58,7 @@ class EditMemberViewModel(
                     topBarPartyName = memberModel.name
                 )
             }catch (e: Exception){
+                coroutineContext.ensureActive()
                 Log.e("EditMemberVM", "Failed to initialize data.", e)
             }
 
@@ -74,108 +76,95 @@ class EditMemberViewModel(
 
     suspend fun updateMember() {
         if (validateMember()) {
-            try{
-                owRepository.updateMember(editMemberUiState.memberUiState.memberDetails.toMemberModel())
-            }catch (e: Exception){
-                Log.e("EditMemberVM", "Failed to update member.", e)
-            }
+            owRepository.updateMember(editMemberUiState.memberUiState.memberDetails.toMemberModel())
         }
     }
 
     suspend fun deleteMember(){
-        try{
-            // If there are only 2 members left, cannot perform a proper transfer of debts so
-            // delete all remaining expenses and then delete the member.
-            val memList = owRepository.getAllMembersFromParty(partyId).filterNotNull().first()
-            if(memList.size < 3){
-                owRepository.deleteAllExpensesInParty(partyId)
-                owRepository.deleteMember(editMemberUiState.memberUiState.memberDetails.toMemberModel())
-                return
-            }
+        // If there are only 2 members left, cannot perform a proper transfer of debts so
+        // delete all remaining expenses and then delete the member.
+        val memList = owRepository.getAllMembersFromParty(partyId).filterNotNull().first()
+        if(memList.size < 3){
+            owRepository.deleteAllExpensesInParty(partyId)
+            owRepository.deleteMember(editMemberUiState.memberUiState.memberDetails.toMemberModel())
+            return
+        }
 
-            // Get split (ie. expense) for specific member
-            val splitList = owRepository
-                .getAllSplitsForMember(editMemberUiState.memberUiState.memberDetails.id)
+        // Get split (ie. expense) for specific member
+        val splitList = owRepository
+            .getAllSplitsForMember(editMemberUiState.memberUiState.memberDetails.id)
+            .filterNotNull()
+            .first()
+
+        // Check if there are any expenses involving the member. If not, it is safe to delete.
+        if(splitList.isEmpty()){
+            owRepository.deleteMember(editMemberUiState.memberUiState.memberDetails.toMemberModel())
+            return
+        }
+
+        // For each expense, go in and adjust the split values
+        splitList.forEach{ split ->
+            // Get the expense
+            val expense = owRepository.getExpense(split.expenseKey, partyId)
                 .filterNotNull()
                 .first()
+            // Delete the split
+            owRepository.deleteSplit(split)
 
-            // Check if there are any expenses involving the member. If not, it is safe to delete.
-            if(splitList.isEmpty()){
-                owRepository.deleteMember(editMemberUiState.memberUiState.memberDetails.toMemberModel())
-                return
-            }
-
-            // For each expense, go in and adjust the split values
-            splitList.forEach{ split ->
-                // Get the expense
-                val expense = owRepository.getExpense(split.expenseKey, partyId)
-                    .filterNotNull()
-                    .first()
-                // Delete the split
-                owRepository.deleteSplit(split)
-
-                if (split.splitType == SplitType.PAID_AND_SPLIT || split.splitType == SplitType.PAID_IN_FULL){
-                    // if the member was the person who paid, delete the expense entirely
-                    owRepository.deleteExpense(expense)
+            if (split.splitType == SplitType.PAID_AND_SPLIT || split.splitType == SplitType.PAID_IN_FULL){
+                // if the member was the person who paid, delete the expense entirely
+                owRepository.deleteExpense(expense)
+            }else{
+                // else, must get a new split with the remaining members and update the split table
+                val expSplits = owRepository.getAllSplitsForExpense(expense.id).filterNotNull().first()
+                // The split retrieval is always ordered so that the creditor is the first entry
+                val payType = expSplits[0].splitType
+                assert(payType == SplitType.PAID_AND_SPLIT || payType == SplitType.PAID_IN_FULL)
+                // Calculate the splits based on the payType
+                val total = expense.amount.toBigDecimal()
+                var creditSplit = total
+                val debtSplit: BigDecimal?
+                if(payType == SplitType.PAID_IN_FULL){
+                    debtSplit = calculateExpenseSplit(total = total, splitBy = BigDecimal(expSplits.size - 1))
                 }else{
-                    // else, must get a new split with the remaining members and update the split table
-                    val expSplits = owRepository.getAllSplitsForExpense(expense.id).filterNotNull().first()
-                    // The split retrieval is always ordered so that the creditor is the first entry
-                    val payType = expSplits[0].splitType
-                    assert(payType == SplitType.PAID_AND_SPLIT || payType == SplitType.PAID_IN_FULL)
-                    // Calculate the splits based on the payType
-                    val total = expense.amount.toBigDecimal()
-                    var creditSplit = total
-                    val debtSplit: BigDecimal?
-                    if(payType == SplitType.PAID_IN_FULL){
-                        debtSplit = calculateExpenseSplit(total = total, splitBy = BigDecimal(expSplits.size - 1))
-                    }else{
-                        debtSplit = calculateExpenseSplit(total = total, splitBy = BigDecimal(expSplits.size))
-                        creditSplit = total.subtract(debtSplit)
-                    }
-                    expSplits.forEach{ newSplit ->
-                        when (newSplit.splitType){
-                            SplitType.PAID_IN_FULL, SplitType.PAID_AND_SPLIT-> {
-                                owRepository.updateSplit(
-                                    SplitModel(
-                                        id = newSplit.id,
-                                        partyKey = newSplit.partyKey,
-                                        expenseKey = newSplit.expenseKey,
-                                        memberKey = newSplit.memberKey,
-                                        splitType = newSplit.splitType,
-                                        splitAmount = creditSplit.toString()
-                                    )
+                    debtSplit = calculateExpenseSplit(total = total, splitBy = BigDecimal(expSplits.size))
+                    creditSplit = total.subtract(debtSplit)
+                }
+                expSplits.forEach{ newSplit ->
+                    when (newSplit.splitType){
+                        SplitType.PAID_IN_FULL, SplitType.PAID_AND_SPLIT-> {
+                            owRepository.updateSplit(
+                                SplitModel(
+                                    id = newSplit.id,
+                                    partyKey = newSplit.partyKey,
+                                    expenseKey = newSplit.expenseKey,
+                                    memberKey = newSplit.memberKey,
+                                    splitType = newSplit.splitType,
+                                    splitAmount = creditSplit.toString()
                                 )
-                            }
-                            SplitType.OWE -> {
-                                owRepository.updateSplit(
-                                    SplitModel(
-                                        id = newSplit.id,
-                                        partyKey = newSplit.partyKey,
-                                        expenseKey = newSplit.expenseKey,
-                                        memberKey = newSplit.memberKey,
-                                        splitType = newSplit.splitType,
-                                        splitAmount = debtSplit.negate().toString()
-                                    )
+                            )
+                        }
+                        SplitType.OWE -> {
+                            owRepository.updateSplit(
+                                SplitModel(
+                                    id = newSplit.id,
+                                    partyKey = newSplit.partyKey,
+                                    expenseKey = newSplit.expenseKey,
+                                    memberKey = newSplit.memberKey,
+                                    splitType = newSplit.splitType,
+                                    splitAmount = debtSplit.negate().toString()
                                 )
-                            }
+                            )
                         }
                     }
                 }
             }
-            owRepository.deleteMember(editMemberUiState.memberUiState.memberDetails.toMemberModel())
-        }catch (e: Exception){
-            Log.e("EditMemberVM", "Failed to delete member.", e)
         }
+        owRepository.deleteMember(editMemberUiState.memberUiState.memberDetails.toMemberModel())
     }
 
     suspend fun updateParty(){
-        try{
-            owRepository.updateParty(editMemberUiState.partyUiState.partyDetails.toPartyModel())
-        }catch (e: Exception){
-            Log.e("EditMemberVM", "Failed to update party.", e)
-        }
-
+        owRepository.updateParty(editMemberUiState.partyUiState.partyDetails.toPartyModel())
     }
 
     private fun validateMember(uiState: MemberDetails = editMemberUiState.memberUiState.memberDetails): Boolean {

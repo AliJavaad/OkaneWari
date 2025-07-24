@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.okanewari.data.PartyModel
 import com.example.okanewari.data.OkaneWariRepository
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -22,7 +23,10 @@ class ListPartysViewModel(owRepository: OkaneWariRepository): ViewModel() {
     val listPartysUiState: StateFlow<ListPartysUiState> =
         owRepository.getAllPartiesStream().map{ ListPartysUiState(it) }
             .catch { e ->
-                Log.e("ListPartysVM", "Failed to initialize data.", e)
+                if (e is CancellationException){
+                    throw e
+                }
+                Log.e("ListExpensesVM", "Failed to initialize data.", e)
             }
             .stateIn(
                 scope = viewModelScope,

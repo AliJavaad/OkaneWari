@@ -1,5 +1,6 @@
 package com.example.okanewari.ui.party
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -22,6 +23,7 @@ import com.example.okanewari.ui.OwViewModelProvider
 import com.example.okanewari.ui.components.DoneAndCancelButtons
 import com.example.okanewari.ui.components.MemberDetails
 import com.example.okanewari.ui.components.PartyDetails
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import java.util.Date
 
@@ -64,9 +66,15 @@ fun AddMemberScreen(
             DoneAndCancelButtons(
                 doneButtonClick = {
                     coroutineScope.launch{
-                        viewModel.saveMember()
-                        viewModel.updateParty()
-                        navigateBack()
+                        try{
+                            viewModel.saveMember()
+                            viewModel.updateParty()
+                            navigateBack()
+                        }catch(e: Exception){
+                            coroutineContext.ensureActive()
+                            Log.e("AddMember", "Failed to add member.", e)
+                        }
+
                     }
                 },
                 cancelButtonClick = navigateBack,

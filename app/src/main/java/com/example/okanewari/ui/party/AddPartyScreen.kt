@@ -1,5 +1,6 @@
 package com.example.okanewari.ui.party
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -41,6 +42,7 @@ import com.example.okanewari.ui.components.CurrencySymbols
 import com.example.okanewari.ui.components.DoneAndCancelButtons
 import com.example.okanewari.ui.components.PartyDetails
 import com.example.okanewari.ui.components.PartyUiState
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import java.util.Date
 
@@ -73,8 +75,13 @@ fun AddPartyScreen(
             onPartyValueChange = viewModel::updateUiState,
             onDone = {
                 coroutineScope.launch{
-                    viewModel.saveParty()
-                    navigateBack()
+                    try{
+                        viewModel.saveParty()
+                        navigateBack()
+                    }catch (e: Exception){
+                        coroutineContext.ensureActive()
+                        Log.e("AddParty", "Failed to add party.", e)
+                    }
                 }
             },
             onCancel = navigateBack,

@@ -20,6 +20,7 @@ import com.example.okanewari.R
 import com.example.okanewari.navigation.NavigationDestination
 import com.example.okanewari.ui.OwViewModelProvider
 import com.example.okanewari.ui.components.DoneCancelDeleteButtons
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import java.util.Date
 
@@ -39,10 +40,6 @@ fun EditExpenseScreen(
     canNavigateBackBool: Boolean = true,
     viewModel: EditExpenseViewModel = viewModel(factory = OwViewModelProvider.Factory)
 ){
-    // Log.d("PartyKey", "EditExpenseScreen Party Key: ${viewModel.editExpenseUiState.expenseUiState.expenseDetails.partyKey}")
-    // Log.d("ExpenseKey", "EditExpenseScreen Expense Key: ${viewModel.editExpenseUiState.expenseUiState.expenseDetails.id}")
-    Log.d("EditExpScreen", "Buying member name: ${viewModel.editExpenseUiState.payingMember.name}")
-
     val coroutineScope = rememberCoroutineScope()
     Scaffold(
         topBar = {
@@ -80,9 +77,14 @@ fun EditExpenseScreen(
             )
             DoneCancelDeleteButtons(
                 doneButtonClick = { coroutineScope.launch{
-                    viewModel.updateExpenseAndSplit()
-                    viewModel.updateParty()
-                    navigateBack()
+                    try{
+                        viewModel.updateExpenseAndSplit()
+                        viewModel.updateParty()
+                        navigateBack()
+                    }catch (e: Exception){
+                        coroutineContext.ensureActive()
+                        Log.e("EditExpense", "Failed to save expense and split.", e)
+                    }
                 } },
                 cancelButtonClick = navigateBack,
                 deleteButtonClicked = {
@@ -91,9 +93,14 @@ fun EditExpenseScreen(
                         viewModel.editExpenseUiState.partyUiState.partyDetails.copy(dateModded = Date()),
                         viewModel.editExpenseUiState.expenseUiState.expenseDetails.copy())
                     coroutineScope.launch{
-                        viewModel.deleteExpense()
-                        viewModel.updateParty()
-                        navigateBack()
+                        try{
+                            viewModel.deleteExpense()
+                            viewModel.updateParty()
+                            navigateBack()
+                        }catch(e: Exception){
+                            coroutineContext.ensureActive()
+                            Log.e("EditExpense", "Failed to delete expense and split.", e)
+                        }
                     } },
                 enableDone = viewModel.editExpenseUiState.expenseUiState.isEntryValid &&
                         viewModel.editExpenseUiState.owingMembers.isNotEmpty()

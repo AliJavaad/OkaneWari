@@ -14,6 +14,7 @@ import com.example.okanewari.ui.components.PartyUiState
 import com.example.okanewari.ui.components.toPartyModel
 import com.example.okanewari.ui.components.toPartyUiState
 import com.example.okanewari.ui.components.validateNameInput
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -53,6 +54,7 @@ class EditPartyViewModel(
                         )
                     }
             }catch (e: Exception){
+                coroutineContext.ensureActive()
                 Log.e("EditPartyVM", "Failed to initialize data.", e)
             }
         }
@@ -60,11 +62,7 @@ class EditPartyViewModel(
 
     suspend fun updateParty() {
         if (validateInput()) {
-            try{
-                owRepository.updateParty(editPartyUiState.partyUiState.partyDetails.toPartyModel())
-            }catch(e: Exception){
-                Log.e("EditPartyVM", "Failed to update party.", e)
-            }
+            owRepository.updateParty(editPartyUiState.partyUiState.partyDetails.toPartyModel())
         }
     }
 
@@ -82,11 +80,7 @@ class EditPartyViewModel(
      * Deletes the Party from the [OkaneWariRepository]'s data source.
      */
     suspend fun deleteParty() {
-        try{
-            owRepository.deleteParty(editPartyUiState.partyUiState.partyDetails.toPartyModel())
-        }catch(e: Exception){
-            Log.e("EditPartyVM", "Failed to delete party.", e)
-        }
+        owRepository.deleteParty(editPartyUiState.partyUiState.partyDetails.toPartyModel())
     }
 
     private fun validateInput(uiState: PartyDetails = editPartyUiState.partyUiState.partyDetails): Boolean {

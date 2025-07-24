@@ -17,6 +17,7 @@ import com.example.okanewari.ui.components.toPartyModel
 import com.example.okanewari.ui.components.toPartyUiState
 import com.example.okanewari.ui.components.validateNameInput
 import com.example.okanewari.ui.expense.AddExpenseDestination
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -43,6 +44,7 @@ class AddMemberViewModel(
                     partyUiState = partyModel.toPartyUiState(true)
                 )
             }catch (e:Exception){
+                coroutineContext.ensureActive()
                 Log.e("AddMemberVM", "Failed to initialize data.", e)
             }
 
@@ -59,20 +61,12 @@ class AddMemberViewModel(
 
     suspend fun saveMember() {
         if (validateMember()) {
-            try {
-                owRepository.insertMember(addMemberUiState.memberUiState.memberDetails.toMemberModel())
-            }catch (e: Exception){
-                Log.e("AddMemberVM", "Failed to save the member.", e)
-            }
+            owRepository.insertMember(addMemberUiState.memberUiState.memberDetails.toMemberModel())
         }
     }
 
     suspend fun updateParty(){
-        try{
-            owRepository.updateParty(addMemberUiState.partyUiState.partyDetails.toPartyModel())
-        }catch (e: Exception){
-            Log.e("AddMemberVM", "Failed to update the party.", e)
-        }
+        owRepository.updateParty(addMemberUiState.partyUiState.partyDetails.toPartyModel())
     }
 
     private fun validateMember(uiState: MemberDetails = addMemberUiState.memberUiState.memberDetails): Boolean {

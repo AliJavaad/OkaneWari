@@ -1,5 +1,6 @@
 package com.example.okanewari.ui.expense
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
@@ -40,6 +41,7 @@ import com.example.okanewari.data.MemberModel
 import com.example.okanewari.navigation.NavigationDestination
 import com.example.okanewari.ui.OwViewModelProvider
 import com.example.okanewari.ui.components.PartyDetails
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 
@@ -96,8 +98,14 @@ fun ShowSplitsScreen(
             ShowSettleUpButton(
                 onConfirm = {
                     coroutineScope.launch {
-                        viewModel.deleteAllExpenses()
-                        navigateBack()
+                        try{
+                            viewModel.deleteAllExpenses()
+                            navigateBack()
+                        }catch (e: Exception){
+                            coroutineContext.ensureActive()
+                            Log.e("ShowSplits", "Failed to delete all expenses", e)
+                        }
+
                     }
                 }
             )
