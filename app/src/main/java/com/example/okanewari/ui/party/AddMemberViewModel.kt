@@ -1,5 +1,6 @@
 package com.example.okanewari.ui.party
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -34,12 +35,17 @@ class AddMemberViewModel(
     // Get the initial party info when entering the screen
     init {
         viewModelScope.launch {
-            val partyModel = owRepository.getPartyStream(partyId)
-                .filterNotNull()
-                .first()
-            addMemberUiState = addMemberUiState.copy(
-                partyUiState = partyModel.toPartyUiState(true)
-            )
+            try{
+                val partyModel = owRepository.getPartyStream(partyId)
+                    .filterNotNull()
+                    .first()
+                addMemberUiState = addMemberUiState.copy(
+                    partyUiState = partyModel.toPartyUiState(true)
+                )
+            }catch (e:Exception){
+                Log.e("AddMemberVM", "Failed to initialize data.", e)
+            }
+
         }
     }
 
@@ -53,12 +59,20 @@ class AddMemberViewModel(
 
     suspend fun saveMember() {
         if (validateMember()) {
-            owRepository.insertMember(addMemberUiState.memberUiState.memberDetails.toMemberModel())
+            try {
+                owRepository.insertMember(addMemberUiState.memberUiState.memberDetails.toMemberModel())
+            }catch (e: Exception){
+                Log.e("AddMemberVM", "Failed to save the member.", e)
+            }
         }
     }
 
     suspend fun updateParty(){
-        owRepository.updateParty(addMemberUiState.partyUiState.partyDetails.toPartyModel())
+        try{
+            owRepository.updateParty(addMemberUiState.partyUiState.partyDetails.toPartyModel())
+        }catch (e: Exception){
+            Log.e("AddMemberVM", "Failed to update the party.", e)
+        }
     }
 
     private fun validateMember(uiState: MemberDetails = addMemberUiState.memberUiState.memberDetails): Boolean {

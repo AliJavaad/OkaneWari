@@ -42,22 +42,26 @@ class AddExpenseViewModel(
     // Get the initial party info when entering the screen
     init {
         viewModelScope.launch {
-            val partyModel = owRepository.getPartyStream(partyId)
-                .filterNotNull()
-                .first()
-            addExpenseUiState = addExpenseUiState.copy(
-                partyUiState = partyModel.toPartyUiState(true)
-            )
-            // Reactive flow state for member list
-            owRepository.getAllMembersFromParty(partyId)
-                .filterNotNull()
-                .collect{ dbMembers ->
-                    addExpenseUiState = addExpenseUiState.copy(
-                        memberList = dbMembers,
-                        // Since the group owner will always be returned as index [0]
-                        payingMember = dbMembers[0].toMemberDetails()
-                    )
-                }
+            try{
+                val partyModel = owRepository.getPartyStream(partyId)
+                    .filterNotNull()
+                    .first()
+                addExpenseUiState = addExpenseUiState.copy(
+                    partyUiState = partyModel.toPartyUiState(true)
+                )
+                // Reactive flow state for member list
+                owRepository.getAllMembersFromParty(partyId)
+                    .filterNotNull()
+                    .collect{ dbMembers ->
+                        addExpenseUiState = addExpenseUiState.copy(
+                            memberList = dbMembers,
+                            // Since the group owner will always be returned as index [0]
+                            payingMember = dbMembers[0].toMemberDetails()
+                        )
+                    }
+            } catch(e: Exception){
+                Log.e("AddExpenseVM", "Failed to initialize the data.", e)
+            }
         }
     }
 
@@ -121,13 +125,18 @@ class AddExpenseViewModel(
                             splitAmount = debtSplit.negate().toString()))
                 }
             }catch(e: Exception){
-                Log.e("saveExpenseAndSplit", e.toString())
+                Log.e("AddExpenseVM", "Failed to save expense and splits.", e)
             }
         }
     }
 
     suspend fun updateParty(){
-        owRepository.updateParty(addExpenseUiState.partyUiState.partyDetails.toPartyModel())
+        try{
+            owRepository.updateParty(addExpenseUiState.partyUiState.partyDetails.toPartyModel())
+        }catch(e: Exception){
+            Log.e("AddExpenseVM", "Failed to update the party.", e)
+        }
+
     }
 
     private fun validateExpense(uiState: ExpenseDetails = addExpenseUiState.expenseUiState.expenseDetails): Boolean {

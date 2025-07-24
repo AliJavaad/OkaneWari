@@ -41,54 +41,58 @@ class EditExpenseViewModel(
 
     init {
         viewModelScope.launch {
-            // Load in the initial data (expense and party info)
-            val expenseModel = owRepository.getExpense(expenseId, partyId)
-                .filterNotNull()
-                .first()
-            val partyModel = owRepository.getPartyStream(partyId)
-                .filterNotNull()
-                .first()
-            // The topBarExpenseName should only be updated at the initial screen creation stage.
-            // Otherwise it will keep changing as the text field name is edited.
-            editExpenseUiState = editExpenseUiState.copy(
-                expenseUiState = expenseModel.toExpenseUiState(true),
-                partyUiState = partyModel.toPartyUiState(true),
-                topBarExpenseName = expenseModel.name
-            )
+            try{
+                // Load in the initial data (expense and party info)
+                val expenseModel = owRepository.getExpense(expenseId, partyId)
+                    .filterNotNull()
+                    .first()
+                val partyModel = owRepository.getPartyStream(partyId)
+                    .filterNotNull()
+                    .first()
+                // The topBarExpenseName should only be updated at the initial screen creation stage.
+                // Otherwise it will keep changing as the text field name is edited.
+                editExpenseUiState = editExpenseUiState.copy(
+                    expenseUiState = expenseModel.toExpenseUiState(true),
+                    partyUiState = partyModel.toPartyUiState(true),
+                    topBarExpenseName = expenseModel.name
+                )
 
-            // Load and parse the Member and split info
-            owRepository.getAllMembersFromParty(partyId)
-                .filterNotNull()
-                .combine(owRepository.getAllSplitsForExpense(expenseId).filterNotNull()){
-                    allMems, allSplits ->
-                    Pair(allMems, allSplits)
-                }
-                .collect{ (rawMembers, splitList) ->
-                    // Process the members
-                    val memberMap = rawMembers.associateBy { it.id }
-                    editExpenseUiState = editExpenseUiState.copy(memberList = memberMap)
-
-                    // Process Splits
-                    var owingMembers: List<MemberModel> = listOf()
-                    var payingMember: MemberDetails? = null
-                    var payType = SplitType.PAID_AND_SPLIT
-
-                    splitList.forEach{ split ->
-                        if(split.splitType == SplitType.PAID_AND_SPLIT || split.splitType == SplitType.PAID_IN_FULL){
-                            payingMember = memberMap[split.memberKey]?.toMemberDetails()
-                            payType = split.splitType
-                        }else{
-                            owingMembers = owingMembers.plus(memberMap[split.memberKey]!!)
-                        }
+                // Load and parse the Member and split info
+                owRepository.getAllMembersFromParty(partyId)
+                    .filterNotNull()
+                    .combine(owRepository.getAllSplitsForExpense(expenseId).filterNotNull()){
+                            allMems, allSplits ->
+                        Pair(allMems, allSplits)
                     }
+                    .collect{ (rawMembers, splitList) ->
+                        // Process the members
+                        val memberMap = rawMembers.associateBy { it.id }
+                        editExpenseUiState = editExpenseUiState.copy(memberList = memberMap)
 
-                    // Update the state
-                    editExpenseUiState = editExpenseUiState.copy(
-                        payingMember = payingMember ?: MemberDetails(),
-                        owingMembers = owingMembers,
-                        payType = payType
-                    )
-                }
+                        // Process Splits
+                        var owingMembers: List<MemberModel> = listOf()
+                        var payingMember: MemberDetails? = null
+                        var payType = SplitType.PAID_AND_SPLIT
+
+                        splitList.forEach{ split ->
+                            if(split.splitType == SplitType.PAID_AND_SPLIT || split.splitType == SplitType.PAID_IN_FULL){
+                                payingMember = memberMap[split.memberKey]?.toMemberDetails()
+                                payType = split.splitType
+                            }else{
+                                owingMembers = owingMembers.plus(memberMap[split.memberKey]!!)
+                            }
+                        }
+
+                        // Update the state
+                        editExpenseUiState = editExpenseUiState.copy(
+                            payingMember = payingMember ?: MemberDetails(),
+                            owingMembers = owingMembers,
+                            payType = payType
+                        )
+                    }
+            } catch (e: Exception){
+                Log.e("EditExpenseVM", "Failed to initialize the data.", e)
+            }
         }
     }
 
@@ -150,20 +154,29 @@ class EditExpenseViewModel(
                             splitAmount = debtSplit.negate().toString()))
                 }
             }catch(e: Exception){
-                Log.e("updateExpenseAndSplit", e.toString())
+                Log.e("EditExpenseVM", "Failed to update the expense and splits.", e)
             }
         }
     }
 
     suspend fun updateParty(){
-        owRepository.updateParty(editExpenseUiState.partyUiState.partyDetails.toPartyModel())
+        try{
+            owRepository.updateParty(editExpenseUiState.partyUiState.partyDetails.toPartyModel())
+        }catch (e: Exception){
+            Log.e("EditExpenseVM", "Failed to update the party.", e)
+        }
     }
 
     /**
      * Deletes the expense from the [OkaneWariRepository]'s data source.
      */
     suspend fun deleteExpense() {
-        owRepository.deleteExpense(editExpenseUiState.expenseUiState.expenseDetails.toExpenseModel())
+        try{
+            owRepository.deleteExpense(editExpenseUiState.expenseUiState.expenseDetails.toExpenseModel())
+        }catch (e: Exception){
+            Log.e("EditExpenseVM", "Failed to delete the expense.", e)
+        }
+
     }
 
     private fun validateInput(uiState: ExpenseDetails = editExpenseUiState.expenseUiState.expenseDetails): Boolean {

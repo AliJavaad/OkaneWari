@@ -1,11 +1,11 @@
 package com.example.okanewari.ui.party
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.example.okanewari.data.OkaneWariRepository
-import com.example.okanewari.ui.components.MemberDetails
 import com.example.okanewari.ui.components.PartyDetails
 import com.example.okanewari.ui.components.PartyUiState
 import com.example.okanewari.ui.components.toPartyModel
@@ -33,13 +33,15 @@ class AddPartyViewModel(
     }
 
     /**
-     * Saves the party and host member into the tables.
-     * They MUST be sequential as the party must get stored first so the member can properly
-     * reference the foreign key.
+     * Saves the party into the table.
      */
-    suspend fun savePartyAndHostMember() {
+    suspend fun saveParty() {
         if (validatePartyInput()) {
-            owRepository.insertParty(addPartyUiState.partyUiState.partyDetails.toPartyModel())
+            try{
+                owRepository.insertParty(addPartyUiState.partyUiState.partyDetails.toPartyModel())
+            }catch (e: Exception){
+                Log.e("AddPartyVM", "Failed to save party.", e)
+            }
         }
     }
 
