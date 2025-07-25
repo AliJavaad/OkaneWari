@@ -14,6 +14,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.IOException
+import java.util.Date
 import kotlin.jvm.Throws
 
 @RunWith(AndroidJUnit4::class)
@@ -21,8 +22,8 @@ class PartyDaoTest {
     private lateinit var partyDao: PartyDao
     private lateinit var owDatabase: OkaneWariDatabase
 
-    private val party1 = PartyModel(1, "javs", "$", 3)
-    private val party2 = PartyModel(2, "chad", "¥", 1)
+    private val party1 = PartyModel(1, "javs", "$", 3, Date().time)
+    private val party2 = PartyModel(2, "chad", "¥", 1, Date().time)
 
     @Before
     fun createDb() {
@@ -63,12 +64,15 @@ class PartyDaoTest {
     @Throws(Exception::class)
     fun daoUpdateParty_updatesPartyInDb() = runBlocking{
         addTwoPartysToDb()
-        partyDao.update(PartyModel(1, "svaj", "£", 5))
-        partyDao.update(PartyModel(2, "blue", "$", 2))
+
+        val testParty1 = PartyModel(1, "svaj", "£", 5, Date().time)
+        val testParty2 = PartyModel(2, "blue", "$", 2, Date().time)
+        partyDao.update(testParty1)
+        partyDao.update(testParty2)
 
         val allPartys = partyDao.getAllRecords().first()
-        assertEquals(allPartys[0], PartyModel(1, "svaj", "£", 5))
-        assertEquals(allPartys[1], PartyModel(2, "blue", "$", 2))
+        assertEquals(allPartys[0], testParty1)
+        assertEquals(allPartys[1], testParty2)
     }
 
     @Test
