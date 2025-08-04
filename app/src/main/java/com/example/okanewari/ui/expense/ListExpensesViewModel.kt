@@ -12,8 +12,11 @@ import com.example.okanewari.data.MemberModel
 import com.example.okanewari.data.OkaneWariRepository
 import com.example.okanewari.ui.components.PartyDetails
 import com.example.okanewari.ui.components.toPartyDetails
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
@@ -46,6 +49,11 @@ class ListExpensesViewModel(
                     expenseList = expenses,
                     memberList = mems
                 )
+            }.catch { e ->
+                if (e is CancellationException){
+                    throw e
+                }
+                Log.e("ListExpensesVM", "Failed to initialize data.", e)
             }
             .stateIn(
                 scope = viewModelScope,

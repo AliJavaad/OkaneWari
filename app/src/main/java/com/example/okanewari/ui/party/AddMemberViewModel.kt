@@ -1,5 +1,6 @@
 package com.example.okanewari.ui.party
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -16,6 +17,7 @@ import com.example.okanewari.ui.components.toPartyModel
 import com.example.okanewari.ui.components.toPartyUiState
 import com.example.okanewari.ui.components.validateNameInput
 import com.example.okanewari.ui.expense.AddExpenseDestination
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -34,12 +36,18 @@ class AddMemberViewModel(
     // Get the initial party info when entering the screen
     init {
         viewModelScope.launch {
-            val partyModel = owRepository.getPartyStream(partyId)
-                .filterNotNull()
-                .first()
-            addMemberUiState = addMemberUiState.copy(
-                partyUiState = partyModel.toPartyUiState(true)
-            )
+            try{
+                val partyModel = owRepository.getPartyStream(partyId)
+                    .filterNotNull()
+                    .first()
+                addMemberUiState = addMemberUiState.copy(
+                    partyUiState = partyModel.toPartyUiState(true)
+                )
+            }catch (e:Exception){
+                coroutineContext.ensureActive()
+                Log.e("AddMemberVM", "Failed to initialize data.", e)
+            }
+
         }
     }
 

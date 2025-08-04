@@ -41,6 +41,7 @@ import com.example.okanewari.ui.OwViewModelProvider
 import com.example.okanewari.ui.components.ConfirmationDialog
 import com.example.okanewari.ui.components.DoneCancelDeleteButtons
 import com.example.okanewari.ui.components.PartyDetails
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 
 object EditPartyDestination : NavigationDestination {
@@ -108,13 +109,23 @@ fun EditPartyScreen(
             )
             DoneCancelDeleteButtons(
                 doneButtonClick = { coroutineScope.launch{
-                    viewModel.updateParty()
-                    navigateBack()
+                    try{
+                        viewModel.updateParty()
+                        navigateBack()
+                    }catch (e: Exception){
+                        coroutineScope.ensureActive()
+                        Log.e("EditParty", "Failed to update party.", e)
+                    }
                 } },
                 cancelButtonClick = navigateBack,
                 deleteButtonClicked = { coroutineScope.launch{
-                    viewModel.deleteParty()
-                    navigateHome()
+                    try{
+                        viewModel.deleteParty()
+                        navigateHome()
+                    }catch (e: Exception){
+                        coroutineScope.ensureActive()
+                        Log.e("EditParty", "Failed to delete party.", e)
+                    }
                 } },
                 enableDone = viewModel.editPartyUiState.partyUiState.isEntryValid
             )

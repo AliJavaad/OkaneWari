@@ -23,6 +23,7 @@ import com.example.okanewari.ui.components.toMemberDetails
 import com.example.okanewari.ui.components.toPartyModel
 import com.example.okanewari.ui.components.toPartyUiState
 import com.example.okanewari.ui.components.validateNameInput
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
@@ -41,54 +42,59 @@ class EditExpenseViewModel(
 
     init {
         viewModelScope.launch {
-            // Load in the initial data (expense and party info)
-            val expenseModel = owRepository.getExpense(expenseId, partyId)
-                .filterNotNull()
-                .first()
-            val partyModel = owRepository.getPartyStream(partyId)
-                .filterNotNull()
-                .first()
-            // The topBarExpenseName should only be updated at the initial screen creation stage.
-            // Otherwise it will keep changing as the text field name is edited.
-            editExpenseUiState = editExpenseUiState.copy(
-                expenseUiState = expenseModel.toExpenseUiState(true),
-                partyUiState = partyModel.toPartyUiState(true),
-                topBarExpenseName = expenseModel.name
-            )
+            try{
+                // Load in the initial data (expense and party info)
+                val expenseModel = owRepository.getExpense(expenseId, partyId)
+                    .filterNotNull()
+                    .first()
+                val partyModel = owRepository.getPartyStream(partyId)
+                    .filterNotNull()
+                    .first()
+                // The topBarExpenseName should only be updated at the initial screen creation stage.
+                // Otherwise it will keep changing as the text field name is edited.
+                editExpenseUiState = editExpenseUiState.copy(
+                    expenseUiState = expenseModel.toExpenseUiState(true),
+                    partyUiState = partyModel.toPartyUiState(true),
+                    topBarExpenseName = expenseModel.name
+                )
 
-            // Load and parse the Member and split info
-            owRepository.getAllMembersFromParty(partyId)
-                .filterNotNull()
-                .combine(owRepository.getAllSplitsForExpense(expenseId).filterNotNull()){
-                    allMems, allSplits ->
-                    Pair(allMems, allSplits)
-                }
-                .collect{ (rawMembers, splitList) ->
-                    // Process the members
-                    val memberMap = rawMembers.associateBy { it.id }
-                    editExpenseUiState = editExpenseUiState.copy(memberList = memberMap)
-
-                    // Process Splits
-                    var owingMembers: List<MemberModel> = listOf()
-                    var payingMember: MemberDetails? = null
-                    var payType = SplitType.PAID_AND_SPLIT
-
-                    splitList.forEach{ split ->
-                        if(split.splitType == SplitType.PAID_AND_SPLIT || split.splitType == SplitType.PAID_IN_FULL){
-                            payingMember = memberMap[split.memberKey]?.toMemberDetails()
-                            payType = split.splitType
-                        }else{
-                            owingMembers = owingMembers.plus(memberMap[split.memberKey]!!)
-                        }
+                // Load and parse the Member and split info
+                owRepository.getAllMembersFromParty(partyId)
+                    .filterNotNull()
+                    .combine(owRepository.getAllSplitsForExpense(expenseId).filterNotNull()){
+                            allMems, allSplits ->
+                        Pair(allMems, allSplits)
                     }
+                    .collect{ (rawMembers, splitList) ->
+                        // Process the members
+                        val memberMap = rawMembers.associateBy { it.id }
+                        editExpenseUiState = editExpenseUiState.copy(memberList = memberMap)
 
-                    // Update the state
-                    editExpenseUiState = editExpenseUiState.copy(
-                        payingMember = payingMember ?: MemberDetails(),
-                        owingMembers = owingMembers,
-                        payType = payType
-                    )
-                }
+                        // Process Splits
+                        var owingMembers: List<MemberModel> = listOf()
+                        var payingMember: MemberDetails? = null
+                        var payType = SplitType.PAID_AND_SPLIT
+
+                        splitList.forEach{ split ->
+                            if(split.splitType == SplitType.PAID_AND_SPLIT || split.splitType == SplitType.PAID_IN_FULL){
+                                payingMember = memberMap[split.memberKey]?.toMemberDetails()
+                                payType = split.splitType
+                            }else{
+                                owingMembers = owingMembers.plus(memberMap[split.memberKey]!!)
+                            }
+                        }
+
+                        // Update the state
+                        editExpenseUiState = editExpenseUiState.copy(
+                            payingMember = payingMember ?: MemberDetails(),
+                            owingMembers = owingMembers,
+                            payType = payType
+                        )
+                    }
+            } catch (e: Exception){
+                coroutineContext.ensureActive()
+                Log.e("EditExpenseVM", "Failed to initialize the data.", e)
+            }
         }
     }
 
@@ -115,42 +121,38 @@ class EditExpenseViewModel(
         val currentPayType = currentState.payType
 
         if (validateInput() && currentOwingMembers.isNotEmpty()) {
-            try{
-                // First delete all the splits
-                owRepository.deleteSplitByExpense(expenseId)
-                // Update the expense
-                owRepository.updateExpense(currentState.expenseUiState.expenseDetails.toExpenseModel())
-                // Calculate the split value
-                val total = BigDecimal(currentState.expenseUiState.expenseDetails.amount)
-                var creditSplit = total
-                val debtSplit: BigDecimal?
-                if(currentPayType == SplitType.PAID_IN_FULL){
-                    debtSplit = calculateExpenseSplit(total = total, splitBy = BigDecimal(currentState.owingMembers.size))
-                }else{
-                    debtSplit = calculateExpenseSplit(total = total, splitBy = BigDecimal(currentState.owingMembers.size + 1 ))
-                    creditSplit = total.subtract(debtSplit)
-                }
-                // Now, save the split for the PAYER as (total - split).
+            // First delete all the splits
+            owRepository.deleteSplitByExpense(expenseId)
+            // Update the expense
+            owRepository.updateExpense(currentState.expenseUiState.expenseDetails.toExpenseModel())
+            // Calculate the split value
+            val total = BigDecimal(currentState.expenseUiState.expenseDetails.amount)
+            var creditSplit = total
+            val debtSplit: BigDecimal?
+            if(currentPayType == SplitType.PAID_IN_FULL){
+                debtSplit = calculateExpenseSplit(total = total, splitBy = BigDecimal(currentState.owingMembers.size))
+            }else{
+                debtSplit = calculateExpenseSplit(total = total, splitBy = BigDecimal(currentState.owingMembers.size + 1 ))
+                creditSplit = total.subtract(debtSplit)
+            }
+            // Now, save the split for the PAYER as (total - split).
+            owRepository.insertSplit(
+                SplitModel(
+                    partyKey = partyId,
+                    expenseKey = expenseId,
+                    memberKey = currentPayingMember.id,
+                    splitType = currentPayType,
+                    splitAmount = creditSplit.toString()))
+            // Next insert all splits for members that OWE as negative of the split
+            for(member in currentOwingMembers){
+                Log.d("InsertOweLoop", "Owing mem: ${member.name}")
                 owRepository.insertSplit(
                     SplitModel(
                         partyKey = partyId,
                         expenseKey = expenseId,
-                        memberKey = currentPayingMember.id,
-                        splitType = currentPayType,
-                        splitAmount = creditSplit.toString()))
-                // Next insert all splits for members that OWE as negative of the split
-                for(member in currentOwingMembers){
-                    Log.d("InsertOweLoop", "Owing mem: ${member.name}")
-                    owRepository.insertSplit(
-                        SplitModel(
-                            partyKey = partyId,
-                            expenseKey = expenseId,
-                            memberKey = member.id,
-                            splitType = SplitType.OWE,
-                            splitAmount = debtSplit.negate().toString()))
-                }
-            }catch(e: Exception){
-                Log.e("updateExpenseAndSplit", e.toString())
+                        memberKey = member.id,
+                        splitType = SplitType.OWE,
+                        splitAmount = debtSplit.negate().toString()))
             }
         }
     }
@@ -164,6 +166,7 @@ class EditExpenseViewModel(
      */
     suspend fun deleteExpense() {
         owRepository.deleteExpense(editExpenseUiState.expenseUiState.expenseDetails.toExpenseModel())
+
     }
 
     private fun validateInput(uiState: ExpenseDetails = editExpenseUiState.expenseUiState.expenseDetails): Boolean {

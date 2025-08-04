@@ -1,5 +1,6 @@
 package com.example.okanewari.ui.expense
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -8,10 +9,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.okanewari.data.MemberModel
 import com.example.okanewari.data.OkaneWariRepository
-import com.example.okanewari.ui.components.MemberDetails
 import com.example.okanewari.ui.components.PartyDetails
 import com.example.okanewari.ui.components.PartyUiState
 import com.example.okanewari.ui.components.toPartyUiState
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
@@ -29,45 +30,50 @@ class ShowSplitsViewModel(
 
     init {
         viewModelScope.launch {
-            // Get party info
-            val partyModel = owRepository.getPartyStream(partyId)
-                .filterNotNull()
-                .first()
-            showSplitsUiState = showSplitsUiState.copy(
-                partyUiState = partyModel.toPartyUiState(true),
-                topBarExpenseName = partyModel.partyName
-            )
+            try{
+                // Get party info
+                val partyModel = owRepository.getPartyStream(partyId)
+                    .filterNotNull()
+                    .first()
+                showSplitsUiState = showSplitsUiState.copy(
+                    partyUiState = partyModel.toPartyUiState(true),
+                    topBarExpenseName = partyModel.partyName
+                )
 
-            // Load and parse the Member and split info
-            owRepository.getAllMembersFromParty(partyId)
-                .filterNotNull()
-                .combine(
-                    owRepository.getAllSplitsForParty(partyId).filterNotNull()
-                ) { allMems, allSplits ->
-                    Pair(allMems, allSplits)
-                }
-                .collect { (rawMembers, splitList) ->
-                    // Process the members
-                    val memberMap = rawMembers.associateBy { it.id }
-
-                    // Process Splits
-                    val memberSplitTotals =
-                        memberMap.map { it.key to BigDecimal.ZERO }.toMap().toMutableMap()
-
-                    splitList.forEach { split ->
-                        memberSplitTotals[split.memberKey] =
-                            BigDecimal(split.splitAmount).add(memberSplitTotals[split.memberKey])
+                // Load and parse the Member and split info
+                owRepository.getAllMembersFromParty(partyId)
+                    .filterNotNull()
+                    .combine(
+                        owRepository.getAllSplitsForParty(partyId).filterNotNull()
+                    ) { allMems, allSplits ->
+                        Pair(allMems, allSplits)
                     }
+                    .collect { (rawMembers, splitList) ->
+                        // Process the members
+                        val memberMap = rawMembers.associateBy { it.id }
 
-                    val transactions = calculateTransactions(memberSplitTotals)
+                        // Process Splits
+                        val memberSplitTotals =
+                            memberMap.map { it.key to BigDecimal.ZERO }.toMap().toMutableMap()
 
-                    // Update the state
-                    showSplitsUiState = showSplitsUiState.copy(
-                        memberList = memberMap,
-                        memberSplitTotals = memberSplitTotals,
-                        transactions = transactions
-                    )
-                }
+                        splitList.forEach { split ->
+                            memberSplitTotals[split.memberKey] =
+                                BigDecimal(split.splitAmount).add(memberSplitTotals[split.memberKey])
+                        }
+
+                        val transactions = calculateTransactions(memberSplitTotals)
+
+                        // Update the state
+                        showSplitsUiState = showSplitsUiState.copy(
+                            memberList = memberMap,
+                            memberSplitTotals = memberSplitTotals,
+                            transactions = transactions
+                        )
+                    }
+            }catch (e: Exception){
+                coroutineContext.ensureActive()
+                Log.e("ShowSplitVM", "Failed to initialize the data.", e)
+            }
         }
     }
 

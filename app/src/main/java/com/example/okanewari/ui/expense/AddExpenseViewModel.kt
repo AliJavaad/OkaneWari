@@ -22,6 +22,7 @@ import com.example.okanewari.ui.components.toMemberDetails
 import com.example.okanewari.ui.components.toPartyModel
 import com.example.okanewari.ui.components.toPartyUiState
 import com.example.okanewari.ui.components.validateNameInput
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -42,22 +43,27 @@ class AddExpenseViewModel(
     // Get the initial party info when entering the screen
     init {
         viewModelScope.launch {
-            val partyModel = owRepository.getPartyStream(partyId)
-                .filterNotNull()
-                .first()
-            addExpenseUiState = addExpenseUiState.copy(
-                partyUiState = partyModel.toPartyUiState(true)
-            )
-            // Reactive flow state for member list
-            owRepository.getAllMembersFromParty(partyId)
-                .filterNotNull()
-                .collect{ dbMembers ->
-                    addExpenseUiState = addExpenseUiState.copy(
-                        memberList = dbMembers,
-                        // Since the group owner will always be returned as index [0]
-                        payingMember = dbMembers[0].toMemberDetails()
-                    )
-                }
+            try{
+                val partyModel = owRepository.getPartyStream(partyId)
+                    .filterNotNull()
+                    .first()
+                addExpenseUiState = addExpenseUiState.copy(
+                    partyUiState = partyModel.toPartyUiState(true)
+                )
+                // Reactive flow state for member list
+                owRepository.getAllMembersFromParty(partyId)
+                    .filterNotNull()
+                    .collect{ dbMembers ->
+                        addExpenseUiState = addExpenseUiState.copy(
+                            memberList = dbMembers,
+                            // Since the group owner will always be returned as index [0]
+                            payingMember = dbMembers[0].toMemberDetails()
+                        )
+                    }
+            } catch(e: Exception){
+                coroutineContext.ensureActive()
+                Log.e("AddExpenseVM", "Failed to initialize the data.", e)
+            }
         }
     }
 
@@ -88,40 +94,36 @@ class AddExpenseViewModel(
         val currentPayType = currentState.payType
 
         if (validateExpense() && currentOwingMembers.isNotEmpty()) {
-            try{
-                // First save the expense in general and get the id.
-                val expKey = owRepository.insertExpense(currentState.expenseUiState.expenseDetails.toExpenseModel())
-                // Calculate the split value
-                val total = BigDecimal(currentState.expenseUiState.expenseDetails.amount)
-                var creditSplit = total
-                val debtSplit: BigDecimal?
-                if(currentPayType == SplitType.PAID_IN_FULL){
-                    debtSplit = calculateExpenseSplit(total = total, splitBy = BigDecimal(currentState.owingMembers.size))
-                }else{
-                    debtSplit = calculateExpenseSplit(total = total, splitBy = BigDecimal(currentState.owingMembers.size + 1 ))
-                    creditSplit = total.subtract(debtSplit)
-                }
-                Log.d("Split", "The total is $total the credit is $creditSplit and debt is $debtSplit")
-                // Now, save the split for the PAYER as (total - split).
+            // First save the expense in general and get the id.
+            val expKey = owRepository.insertExpense(currentState.expenseUiState.expenseDetails.toExpenseModel())
+            // Calculate the split value
+            val total = BigDecimal(currentState.expenseUiState.expenseDetails.amount)
+            var creditSplit = total
+            val debtSplit: BigDecimal?
+            if(currentPayType == SplitType.PAID_IN_FULL){
+                debtSplit = calculateExpenseSplit(total = total, splitBy = BigDecimal(currentState.owingMembers.size))
+            }else{
+                debtSplit = calculateExpenseSplit(total = total, splitBy = BigDecimal(currentState.owingMembers.size + 1 ))
+                creditSplit = total.subtract(debtSplit)
+            }
+            Log.d("Split", "The total is $total the credit is $creditSplit and debt is $debtSplit")
+            // Now, save the split for the PAYER as (total - split).
+            owRepository.insertSplit(
+                SplitModel(
+                    partyKey = partyId,
+                    expenseKey = expKey,
+                    memberKey = currentPayingMember.id,
+                    splitType = currentPayType,
+                    splitAmount = creditSplit.toString()))
+            // Next insert all splits for members that OWE as negative of the split
+            for(member in currentOwingMembers){
                 owRepository.insertSplit(
                     SplitModel(
                         partyKey = partyId,
                         expenseKey = expKey,
-                        memberKey = currentPayingMember.id,
-                        splitType = currentPayType,
-                        splitAmount = creditSplit.toString()))
-                // Next insert all splits for members that OWE as negative of the split
-                for(member in currentOwingMembers){
-                    owRepository.insertSplit(
-                        SplitModel(
-                            partyKey = partyId,
-                            expenseKey = expKey,
-                            memberKey = member.id,
-                            splitType = SplitType.OWE,
-                            splitAmount = debtSplit.negate().toString()))
-                }
-            }catch(e: Exception){
-                Log.e("saveExpenseAndSplit", e.toString())
+                        memberKey = member.id,
+                        splitType = SplitType.OWE,
+                        splitAmount = debtSplit.negate().toString()))
             }
         }
     }

@@ -1,5 +1,6 @@
 package com.example.okanewari.ui.party
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -20,6 +21,7 @@ import com.example.okanewari.ui.components.toPartyModel
 import com.example.okanewari.ui.components.toPartyUiState
 import com.example.okanewari.ui.components.validateNameInput
 import com.example.okanewari.ui.expense.calculateExpenseSplit
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -42,18 +44,24 @@ class EditMemberViewModel(
     // Get the initial party and member info when entering the screen
     init {
         viewModelScope.launch {
-            val partyModel = owRepository.getPartyStream(partyId)
-                .filterNotNull()
-                .first()
-            val memberModel = owRepository.getMember(memberId, partyId)
-                .filterNotNull()
-                .first()
+            try{
+                val partyModel = owRepository.getPartyStream(partyId)
+                    .filterNotNull()
+                    .first()
+                val memberModel = owRepository.getMember(memberId, partyId)
+                    .filterNotNull()
+                    .first()
 
-            editMemberUiState = editMemberUiState.copy(
-                partyUiState = partyModel.toPartyUiState(true),
-                memberUiState = memberModel.toMemberUiState(true),
-                topBarPartyName = memberModel.name
-            )
+                editMemberUiState = editMemberUiState.copy(
+                    partyUiState = partyModel.toPartyUiState(true),
+                    memberUiState = memberModel.toMemberUiState(true),
+                    topBarPartyName = memberModel.name
+                )
+            }catch (e: Exception){
+                coroutineContext.ensureActive()
+                Log.e("EditMemberVM", "Failed to initialize data.", e)
+            }
+
         }
     }
 

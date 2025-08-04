@@ -1,5 +1,6 @@
 package com.example.okanewari.ui.party
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -13,6 +14,7 @@ import com.example.okanewari.ui.components.PartyUiState
 import com.example.okanewari.ui.components.toPartyModel
 import com.example.okanewari.ui.components.toPartyUiState
 import com.example.okanewari.ui.components.validateNameInput
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -32,25 +34,29 @@ class EditPartyViewModel(
 
     init {
         viewModelScope.launch {
-            // One time get for party
-            val partyModel = owRepository.getPartyStream(partyId)
-                .filterNotNull()
-                .first()
-            // The topBarPartyName should only be updated at the initial screen creation stage.
-            // Otherwise it will keep changing as the text field/party name is edited.
-            editPartyUiState = editPartyUiState.copy(
-                partyUiState = partyModel.toPartyUiState(true),
-                topBarPartyName = partyModel.partyName
-            )
-            // Reactive flow state for member list
-            owRepository.getAllMembersFromParty(partyId)
-                .filterNotNull()
-                .collect{ dbMembers ->
-                    editPartyUiState = editPartyUiState.copy(
-                        memberList = dbMembers
-                    )
-                }
-
+            try {
+                // One time get for party
+                val partyModel = owRepository.getPartyStream(partyId)
+                    .filterNotNull()
+                    .first()
+                // The topBarPartyName should only be updated at the initial screen creation stage.
+                // Otherwise it will keep changing as the text field/party name is edited.
+                editPartyUiState = editPartyUiState.copy(
+                    partyUiState = partyModel.toPartyUiState(true),
+                    topBarPartyName = partyModel.partyName
+                )
+                // Reactive flow state for member list
+                owRepository.getAllMembersFromParty(partyId)
+                    .filterNotNull()
+                    .collect{ dbMembers ->
+                        editPartyUiState = editPartyUiState.copy(
+                            memberList = dbMembers
+                        )
+                    }
+            }catch (e: Exception){
+                coroutineContext.ensureActive()
+                Log.e("EditPartyVM", "Failed to initialize data.", e)
+            }
         }
     }
 
@@ -65,12 +71,9 @@ class EditPartyViewModel(
      * This method also triggers a validation for input values.
      */
     fun updatePartyUiState(partyDetails: PartyDetails) {
-        editPartyUiState =
-            EditPartyUiState(
-                partyUiState = PartyUiState(partyDetails, validateInput(partyDetails)),
-                memberList = editPartyUiState.memberList,
-                topBarPartyName = editPartyUiState.topBarPartyName
-            )
+        editPartyUiState = editPartyUiState.copy(
+            partyUiState = PartyUiState(partyDetails, validateInput(partyDetails))
+        )
     }
 
     /**

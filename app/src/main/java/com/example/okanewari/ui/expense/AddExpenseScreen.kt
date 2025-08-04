@@ -1,5 +1,6 @@
 package com.example.okanewari.ui.expense
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -49,6 +50,8 @@ import com.example.okanewari.ui.components.MemberDetails
 import com.example.okanewari.ui.components.PartyDetails
 import com.example.okanewari.ui.components.PartyUiState
 import com.example.okanewari.ui.components.toMemberDetails
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import java.util.Date
 
@@ -89,9 +92,14 @@ fun AddExpenseScreen(
             onSplitValueChange = viewModel::updateSplitUiState,
             onDone = {
                 coroutineScope.launch{
-                    viewModel.saveExpenseAndSplit()
-                    viewModel.updateParty()
-                    navigateBack()
+                    try{
+                        viewModel.saveExpenseAndSplit()
+                        viewModel.updateParty()
+                        navigateBack()
+                    }catch (e: Exception){
+                        coroutineContext.ensureActive()
+                        Log.e("AddExpense", "Could not save the data", e)
+                    }
                 }
             },
             onCancel = navigateBack,
