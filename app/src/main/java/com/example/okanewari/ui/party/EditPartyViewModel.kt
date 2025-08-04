@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.okanewari.data.MemberModel
 import com.example.okanewari.data.OkaneWariRepository
+import com.example.okanewari.ui.components.LimitHolder
 import com.example.okanewari.ui.components.PartyDetails
 import com.example.okanewari.ui.components.PartyUiState
 import com.example.okanewari.ui.components.toPartyModel
@@ -87,6 +88,10 @@ class EditPartyViewModel(
         return with(uiState) {
             validateNameInput(partyName) && currency.isNotBlank() && numberOfMems.isNotBlank()
         }
+    }
+
+    fun isOverMemberCountLimit(size: Int): Boolean{
+        return (size > LimitHolder.memberCountLimit)
     }
 }
 

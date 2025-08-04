@@ -118,7 +118,7 @@ fun ListExpensesScreen(
                     showDismissButton = false
                 )
             }
-            else if (listExpensesUiState.expenseList.size > 1024){
+            else if (viewModel.isOverExpenseCountLimit(listExpensesUiState.expenseList.size)){
                 ConfirmationDialog(
                     onConfirm = { checkExpenseLimit = false },
                     onCancel = { checkExpenseLimit = false },

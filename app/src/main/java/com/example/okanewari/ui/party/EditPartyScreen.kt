@@ -38,7 +38,6 @@ import com.example.okanewari.R
 import com.example.okanewari.data.MemberModel
 import com.example.okanewari.navigation.NavigationDestination
 import com.example.okanewari.ui.OwViewModelProvider
-import com.example.okanewari.ui.components.ConfirmationDialog
 import com.example.okanewari.ui.components.DoneCancelDeleteButtons
 import com.example.okanewari.ui.components.PartyDetails
 import kotlinx.coroutines.ensureActive
@@ -101,7 +100,8 @@ fun EditPartyScreen(
                 membersList = viewModel.editPartyUiState.memberList,
                 partyDetails = viewModel.editPartyUiState.partyUiState.partyDetails,
                 onModifyMemberClicked = onEditMemberClicked,
-                onAddMemberClicked = onAddMemberClicked
+                onAddMemberClicked = onAddMemberClicked,
+                checkMemberLimit = viewModel::isOverMemberCountLimit
             )
             HorizontalDivider(
                 thickness = 4.dp,
@@ -138,7 +138,8 @@ fun ListPartyMembers(
     membersList: List<MemberModel>,
     partyDetails: PartyDetails,
     onModifyMemberClicked: (List<Long>) -> Unit,
-    onAddMemberClicked: (Long) -> Unit
+    onAddMemberClicked: (Long) -> Unit,
+    checkMemberLimit: (Int) -> Boolean
 ){
     val mediumPadding = dimensionResource(R.dimen.medium_padding)
     for (member in membersList){
@@ -183,7 +184,7 @@ fun ListPartyMembers(
         }
     }
     var memberLimitReached by rememberSaveable { mutableStateOf(false) }
-    if (membersList.size > 64){
+    if (checkMemberLimit(membersList.size)){
         memberLimitReached = true
     }
     FilledTonalButton(

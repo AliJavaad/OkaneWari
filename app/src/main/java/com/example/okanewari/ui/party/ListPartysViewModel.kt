@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.okanewari.data.PartyModel
 import com.example.okanewari.data.OkaneWariRepository
+import com.example.okanewari.ui.components.LimitHolder
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -36,6 +37,10 @@ class ListPartysViewModel(owRepository: OkaneWariRepository): ViewModel() {
 
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
+    }
+
+    fun isOverPartyCountLimit(size: Int): Boolean{
+        return (size > LimitHolder.partyCountLimit)
     }
 }
 

@@ -89,7 +89,7 @@ fun ListPartysScreen(
             contentPadding = innerPadding
         )
         if(checkPartyLimit){
-            if (listPartysUiState.partyList.size > 128){
+            if (viewModel.isOverPartyCountLimit(listPartysUiState.partyList.size)){
                 ConfirmationDialog(
                     onConfirm = { checkPartyLimit = false },
                     onCancel = { checkPartyLimit = false },
