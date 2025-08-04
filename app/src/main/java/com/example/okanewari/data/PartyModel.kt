@@ -17,6 +17,5 @@ data class PartyModel (
     val id: Long = 0,
     val partyName: String,
     val currency: String,
-    val numberOfMembers: Int,
     val dateModded: Long
 )

@@ -43,7 +43,7 @@ class AddPartyViewModel(
 
     private fun validatePartyInput(uiState: PartyDetails = addPartyUiState.partyUiState.partyDetails): Boolean {
         return with(uiState) {
-            validateNameInput(partyName) && currency.isNotBlank() && numberOfMems.isNotBlank()
+            validateNameInput(partyName) && currency.isNotBlank()
         }
     }
 }

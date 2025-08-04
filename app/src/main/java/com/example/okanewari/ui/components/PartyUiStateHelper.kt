@@ -16,7 +16,6 @@ data class PartyDetails(
     val partyName: String = "",
     // Defualt currency symbol for a new party
     val currency: String = "¥",
-    val numberOfMems: String = "1",
     val dateModded: Date = Date()
 )
 
@@ -29,7 +28,6 @@ fun PartyDetails.toPartyModel(): PartyModel = PartyModel(
     id = id,
     partyName = partyName,
     currency = currency,
-    numberOfMembers = numberOfMems.toIntOrNull() ?: 1,
     dateModded = dateModded.time
 )
 
@@ -48,7 +46,6 @@ fun PartyModel.toPartyDetails(): PartyDetails = PartyDetails(
     id = id,
     partyName = partyName,
     currency = currency,
-    numberOfMems = numberOfMembers.toString(),
     dateModded = Date(dateModded)
 )
 

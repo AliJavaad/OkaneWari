@@ -86,7 +86,7 @@ class EditPartyViewModel(
 
     private fun validateInput(uiState: PartyDetails = editPartyUiState.partyUiState.partyDetails): Boolean {
         return with(uiState) {
-            validateNameInput(partyName) && currency.isNotBlank() && numberOfMems.isNotBlank()
+            validateNameInput(partyName) && currency.isNotBlank()
         }
     }
 
