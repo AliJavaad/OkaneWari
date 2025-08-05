@@ -41,6 +41,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.core.ktx)
     val nav_version = "2.8.7"
     val room_version = "2.6.1"
     val viewmodel_version = "2.8.7"
