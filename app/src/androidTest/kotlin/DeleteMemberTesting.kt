@@ -58,18 +58,26 @@ class DeleteMemberTesting {
     private val split4_3 = SplitModel(14, 1, 4, 3, SplitType.OWE, "-10.00")
     private val split4_4 = SplitModel(15, 1, 4, 4, SplitType.PAID_IN_FULL, "30.00")
 
+    private val expense5 = ExpenseModel(5, 1, "food","800", Date().time)
+    private val split5_1 = SplitModel(16, 1, 5, 1, SplitType.PAID_AND_SPLIT, "400.00")
+    private val split5_2 = SplitModel(17, 1, 5, 2, SplitType.OWE, "-400.00")
+
+    private val expense6 = ExpenseModel(6, 1, "drinks","200", Date().time)
+    private val split6_1 = SplitModel(18, 1, 6, 1, SplitType.PAID_AND_SPLIT, "100.00")
+    private val split6_2 = SplitModel(19, 1, 6, 2, SplitType.OWE, "-100.00")
+
     // Holders to check the split data
-    private val splitListExpense1 = listOf(
+    private val dmasd_splitListExpense1 = listOf(
         SplitModel(1, 1,1,1, SplitType.PAID_AND_SPLIT, "200.00"),
         SplitModel(2, 1,1,2, SplitType.OWE, "-100.00"),
         SplitModel(3, 1,1,3, SplitType.OWE, "-100.00")
     )
-    private val splitListExpense2 = listOf(
+    private val dmasd_splitListExpense2 = listOf(
         SplitModel(5, 1,2,2, SplitType.PAID_IN_FULL, "180"),
         SplitModel(4, 1,2,1, SplitType.OWE, "-90.00"),
         SplitModel(6, 1,2,3, SplitType.OWE, "-90.00")
     )
-    private val splitListExpense3 = listOf(
+    private val dmasd_splitListExpense3 = listOf(
         SplitModel(10, 1,3,3, SplitType.PAID_AND_SPLIT, "133.33"),
         SplitModel(8, 1,3,1, SplitType.OWE, "-66.67"),
         SplitModel(9, 1,3,2, SplitType.OWE, "-66.67")
@@ -100,9 +108,9 @@ class DeleteMemberTesting {
 
     @Test
     @Throws(Exception::class)
-    fun deleteMemberFromParty_CheckExpensesSplits() = runBlocking{
+    fun deleteMemberAndShiftDebts_CheckExpensesSplits() = runBlocking{
         // Prepopulate the database
-        prePopulateDatabase()
+        prePopulateDatabaseFull()
         // init the viewmodel
         val testPartyId = 1L
         val testMemberId = 4L
@@ -121,13 +129,13 @@ class DeleteMemberTesting {
 
         // Retrieve the splits, expense 4 should be deleted
         val splits1 = owRepository.getAllSplitsForExpense(1).first()
-        assertEquals(splitListExpense1, splits1)
+        assertEquals(dmasd_splitListExpense1, splits1)
 
         val splits2 = owRepository.getAllSplitsForExpense(2).first()
-        assertEquals(splitListExpense2, splits2)
+        assertEquals(dmasd_splitListExpense2, splits2)
 
         val splits3 = owRepository.getAllSplitsForExpense(3).first()
-        assertEquals(splitListExpense3, splits3)
+        assertEquals(dmasd_splitListExpense3, splits3)
 
         val splits4 = owRepository.getAllSplitsForExpense(4).first()
         assertTrue(splits4.isEmpty())
@@ -135,7 +143,69 @@ class DeleteMemberTesting {
         assertNull(exp4)
     }
 
-    private suspend fun prePopulateDatabase(){
+    @Test
+    @Throws(Exception::class)
+    fun deleteMemberWithOnlyTwoMembersInParty_CheckExpensesSplits() = runBlocking{
+        // Prepopulate the database with only 2 members
+        prePopulateDatabaseTwoMembers()
+        // init the viewmodel
+        val testPartyId = 1L
+        val testMemberId = 2L
+        val savedStateHandle = SavedStateHandle().apply {
+            set(EditMemberDestination.partyIdArg, testPartyId)
+            set(EditMemberDestination.memberIdArg, testMemberId)
+        }
+        val viewModel = EditMemberViewModel(savedStateHandle, owRepository)
+
+        // Execute the delete member for member 2
+        viewModel.updateUiState(
+            partyDetails = party1.toPartyDetails(),
+            memberDetails = member2.toMemberDetails(),
+        )
+        viewModel.deleteMember()
+
+        // Retrieve the splits and expenses. should all be empty
+        val splits5 = owRepository.getAllSplitsForExpense(5).first()
+        assertTrue(splits5.isEmpty())
+        val exp5 = owRepository.getExpense(5, 1).first()
+        assertNull(exp5)
+
+        val splits6 = owRepository.getAllSplitsForExpense(6).first()
+        assertTrue(splits6.isEmpty())
+        val exp6 = owRepository.getExpense(6, 1).first()
+        assertNull(exp6)
+    }
+
+    @Test
+    @Throws(Exception::class)
+    fun deleteMemberWithNoSplitInvolvements_CheckExpensesSplits() = runBlocking{
+        // Prepopulate the database with only 2 members
+        prePopulateDatabaseThreeMembers()
+        // init the viewmodel
+        val testPartyId = 1L
+        val testMemberId = 3L
+        val savedStateHandle = SavedStateHandle().apply {
+            set(EditMemberDestination.partyIdArg, testPartyId)
+            set(EditMemberDestination.memberIdArg, testMemberId)
+        }
+        val viewModel = EditMemberViewModel(savedStateHandle, owRepository)
+
+        // Execute the delete member for member 3
+        viewModel.updateUiState(
+            partyDetails = party1.toPartyDetails(),
+            memberDetails = member3.toMemberDetails(),
+        )
+        viewModel.deleteMember()
+
+        // Retrieve the splits. should not be changed
+        val splits5 = owRepository.getAllSplitsForExpense(5).first()
+        assertEquals(listOf(split5_1, split5_2), splits5)
+
+        val splits6 = owRepository.getAllSplitsForExpense(6).first()
+        assertEquals(listOf(split6_1, split6_2), splits6)
+    }
+
+    private suspend fun prePopulateDatabaseFull(){
         owRepository.insertParty(party1)
         owRepository.insertMember(member1)
         owRepository.insertMember(member2)
@@ -164,5 +234,34 @@ class DeleteMemberTesting {
         owRepository.insertSplit(split4_2)
         owRepository.insertSplit(split4_3)
         owRepository.insertSplit(split4_4)
+    }
+
+    private suspend fun prePopulateDatabaseTwoMembers(){
+        owRepository.insertParty(party1)
+        owRepository.insertMember(member1)
+        owRepository.insertMember(member2)
+
+        owRepository.insertExpense(expense5)
+        owRepository.insertSplit(split5_1)
+        owRepository.insertSplit(split5_2)
+
+        owRepository.insertExpense(expense6)
+        owRepository.insertSplit(split6_1)
+        owRepository.insertSplit(split6_2)
+    }
+
+    private suspend fun prePopulateDatabaseThreeMembers(){
+        owRepository.insertParty(party1)
+        owRepository.insertMember(member1)
+        owRepository.insertMember(member2)
+        owRepository.insertMember(member3)
+
+        owRepository.insertExpense(expense5)
+        owRepository.insertSplit(split5_1)
+        owRepository.insertSplit(split5_2)
+
+        owRepository.insertExpense(expense6)
+        owRepository.insertSplit(split6_1)
+        owRepository.insertSplit(split6_2)
     }
 }
