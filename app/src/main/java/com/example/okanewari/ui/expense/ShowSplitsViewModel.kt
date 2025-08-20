@@ -23,7 +23,7 @@ class ShowSplitsViewModel(
     savedStateHandle: SavedStateHandle,
     private val owRepository: OkaneWariRepository
 ): ViewModel() {
-    private val partyId: Long = checkNotNull(savedStateHandle[EditExpenseDestination.partyIdArg])
+    private val partyId: Long = checkNotNull(savedStateHandle[ShowSplitsDestination.partyIdArg])
 
     var showSplitsUiState by mutableStateOf(ShowSplitsUiState())
         private set
@@ -31,7 +31,9 @@ class ShowSplitsViewModel(
     init {
         viewModelScope.launch {
             try{
+                Log.d("ShowSplitVM", "Starting init")
                 // Get party info
+                Log.d("ShowSplitVM", "Loading party $partyId")
                 val partyModel = owRepository.getPartyStream(partyId)
                     .filterNotNull()
                     .first()
@@ -39,16 +41,20 @@ class ShowSplitsViewModel(
                     partyUiState = partyModel.toPartyUiState(true),
                     topBarExpenseName = partyModel.partyName
                 )
+                Log.d("ShowSplitVM", "Loaded party ${partyModel.partyName}")
 
                 // Load and parse the Member and split info
+                Log.d("ShowSplitVM", "Loading members and splits")
                 owRepository.getAllMembersFromParty(partyId)
                     .filterNotNull()
                     .combine(
                         owRepository.getAllSplitsForParty(partyId).filterNotNull()
                     ) { allMems, allSplits ->
+                        Log.d("ShowSplitVM", "Loaded ${allMems.size} members and ${allSplits.size} splits")
                         Pair(allMems, allSplits)
                     }
                     .collect { (rawMembers, splitList) ->
+                        Log.d("ShowSplitVM", "Processing ${rawMembers.size} members and ${splitList.size} splits")
                         // Process the members
                         val memberMap = rawMembers.associateBy { it.id }
 
@@ -62,6 +68,7 @@ class ShowSplitsViewModel(
                         }
 
                         val transactions = calculateTransactions(memberSplitTotals)
+                        Log.d("ShowSplitVM", "Calculated ${transactions.size} transactions")
 
                         // Update the state
                         showSplitsUiState = showSplitsUiState.copy(
