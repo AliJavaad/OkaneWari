@@ -22,8 +22,8 @@ class PartyDaoTest {
     private lateinit var partyDao: PartyDao
     private lateinit var owDatabase: OkaneWariDatabase
 
-    private val party1 = PartyModel(1, "javs", "$", 3, Date().time)
-    private val party2 = PartyModel(2, "chad", "¥", 1, Date().time)
+    private val party1 = PartyModel(1, "javs", "$", Date().time)
+    private val party2 = PartyModel(2, "chad", "¥", Date().time)
 
     @Before
     fun createDb() {
@@ -65,8 +65,8 @@ class PartyDaoTest {
     fun daoUpdateParty_updatesPartyInDb() = runBlocking{
         addTwoPartysToDb()
 
-        val testParty1 = PartyModel(1, "svaj", "£", 5, Date().time)
-        val testParty2 = PartyModel(2, "blue", "$", 2, Date().time)
+        val testParty1 = PartyModel(1, "svaj", "£", Date().time)
+        val testParty2 = PartyModel(2, "blue", "$", Date().time)
         partyDao.update(testParty1)
         partyDao.update(testParty2)
 
