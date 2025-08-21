@@ -148,7 +148,6 @@ fun ListPartyMembers(
                 .fillMaxSize()
                 .padding(mediumPadding)
                 .clickable {
-                    Log.d("Member Card", "Member Card Clicked: ${member.id}")
                     onModifyMemberClicked(listOf(partyDetails.id, member.id))
                 }
         ) {

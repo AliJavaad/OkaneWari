@@ -107,7 +107,6 @@ fun ListExpensesScreen(
             contentPadding = innerPadding
         )
         if(checkExpenseLimit){
-            Log.d("ListExpenses", "MemList size: ${listExpensesUiState.memberList.size}")
             if (listExpensesUiState.memberList.size < 2){
                 ConfirmationDialog(
                     onConfirm = { checkExpenseLimit = false },

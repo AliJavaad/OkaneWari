@@ -145,7 +145,6 @@ class EditExpenseViewModel(
                     splitAmount = creditSplit.toString()))
             // Next insert all splits for members that OWE as negative of the split
             for(member in currentOwingMembers){
-                Log.d("InsertOweLoop", "Owing mem: ${member.name}")
                 owRepository.insertSplit(
                     SplitModel(
                         partyKey = partyId,

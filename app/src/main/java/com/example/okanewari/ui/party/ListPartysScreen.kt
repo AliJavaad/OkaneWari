@@ -159,7 +159,6 @@ fun DisplayParties(
                     .fillMaxSize()
                     .padding(dimensionResource(R.dimen.medium_padding))
                     .clickable {
-                        Log.d("PartyKey", "Inserting selected party's key: ${it.id}")
                         partyClicked(it.id)
                     }
             ){

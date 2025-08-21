@@ -348,11 +348,4 @@ fun SplitExpenseForm(
             )
         }
     }
-//    HorizontalDivider(
-//        thickness = 4.dp,
-//        modifier = Modifier.padding(all = dimensionResource(R.dimen.medium_padding))
-//    )
-//    for(member in owingMembers){
-//        Text(text = member.name, modifier = Modifier.padding(all = medPadding))
-//    }
 }

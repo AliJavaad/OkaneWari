@@ -106,7 +106,6 @@ class AddExpenseViewModel(
                 debtSplit = calculateExpenseSplit(total = total, splitBy = BigDecimal(currentState.owingMembers.size + 1 ))
                 creditSplit = total.subtract(debtSplit)
             }
-            Log.d("Split", "The total is $total the credit is $creditSplit and debt is $debtSplit")
             // Now, save the split for the PAYER as (total - split).
             owRepository.insertSplit(
                 SplitModel(
