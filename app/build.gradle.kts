@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.okanewari"
+    namespace = "com.javs.okanewari"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.okanewari"
+        applicationId = "com.javs.okanewari"
         minSdk = 26
         targetSdk = 34
         versionCode = 1
