@@ -94,7 +94,8 @@ fun ListExpensesScreen(
         },
         floatingActionButton = {
             DisplayFab(
-                myClick = { checkExpenseLimit = true }
+                myClick = { checkExpenseLimit = true },
+                contentDescription = stringResource(R.string.add_new_expense)
             )
         }
     ) { innerPadding ->

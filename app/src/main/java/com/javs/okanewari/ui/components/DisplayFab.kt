@@ -1,5 +1,7 @@
 package com.javs.okanewari.ui.components
 
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -26,7 +28,8 @@ enum class FabSize(){
 fun DisplayFab(
     myClick: () -> Unit,
     icon: ImageVector = Icons.Filled.Add,
-    fabSize: FabSize = FabSize.NORMAL
+    fabSize: FabSize = FabSize.NORMAL,
+    contentDescription: String = ""
 ){
     when (fabSize) {
         FabSize.LARGE -> {
@@ -34,9 +37,9 @@ fun DisplayFab(
                 onClick = myClick,
                 shape = CircleShape,
                 modifier = Modifier
-                    .padding(all = dimensionResource(R.dimen.medium_padding))
+                    .navigationBarsPadding()
             ) {
-                Icon(icon, stringResource( R.string.add_new_party))
+                Icon(icon, contentDescription)
             }
         }
         FabSize.SMALL -> {
@@ -44,9 +47,9 @@ fun DisplayFab(
                 onClick = myClick,
                 shape = CircleShape,
                 modifier = Modifier
-                    .padding(all = dimensionResource(R.dimen.medium_padding))
+                    .navigationBarsPadding()
             ) {
-                Icon(icon, stringResource( R.string.add_new_party))
+                Icon(icon, contentDescription)
             }
         }
         FabSize.NORMAL -> {
@@ -54,9 +57,9 @@ fun DisplayFab(
                 onClick = myClick,
                 shape = CircleShape,
                 modifier = Modifier
-                    .padding(all = dimensionResource(R.dimen.medium_padding))
+                    .navigationBarsPadding()
             ) {
-                Icon(icon, stringResource(R.string.add_new_party))
+                Icon(icon, contentDescription)
             }
         }
     }

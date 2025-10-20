@@ -78,7 +78,8 @@ fun ListPartysScreen(
         floatingActionButton = {
             DisplayFab(
                 myClick = { checkPartyLimit = true },
-                fabSize = FabSize.LARGE
+                fabSize = FabSize.LARGE,
+                contentDescription = stringResource(R.string.add_new_party)
             )
         }
     ){ innerPadding ->
